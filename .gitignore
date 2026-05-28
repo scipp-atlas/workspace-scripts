@@ -1,0 +1,20 @@
+# Generated workspaces and fit outputs
+*.root
+*.json
+
+# Fit output directories
+output_simple/
+output_simple_nonp/
+
+# Pre-generic reference snapshots
+pre_generic/
+
+# Superseded/empty files
+make_simple_workspace.py
+simple_workspace.yml
+
+# Editor backups and temp files
+*~
+*.swp
+__pycache__/
+*.pyc

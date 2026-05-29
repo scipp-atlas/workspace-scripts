@@ -40,6 +40,23 @@ def arange(start: float, stop: float, step: float) -> list[float]:
     return vals
 
 
+def detect_poi(wsfile: str, ws_name: str = "combWS",
+               mc_name: str = "ModelConfig") -> str | None:
+    """Return the first POI name from the ModelConfig, or None on failure."""
+    f = ROOT.TFile(wsfile)
+    if f.IsZombie():
+        return None
+    ws = f.Get(ws_name)
+    mc = ws and ws.obj(mc_name)
+    poi = None
+    if mc:
+        pois = mc.GetParametersOfInterest()
+        if pois and pois.getSize() > 0:
+            poi = pois.first().GetName()
+    f.Close()
+    return poi
+
+
 def detect_constraint(wsfile: str, ws_name: str = "combWS",
                       constr_name: str = "constr_alpha_sigma") -> str | None:
     """Return the constraint PDF name if it exists in the workspace, else None."""
@@ -70,13 +87,13 @@ def detect_bkg_type(wsfile: str, ws_name: str = "combWS",
 
 
 def run_quickfit(wsfile: str, mu_val: float, result_file: str,
-                 extra_args: list[str]) -> tuple[bool, str]:
-    """Run quickFit with mu_sig fixed; return (converged, combined log)."""
+                 poi: str, extra_args: list[str]) -> tuple[bool, str]:
+    """Run quickFit with the POI fixed; return (converged, combined log)."""
     cmd = [
         "quickFit",
         "-f", wsfile,
         "-w", "combWS", "-m", "ModelConfig", "-d", "combData",
-        "-p", f"mu_sig={mu_val}",
+        "-p", f"{poi}={mu_val}",
         "-o", result_file,
         *extra_args,
     ]
@@ -131,6 +148,10 @@ def main() -> None:
     parser.add_argument("--logdir",  default="output_simple",
                         help="Directory for per-mu quickFit logs and result files "
                              "(default: output_simple)")
+    parser.add_argument("--poi",     default=None,
+                        help="Parameter of interest name (default: auto-detect from ModelConfig)")
+    parser.add_argument("--nll-offset", action="store_true",
+                        help="Pass --nllOffset 0 to quickFit (suppresses automatic NLL offsetting)")
     args = parser.parse_args()
 
     if args.mu_vals:
@@ -141,15 +162,24 @@ def main() -> None:
     os.makedirs(args.logdir, exist_ok=True)
 
     # Auto-detect workspace properties.
+    if args.poi is None:
+        args.poi = detect_poi(args.input)
+        if args.poi is None:
+            print("ERROR: could not detect POI from ModelConfig; use --poi to specify it")
+            sys.exit(1)
     constraint = detect_constraint(args.input)
     quickfit_extra = ["--externalConstraint", constraint] if constraint else []
+    if args.nll_offset:
+        quickfit_extra += ["--nllOffset", "0"]
     bkg_type = detect_bkg_type(args.input)
 
     print(f"Scanning {len(mu_values)} mu values: "
           f"{mu_values[0]:.3g} → {mu_values[-1]:.3g}")
     print(f"Workspace : {args.input}")
+    print(f"POI       : {args.poi}")
     print(f"Background: {bkg_type}")
     print(f"Constraint: {constraint or '(none)'}")
+    print(f"NLL offset: {'yes (--nllOffset 0)' if args.nll_offset else 'no'}")
     print(f"Logs      : {args.logdir}/")
     print(f"Output    : {args.output}")
     print()
@@ -161,7 +191,7 @@ def main() -> None:
         result_f   = f"{args.logdir}/result_mu_{mu_tag}.root"
         log_f      = f"{args.logdir}/log_mu_{mu_tag}.txt"
 
-        converged, log_text = run_quickfit(args.input, mu, result_f, quickfit_extra)
+        converged, log_text = run_quickfit(args.input, mu, result_f, args.poi, quickfit_extra)
 
         # Write per-mu log regardless of convergence
         with open(log_f, "w") as fh:
@@ -170,7 +200,7 @@ def main() -> None:
         point = read_result(result_f)
         if point is None:
             print(f"  mu={mu:+.4f}  ERROR: could not read result file")
-            scan_points.append({"mu_sig": mu, "nll": None, "fit_status": -1,
+            scan_points.append({args.poi: mu, "nll": None, "fit_status": -1,
                                  "parameters": {}})
             continue
 
@@ -178,14 +208,14 @@ def main() -> None:
         if point["nll"] is not None and math.isnan(point["nll"]):
             point["nll"] = None
 
-        point["mu_sig"] = mu
+        point[args.poi] = mu
         scan_points.append(point)
 
         if point["nll"] is None:
-            print(f"  mu={mu:+.6f}  nll=NaN  FAILED({point['fit_status']})")
+            print(f"  {args.poi}={mu:+.6f}  nll=NaN  FAILED({point['fit_status']})")
         else:
             status_str = "OK" if point["fit_status"] == 0 else f"FAILED({point['fit_status']})"
-            print(f"  mu={mu:+.6f}  nll={point['nll']:+.6f}  {status_str}")
+            print(f"  {args.poi}={mu:+.6f}  nll={point['nll']:+.6f}  {status_str}")
 
     # Compute delta_nll = 2*(nll - nll_min) across all converged points
     valid_nlls = [p["nll"] for p in scan_points
@@ -197,13 +227,13 @@ def main() -> None:
         else:
             p["delta_nll"] = None
 
-    # Sort by mu for clean output
-    scan_points.sort(key=lambda p: p["mu_sig"])
+    # Sort by POI value for clean output
+    scan_points.sort(key=lambda p: p[args.poi])
 
     output = {
         "metadata": {
             "workspace":  args.input,
-            "poi":        "mu_sig",
+            "poi":        args.poi,
             "bkg_type":   bkg_type,
             "constraint": constraint,
             "n_points":   len(scan_points),

@@ -3,8 +3,7 @@
 *.json
 
 # Fit output directories
-output_simple/
-output_simple_nonp/
+output_*
 
 # Pre-generic reference snapshots
 pre_generic/

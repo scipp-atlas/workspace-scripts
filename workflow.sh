@@ -63,6 +63,11 @@ ok "simple_workspace_generic.json"
 python3 export_hs3.py --input simple_workspace_generic_nonp.root --verify
 ok "simple_workspace_generic_nonp.json"
 
+python3 export_hs3.py --input simple_workspace.root              --no-aux-constraints --verify
+ok "simple_workspace_noaux.json"
+python3 export_hs3.py --input simple_workspace_generic.root      --no-aux-constraints --verify
+ok "simple_workspace_generic_noaux.json"
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 step "Done"
 printf '  Workspaces  : simple_workspace.root  simple_workspace_nonp.root\n'

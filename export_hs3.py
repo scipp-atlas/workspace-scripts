@@ -261,7 +261,7 @@ def cleanup_for_pyhs3(doc: dict, use_aux_distributions: bool = True) -> dict:
 def export_workspace(ws: ROOT.RooWorkspace, stem: str,
                      use_aux_distributions: bool = True) -> str:
     import json as _json
-    path = f"{stem}.json"
+    path = f"{stem}.json" if use_aux_distributions else f"{stem}_noaux.json"
     ROOT.RooJSONFactoryWSTool(ws).exportJSON(path)
     with open(path) as fh:
         doc = _json.load(fh)

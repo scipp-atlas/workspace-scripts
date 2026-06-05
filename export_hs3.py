@@ -307,7 +307,12 @@ def verify_roundtrip(hs3_file: str, ws_name: str = "combWS") -> bool:
     # Suppress harmless duplicate-observable errors that arise when a shared
     # observable ('x') is re-added for each channel during simultaneous PDF import.
     ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
-    tool.importJSON(hs3_file)
+    try:
+        tool.importJSON(hs3_file)
+    except Exception as e:
+        ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
+        print(f"  importJSON raised an exception: {e}")
+        return False
     ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
     ok = True
@@ -368,6 +373,9 @@ def main() -> None:
                              "(default: input filename without .root)")
     parser.add_argument("--verify",      action="store_true",
                         help="Re-import the exported file and verify round-trip")
+    parser.add_argument("--check-json", metavar="FILE",
+                        help="Load an existing HS3 JSON file into ROOT and verify it "
+                             "(skips export; --ws-name still applies)")
     parser.add_argument("--aux-constraints", dest="aux_constraints",
                         action="store_true", default=True,
                         help="Export constraint PDFs under aux_distributions/aux_data "
@@ -419,6 +427,17 @@ def main() -> None:
         args.do_fix_analysis_init   = False
         args.do_fix_remove_obs      = False
         args.do_fix_constraints     = False
+
+    if args.check_json:
+        summarise(args.check_json)
+        print("Verifying JSON loads into ROOT ...")
+        ok = verify_roundtrip(args.check_json, args.ws_name)
+        if ok:
+            print("  Verification: PASS")
+        else:
+            print("  Verification: FAIL")
+            sys.exit(1)
+        sys.exit(0)
 
     stem = args.output_stem
     if stem is None:

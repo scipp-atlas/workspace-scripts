@@ -35,7 +35,7 @@ def load_workspace(root_file: str, ws_name: str = "combWS") -> ROOT.RooWorkspace
     return ws, f
 
 
-def cleanup_exponential_functions(doc: dict) -> dict:
+def fix_exponential_functions(doc: dict) -> dict:
     """
     Remove ROOT's sign-inversion intermediates for exponential distributions.
 
@@ -102,57 +102,35 @@ def cleanup_exponential_functions(doc: dict) -> dict:
     return doc
 
 
-def cleanup_for_pyhs3(doc: dict, use_aux_distributions: bool = True) -> dict:
-    """
-    Fixes for pyhs3 compatibility:
-
-    1. Replace null axes in empty domains (e.g. global-observables) with [].
-    2. Add min/max to dataset axis entries and drop the ROOT-internal value field.
-    3. Split the single combined likelihood into one likelihood per channel, and
-       update the analysis to reference them all via "likelihoods".
-    4. Add "init": "default_values" to each analysis so pyhs3 knows which
-       parameter set carries the const flags.
-    5. Remove non-constant observables (e.g. x) from default_values — they must
-       not appear in parameter sets or they overwrite the data array at eval time.
-       Constant parameters (global observables) are kept even if in a dataset.
-    6. Wire standalone constraint PDFs into the first per-channel likelihood.
-       Constraint PDFs are those not yet referenced in any likelihood whose 'x'
-       field names a constant parameter (the global observable). A single-entry
-       dataset is created from default_values and added alongside the constraint.
-       When use_aux_distributions=True (default), constraints are placed under
-       "aux_distributions"/"aux_data" so tools normalise them correctly.
-       When False, constraints are placed under "distributions"/"data" (old
-       behaviour, kept for compatibility).
-    """
-    # ── Fix 1: replace null axes with [] ────────────────────────────────────
+def fix_null_axes(doc: dict) -> dict:
+    """Fix 1: Replace null axes in empty domains (e.g. global-observables) with []."""
     for domain in doc.get("domains", []):
         if domain.get("axes") is None:
             domain["axes"] = []
+    return doc
 
-    # ── Fix 2: add min/max to dataset axes, drop value ──────────────────────
+
+def fix_dataset_axes(doc: dict) -> dict:
+    """Fix 2: Add min/max to dataset axis entries and drop the ROOT-internal value field."""
     obs_ranges: dict[str, dict] = {}
     for domain in doc.get("domains", []):
         if domain.get("name") == "default_domain":
             for ax in (domain.get("axes") or []):
                 obs_ranges[ax["name"]] = {"min": ax["min"], "max": ax["max"]}
 
-    obs_names: set[str] = set()
     for dataset in doc.get("data", []):
         for ax in (dataset.get("axes") or []):
-            obs_names.add(ax["name"])
             if ax["name"] in obs_ranges:
                 ax["min"] = obs_ranges[ax["name"]]["min"]
                 ax["max"] = obs_ranges[ax["name"]]["max"]
             ax.pop("value", None)
 
-    # ── Fix 5: remove non-const observables from default_values ─────────────
-    # Constant global observables are preserved even if they appear in a dataset.
-    for pp in doc.get("parameter_points", []):
-        if pp.get("name") == "default_values":
-            pp["parameters"] = [p for p in pp["parameters"]
-                                 if p["name"] not in obs_names or p.get("const", False)]
+    return doc
 
-    # ── Fix 3: split combined likelihood into one per channel ────────────────
+
+def fix_split_likelihoods(doc: dict) -> dict:
+    """Fix 3: Split the single combined likelihood into one likelihood per channel,
+    and rewrite analyses to reference the new per-channel likelihoods."""
     old_to_new: dict[str, list[str]] = {}
     new_likelihoods = []
     for lh in doc.get("likelihoods", []):
@@ -161,8 +139,8 @@ def cleanup_for_pyhs3(doc: dict, use_aux_distributions: bool = True) -> dict:
         if len(data_list) > 1 and len(data_list) == len(dist_list):
             new_names = []
             for data_name, dist_name in zip(data_list, dist_list):
-                suffix   = data_name.split("_", 1)[1] if "_" in data_name else data_name
-                lh_name  = f"L_{suffix}"
+                suffix  = data_name.split("_", 1)[1] if "_" in data_name else data_name
+                lh_name = f"L_{suffix}"
                 new_likelihoods.append({
                     "name":          lh_name,
                     "distributions": [dist_name],
@@ -174,99 +152,149 @@ def cleanup_for_pyhs3(doc: dict, use_aux_distributions: bool = True) -> dict:
             new_likelihoods.append(lh)
     doc["likelihoods"] = new_likelihoods
 
-    # ── Fix 3 cont. + Fix 4: replace each split analysis with one per channel ─
     new_analyses = []
     for analysis in doc.get("analyses", []):
         old_lh = analysis.get("likelihood")
         if old_lh in old_to_new:
             base = {k: v for k, v in analysis.items() if k != "likelihood"}
-            base.setdefault("init", "default_values")   # Fix 4
             for lh_name in old_to_new[old_lh]:
                 new_analyses.append({**base, "name": lh_name, "likelihood": lh_name})
         else:
-            analysis.setdefault("init", "default_values")  # Fix 4
             new_analyses.append(analysis)
     doc["analyses"] = new_analyses
 
-    # ── Fix 6: attach constraint PDFs to the first per-channel likelihood ────
-    # Identify distributions not yet referenced in any likelihood.
-    referenced = {d for lh in doc["likelihoods"]
+    return doc
+
+
+def fix_analysis_init(doc: dict) -> dict:
+    """Fix 4: Add "init": "default_values" to each analysis so pyhs3 knows which
+    parameter set carries the const flags."""
+    for analysis in doc.get("analyses", []):
+        analysis.setdefault("init", "default_values")
+    return doc
+
+
+def fix_remove_obs_from_params(doc: dict) -> dict:
+    """Fix 5: Remove non-constant observables (e.g. x) from default_values.
+    They must not appear in parameter sets or they overwrite the data array at
+    eval time. Constant parameters (global observables) are kept even if in a dataset."""
+    obs_names: set[str] = set()
+    for dataset in doc.get("data", []):
+        for ax in (dataset.get("axes") or []):
+            obs_names.add(ax["name"])
+
+    for pp in doc.get("parameter_points", []):
+        if pp.get("name") == "default_values":
+            pp["parameters"] = [p for p in pp["parameters"]
+                                 if p["name"] not in obs_names or p.get("const", False)]
+    return doc
+
+
+def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
+    """Fix 6: Wire standalone constraint PDFs into the first per-channel likelihood.
+    Constraint PDFs are those not yet referenced in any likelihood whose 'x' field
+    names a constant parameter (the global observable). A single-entry dataset is
+    created from default_values and added alongside the constraint.
+    When use_aux_distributions=True (default), constraints are placed under
+    "aux_distributions"/"aux_data" so tools normalise them correctly.
+    When False, constraints are placed under "distributions"/"data" (old behaviour)."""
+    referenced = {d for lh in doc.get("likelihoods", [])
                   for d in (lh.get("distributions") or [])}
     unreferenced = {d["name"] for d in doc.get("distributions", [])} - referenced
 
-    if unreferenced and doc.get("likelihoods"):
-        # Build lookup of const parameter values from default_values.
-        const_vals: dict[str, float] = {}
-        for pp in doc.get("parameter_points", []):
-            if pp.get("name") == "default_values":
-                for p in pp["parameters"]:
-                    if p.get("const"):
-                        const_vals[p["name"]] = p["value"]
+    if not unreferenced or not doc.get("likelihoods"):
+        return doc
 
-        # A constraint distribution is one whose 'x' field is a const parameter
-        # (i.e. a global observable).
-        constr_to_go: dict[str, tuple[str, float]] = {}
-        for dist in doc.get("distributions", []):
-            if dist["name"] in unreferenced and "x" in dist:
-                x_name = dist["x"]
-                if x_name in const_vals:
-                    constr_to_go[dist["name"]] = (x_name, const_vals[x_name])
+    # Build lookup of const parameter values from default_values.
+    const_vals: dict[str, float] = {}
+    for pp in doc.get("parameter_points", []):
+        if pp.get("name") == "default_values":
+            for p in pp["parameters"]:
+                if p.get("const"):
+                    const_vals[p["name"]] = p["value"]
 
-        if constr_to_go:
-            # Collect unique global observables.
-            go_info: dict[str, float] = {v[0]: v[1] for v in constr_to_go.values()}
-            go_names = list(go_info.keys())
-            go_vals  = [go_info[n] for n in go_names]
+    # A constraint distribution is one whose 'x' field is a const parameter
+    # (i.e. a global observable).
+    constr_to_go: dict[str, tuple[str, float]] = {}
+    for dist in doc.get("distributions", []):
+        if dist["name"] in unreferenced and "x" in dist:
+            x_name = dist["x"]
+            if x_name in const_vals:
+                constr_to_go[dist["name"]] = (x_name, const_vals[x_name])
 
-            # Create a single-entry global-observable dataset.
-            go_dataset = {
-                "name": "global_obs_data",
-                "type": "unbinned",
-                "axes": [{"name": n, "min": v - 5.0, "max": v + 5.0}
-                         for n, v in go_info.items()],
-                "entries": [go_vals],
-            }
-            doc.setdefault("data", []).append(go_dataset)
+    if not constr_to_go:
+        return doc
 
-            # Attach each constraint to the first likelihood.
-            first_lh = doc["likelihoods"][0]
-            if use_aux_distributions:
-                dist_key = "aux_distributions"
-                data_key = "aux_data"
-            else:
-                dist_key = "distributions"
-                data_key = "data"
-            for cname in constr_to_go:
-                first_lh.setdefault(dist_key, []).append(cname)
-                first_lh.setdefault(data_key, []).append("global_obs_data")
+    # Collect unique global observables.
+    go_info: dict[str, float] = {v[0]: v[1] for v in constr_to_go.values()}
 
-            # Populate the global-observables domain that ROOT left empty.
-            for domain in doc.get("domains", []):
-                if "global_observables" in domain.get("name", ""):
-                    domain["axes"] = [{"name": n, "min": v - 5.0, "max": v + 5.0}
-                                      for n, v in go_info.items()]
+    # #################################################
+    # MH: I don't think this is necessary.
+    #
+    # # Create a single-entry global-observable dataset.
+    # go_dataset = {
+    #     "name": "global_obs_data",
+    #     "type": "unbinned",
+    #     "axes": [{"name": n, "min": v - 5.0, "max": v + 5.0}
+    #              for n, v in go_info.items()],
+    #     "entries": [[go_info[n] for n in go_info]],
+    # }
+    # doc.setdefault("data", []).append(go_dataset)
 
-            # Remove const flag from global observables in default_values.
-            # Their value is provided by global_obs_data at evaluation time;
-            # const: true would prevent pyhs3 from treating them as observables.
-            for pp in doc.get("parameter_points", []):
-                if pp.get("name") == "default_values":
-                    for p in pp["parameters"]:
-                        if p["name"] in go_info:
-                            p.pop("const", None)
+    # Attach each constraint to the first likelihood.
+    first_lh = doc["likelihoods"][0]
+    dist_key = "aux_distributions" if use_aux_distributions else "distributions"
+    data_key = "aux_data"           if use_aux_distributions else "data"
+    for cname in constr_to_go:
+        first_lh.setdefault(dist_key, []).append(cname)
+        first_lh.setdefault(data_key, []).append("global_obs_data")
+
+    # Populate the global-observables domain that ROOT left empty.
+    for domain in doc.get("domains", []):
+        if "global_observables" in domain.get("name", ""):
+            domain["axes"] = [{"name": n, "min": v - 5.0, "max": v + 5.0}
+                               for n, v in go_info.items()]
+
+    # Remove const flag from global observables in default_values.
+    # Their value is provided by global_obs_data at evaluation time;
+    # const: true would prevent pyhs3 from treating them as observables.
+    for pp in doc.get("parameter_points", []):
+        if pp.get("name") == "default_values":
+            for p in pp["parameters"]:
+                if p["name"] in go_info:
+                    p.pop("const", None)
 
     return doc
 
 
 def export_workspace(ws: ROOT.RooWorkspace, stem: str,
-                     use_aux_distributions: bool = True) -> str:
+                     use_aux_distributions: bool = True,
+                     do_fix_exponential: bool = True,
+                     do_fix_null_axes: bool = True,
+                     do_fix_dataset_axes: bool = True,
+                     do_fix_split_likelihoods: bool = True,
+                     do_fix_analysis_init: bool = True,
+                     do_fix_remove_obs: bool = True,
+                     do_fix_constraints: bool = True) -> str:
     import json as _json
     path = f"{stem}.json" if use_aux_distributions else f"{stem}_noaux.json"
     ROOT.RooJSONFactoryWSTool(ws).exportJSON(path)
     with open(path) as fh:
         doc = _json.load(fh)
-    doc = cleanup_exponential_functions(doc)
-    doc = cleanup_for_pyhs3(doc, use_aux_distributions=use_aux_distributions)
+    if do_fix_exponential:
+        doc = fix_exponential_functions(doc)
+    if do_fix_null_axes:
+        doc = fix_null_axes(doc)
+    if do_fix_dataset_axes:
+        doc = fix_dataset_axes(doc)
+    if do_fix_split_likelihoods:
+        doc = fix_split_likelihoods(doc)
+    if do_fix_analysis_init:
+        doc = fix_analysis_init(doc)
+    if do_fix_remove_obs:
+        doc = fix_remove_obs_from_params(doc)
+    if do_fix_constraints:
+        doc = fix_constraint_pdfs(doc, use_aux_distributions=use_aux_distributions)
     with open(path, "w") as fh:
         _json.dump(doc, fh, indent=2)
     return path
@@ -347,7 +375,50 @@ def main() -> None:
     parser.add_argument("--no-aux-constraints", dest="aux_constraints",
                         action="store_false",
                         help="Export constraint PDFs under distributions/data (old behaviour)")
+
+    # Individual fix toggles
+    fix_group = parser.add_argument_group(
+        "cleanup toggles",
+        "Disable individual post-export fixes (all enabled by default). "
+        "Use --no-cleanup to disable all at once.")
+    fix_group.add_argument("--no-cleanup", action="store_true", default=False,
+                           help="Disable all fixes; write raw ROOT HS3 output")
+    fix_group.add_argument("--no-fix-exponential", dest="do_fix_exponential",
+                           action="store_false", default=True,
+                           help="Skip fix: remove sign-inversion intermediates for "
+                                "RooExponential")
+    fix_group.add_argument("--no-fix-null-axes", dest="do_fix_null_axes",
+                           action="store_false", default=True,
+                           help="Skip fix 1: replace null axes in empty domains with []")
+    fix_group.add_argument("--no-fix-dataset-axes", dest="do_fix_dataset_axes",
+                           action="store_false", default=True,
+                           help="Skip fix 2: add min/max to dataset axes, drop value field")
+    fix_group.add_argument("--no-fix-split-likelihoods", dest="do_fix_split_likelihoods",
+                           action="store_false", default=True,
+                           help="Skip fix 3: split combined likelihood into per-channel "
+                                "likelihoods")
+    fix_group.add_argument("--no-fix-analysis-init", dest="do_fix_analysis_init",
+                           action="store_false", default=True,
+                           help="Skip fix 4: add init: default_values to each analysis")
+    fix_group.add_argument("--no-fix-remove-obs", dest="do_fix_remove_obs",
+                           action="store_false", default=True,
+                           help="Skip fix 5: remove non-const observables from "
+                                "default_values")
+    fix_group.add_argument("--no-fix-constraints", dest="do_fix_constraints",
+                           action="store_false", default=True,
+                           help="Skip fix 6: wire standalone constraint PDFs into the "
+                                "first likelihood")
     args = parser.parse_args()
+
+    # --no-cleanup disables everything
+    if args.no_cleanup:
+        args.do_fix_exponential     = False
+        args.do_fix_null_axes       = False
+        args.do_fix_dataset_axes    = False
+        args.do_fix_split_likelihoods = False
+        args.do_fix_analysis_init   = False
+        args.do_fix_remove_obs      = False
+        args.do_fix_constraints     = False
 
     stem = args.output_stem
     if stem is None:
@@ -358,7 +429,17 @@ def main() -> None:
 
     print("Exporting to HS3 (JSON) ...")
     import os
-    path = export_workspace(ws, stem, use_aux_distributions=args.aux_constraints)
+    path = export_workspace(
+        ws, stem,
+        use_aux_distributions=args.aux_constraints,
+        do_fix_exponential=args.do_fix_exponential,
+        do_fix_null_axes=args.do_fix_null_axes,
+        do_fix_dataset_axes=args.do_fix_dataset_axes,
+        do_fix_split_likelihoods=args.do_fix_split_likelihoods,
+        do_fix_analysis_init=args.do_fix_analysis_init,
+        do_fix_remove_obs=args.do_fix_remove_obs,
+        do_fix_constraints=args.do_fix_constraints,
+    )
     size_kb = os.path.getsize(path) / 1024
     print(f"  Wrote {path}  ({size_kb:.1f} kB)")
     summarise(path)

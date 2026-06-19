@@ -20,6 +20,7 @@ ok()   { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
 # Each entry will be: <stem>|<make_workspace flags>
 VARIANTS=(
     "simple_workspace|"
+    "simple_workspace_nonp|--no-np"
     "simple_workspace_generic|--generic-bkg"
     "simple_workspace_generic_nonp|--no-np --generic-bkg"
     "simple_workspace_generic_fixshape|--generic-bkg --fix-bkg-shape"

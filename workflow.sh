@@ -17,63 +17,75 @@ done
 step() { printf '\n\033[1;34m=== %s ===\033[0m\n' "$*"; }
 ok()   { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
 
+# Each entry will be: <stem>|<make_workspace flags>
+VARIANTS=(
+    "simple_workspace|"
+    "simple_workspace_nonp|--no-np"
+    "simple_workspace_generic|--generic-bkg"
+    "simple_workspace_generic_nonp|--no-np --generic-bkg"
+    "simple_workspace_generic_fixshape|--generic-bkg --fix-bkg-shape"
+    "simple_workspace_generic_poly|--generic-bkg --bkg-form poly"
+    "simple_workspace_gensig|--generic-sig"
+    "simple_workspace_gensig_10_channels|--generic-sig --num-channels 10"
+    "simple_workspace_gensig_30_channels|--generic-sig --num-channels 30"
+    "simple_workspace_poisson|--constraint poisson"
+    "simple_workspace_noconstr|--constraint none"
+    "simple_workspace_0-1x_events|--yield-sf 0.1"
+    "simple_workspace_10x_events|--yield-sf 10"
+    "simple_workspace_100x_events|--yield-sf 100"
+    "simple_workspace_1_channels|--num-channels 1"
+    "simple_workspace_2_channels|--num-channels 2"
+    "simple_workspace_3_channels|--num-channels 3"
+    "simple_workspace_4_channels|--num-channels 4"
+    "simple_workspace_5_channels|--num-channels 5"
+    "simple_workspace_10_channels|--num-channels 10"
+    "simple_workspace_30_channels|--num-channels 30"
+)
+
 # ── 1. Generate workspaces ──────────────────────────────────────────────────
 step "Generating workspaces (seed=$SEED)"
-python3 make_workspace.py                         --seed "$SEED"
-ok "simple_workspace.root"
-python3 make_workspace.py --no-np                 --seed "$SEED"
-ok "simple_workspace_nonp.root"
-python3 make_workspace.py         --generic-bkg   --seed "$SEED"
-ok "simple_workspace_generic.root"
-python3 make_workspace.py --no-np --generic-bkg   --seed "$SEED"
-ok "simple_workspace_generic_nonp.root"
+for entry in "${VARIANTS[@]}"; do
+    IFS='|' read -r stem flags _constr <<< "$entry"
+    python3 make_workspace.py $flags --seed "$SEED" --output "workspaces/${stem}.root"
+done
 
 # ── 2. Run fits ─────────────────────────────────────────────────────────────
-step "Fitting: with NP"
-bash run_simple_fit.sh simple_workspace.root
+step "Running fits"
+for entry in "${VARIANTS[@]}"; do
+    IFS='|' read -r stem flags _constr <<< "$entry"
+    bash run_simple_fit.sh "workspaces/${stem}.root"
+    ok "fit: ${stem}"
+done
 
-step "Fitting: without NP"
-bash run_simple_fit.sh simple_workspace_nonp.root
-
-step "Fitting: with NP and with generic dist backgrounds"
-bash run_simple_fit.sh simple_workspace_generic.root
-
-step "Fitting: without NP and with generic dist backgrounds"
-bash run_simple_fit.sh simple_workspace_generic_nonp.root
-
-# ── 4. Export HS3 ───────────────────────────────────────────────────────────
+# ── 3. mu scans ─────────────────────────────────────────────────────────────
 step "mu scans"
-python3 muscan.py                                            --output muscan.json
-ok "muscan.json"
-python3 muscan.py --input simple_workspace_nonp.root         --output muscan_nonp.json
-ok "muscan_nonp.json"
-python3 muscan.py --input simple_workspace_generic.root      --output muscan_generic.json
-ok "muscan_generic.json"
-python3 muscan.py --input simple_workspace_generic_nonp.root --output muscan_generic_nonp.json
-ok "muscan_generic_nonp.json"
+for entry in "${VARIANTS[@]}"; do
+    IFS='|' read -r stem flags constr <<< "$entry"
+    scan="scans/muscan${stem#simple_workspace}.json"  # "" -> muscan.json, "_nonp" -> muscan_nonp.json, ...
+    python3 muscan.py --input "workspaces/${stem}.root" --output "$scan"
+    ok "$scan"
+done
 
-# ── 5. Export HS3 ───────────────────────────────────────────────────────────
+# ── 4. Export HS3 JSON ───────────────────────────────────────────────────────────
 step "Exporting HS3 JSON"
-python3 export_hs3.py --input simple_workspace.root      --verify
-ok "simple_workspace.json"
-python3 export_hs3.py --input simple_workspace_nonp.root --verify
-ok "simple_workspace_nonp.json"
-python3 export_hs3.py --input simple_workspace_generic.root --verify
-ok "simple_workspace_generic.json"
-python3 export_hs3.py --input simple_workspace_generic_nonp.root --verify
-ok "simple_workspace_generic_nonp.json"
+  for entry in "${VARIANTS[@]}"; do
+      IFS='|' read -r stem flags _constr <<< "$entry"
+      python3 export_hs3.py --input "workspaces/${stem}.root" --verify
+      ok "workspaces/${stem}.json"
+  done
 
-python3 export_hs3.py --input simple_workspace.root              --no-aux-constraints --verify
+# aux-stripped exports (json-only; reuse the .root files above, paired with the
+# standard scans in eval_simple_muscan.py)
+python3 export_hs3.py --input workspaces/simple_workspace.root --no-aux-constraints --verify
 ok "simple_workspace_noaux.json"
-python3 export_hs3.py --input simple_workspace_generic.root      --no-aux-constraints --verify
+python3 export_hs3.py --input workspaces/simple_workspace_generic.root --no-aux-constraints --verify
 ok "simple_workspace_generic_noaux.json"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 step "Done"
-printf '  Workspaces  : simple_workspace.root  simple_workspace_nonp.root\n'
-printf '  Fit results : output_simple/simple_workspace_result.root\n'
-printf '                output_simple/simple_workspace_nonp_result.root\n'
-printf '  Fit logs    : output_simple/simple_workspace_fit.log\n'
-printf '                output_simple/simple_workspace_nonp_fit.log\n'
-printf '  HS3 JSON    : simple_workspace.json  simple_workspace_nonp.json\n'
+printf '  Workspaces  : %d variants (simple_workspace*.root)\n' "${#VARIANTS[@]}"
+printf '  Fit results : output_simple/<stem>_result.root\n'
+printf '  Fit logs    : output_simple/<stem>_fit.log\n'
+printf '  mu scans    : muscan*.json\n'
+printf '  HS3 JSON    : simple_workspace*.json  (+ *_noaux.json)\n'
 

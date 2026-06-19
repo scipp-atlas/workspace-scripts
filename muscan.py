@@ -57,16 +57,23 @@ def detect_poi(wsfile: str, ws_name: str = "combWS",
     return poi
 
 
-def detect_constraint(wsfile: str, ws_name: str = "combWS",
-                      constr_name: str = "constr_alpha_sigma") -> str | None:
-    """Return the constraint PDF name if it exists in the workspace, else None."""
+def detect_constraint(wsfile: str, ws_name: str = "combWS") -> str | None:
+    """Return a comma-separated list of all constraint PDFs (constr_*), or None.
+    Detects e.g. constr_alpha_sigma (Gaussian) or constr_gamma_sigma (Poisson)
+    so the right --externalConstraint is passed for every workspace variant.
+    """
     f = ROOT.TFile(wsfile)
     if f.IsZombie():
         return None
     ws = f.Get(ws_name)
-    found = ws and ws.pdf(constr_name)
+    names = []
+    if ws:
+        for pdf in ws.allPdfs():
+            n = pdf.GetName()
+            if n.startswith("constr_"):
+                names.append(n)
     f.Close()
-    return constr_name if found else None
+    return ",".join(names) if names else None
 
 
 def detect_bkg_type(wsfile: str, ws_name: str = "combWS",

@@ -16,7 +16,13 @@ ROOT.gROOT.SetBatch(True)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 f = ROOT.TFile(sys.argv[1])
 ws = f.Get("combWS")
-print("constr_alpha_sigma" if ws and ws.pdf("constr_alpha_sigma") else "", end="")
+names = []
+if ws:
+     for pdf in ws.allPdfs():
+          n = pdf.GetName()
+          if n.startswith("constr_"):
+               names.append(n)
+print(",".join(names), end="")
 EOF
 )
 

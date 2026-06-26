@@ -30,11 +30,22 @@ constr_arg=()
 [[ -n "$constr" ]] && constr_arg=(--externalConstraint "$constr")
 
 stem=$(basename "$wsfile" .root)
+result="${logdir}/${stem}_result.root"
 
+# pipefail so quickFit's exit status survives the `tee`, otherwise failures are
+# silently masked by tee's (always-0) status.
+set -o pipefail
 quickFit -f "$wsfile" \
          -w combWS -m ModelConfig -d combData \
          -p mu_sig=1_-5_10 \
-         --minos 1 \
          "${constr_arg[@]}" \
-         -o "${logdir}/${stem}_result.root" \
+         -o "$result" \
     |& tee "${logdir}/${stem}_fit.log"
+status=$?
+
+if [[ $status -ne 0 || ! -f "$result" ]]; then
+    echo "ERROR: quickFit failed for ${stem} (exit=${status}); no result file written." >&2
+    echo "       see ${logdir}/${stem}_fit.log" >&2
+    exit "${status:-1}"
+fi
+exit 0

@@ -53,11 +53,26 @@ done
 step "Running fits"
 for entry in "${VARIANTS[@]}"; do
     IFS='|' read -r stem flags _constr <<< "$entry"
-    bash run_simple_fit.sh "workspaces/${stem}.root"
-    ok "fit: ${stem}"
+    # `if` disables set -e here so one failing fit doesn't abort the whole run.
+    if bash run_simple_fit.sh "workspaces/${stem}.root"; then
+        ok "fit: ${stem}"
+    else
+        printf '\033[1;31m  ✗ fit failed: %s\033[0m\n' "${stem}"
+    fi
 done
 
-# ── 3. mu scans ─────────────────────────────────────────────────────────────
+# ── 3. Plot workspaces (best-fit / minimum-NLL parameters) ───────────────────
+# run_simple_fit.sh floats mu_sig and writes the unconditional best fit to
+# output_simple/<stem>_result.root; overlay those post-fit parameters.
+step "Plotting workspaces (best-fit parameters)"
+for entry in "${VARIANTS[@]}"; do
+    IFS='|' read -r stem flags _constr <<< "$entry"
+    python3 plot_workspace.py "workspaces/${stem}.root" \
+        --fit-result "output_simple/${stem}_result.root"
+    ok "plots/${stem}_channels.png"
+done
+
+# ── 4. mu scans ─────────────────────────────────────────────────────────────
 step "mu scans"
 for entry in "${VARIANTS[@]}"; do
     IFS='|' read -r stem flags constr <<< "$entry"
@@ -66,7 +81,7 @@ for entry in "${VARIANTS[@]}"; do
     ok "$scan"
 done
 
-# ── 4. Export HS3 JSON ───────────────────────────────────────────────────────────
+# ── 5. Export HS3 JSON ───────────────────────────────────────────────────────────
 step "Exporting HS3 JSON"
   for entry in "${VARIANTS[@]}"; do
       IFS='|' read -r stem flags _constr <<< "$entry"
@@ -86,6 +101,7 @@ step "Done"
 printf '  Workspaces  : %d variants (simple_workspace*.root)\n' "${#VARIANTS[@]}"
 printf '  Fit results : output_simple/<stem>_result.root\n'
 printf '  Fit logs    : output_simple/<stem>_fit.log\n'
+printf '  Plots       : plots/<stem>_channels.png  (best-fit overlay)\n'
 printf '  mu scans    : muscan*.json\n'
 printf '  HS3 JSON    : simple_workspace*.json  (+ *_noaux.json)\n'
 

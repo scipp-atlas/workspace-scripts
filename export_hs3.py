@@ -136,7 +136,7 @@ def fix_split_likelihoods(doc: dict) -> dict:
     for lh in doc.get("likelihoods", []):
         data_list = lh.get("data", [])
         dist_list = lh.get("distributions", [])
-        if len(data_list) > 1 and len(data_list) == len(dist_list):
+        if len(data_list) >= 1 and len(data_list) == len(dist_list):
             new_names = []
             for data_name, dist_name in zip(data_list, dist_list):
                 suffix  = data_name.split("_", 1)[1] if "_" in data_name else data_name

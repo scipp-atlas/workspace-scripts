@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "workspace": "workspaces/10ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield0p1x.root",
+    "poi": "mu_sig",
+    "bkg_type": "exponential",
+    "constraint": "constr_alpha_sigma",
+    "n_points": 13,
+    "nll_min": 120.8690620648545,
+    "created": "2026-06-26T22:09:44.585361+00:00"
+  },
+  "scan_points": [
+    {
+      "nll": 120.8690620648545,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 0.0,
+      "delta_nll": 0.0
+    },
+    {
+      "nll": 120.87430234032408,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 0.25,
+      "delta_nll": 0.01048055093914968
+    },
+    {
+      "nll": 120.94760664066563,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 0.5,
+      "delta_nll": 0.15708915162224457
+    },
+    {
+      "nll": 121.08088916114457,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 0.75,
+      "delta_nll": 0.4236541925801305
+    },
+    {
+      "nll": 121.2235630141309,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 1.0,
+      "delta_nll": 0.709001898552799
+    },
+    {
+      "nll": 121.44640385446765,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 1.25,
+      "delta_nll": 1.1546835792262868
+    },
+    {
+      "nll": 121.81097596613604,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 1.5,
+      "delta_nll": 1.8838278025630757
+    },
+    {
+      "nll": 122.29270692061041,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 1.75,
+      "delta_nll": 2.84728971151182
+    },
+    {
+      "nll": 122.86680121728725,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 2.0,
+      "delta_nll": 3.995478304865486
+    },
+    {
+      "nll": 123.51607487497843,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 2.25,
+      "delta_nll": 5.294025620247851
+    },
+    {
+      "nll": 124.22733680382107,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 2.5,
+      "delta_nll": 6.7165494779331425
+    },
+    {
+      "nll": 124.99134387004882,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 2.75,
+      "delta_nll": 8.244563610388639
+    },
+    {
+      "nll": 125.80049181525811,
+      "fit_status": -1,
+      "parameters": {},
+      "mu_sig": 3.0,
+      "delta_nll": 9.862859500807218
+    }
+  ]
+}

@@ -83,10 +83,8 @@ VARIANTS=(
     "--generic-sig --num-channels 30"
     "--constraint poisson"
     "--constraint none"
-    "--yield-sf 0.1"
-    "--yield-sf 10"
-    "--yield-sf 100"
-    "--yield-sf 1000"
+    
+    # number of channels:
     "--num-channels 1"
     "--num-channels 2"
     "--num-channels 4"
@@ -96,6 +94,23 @@ VARIANTS=(
     "--num-channels 20"
     "--num-channels 25"
     "--num-channels 30"
+
+    # number of events:
+    "--yield-sf 0.1"
+    "--yield-sf 2"
+    "--yield-sf 5"
+    "--yield-sf 10"
+    "--yield-sf 20"
+    "--yield-sf 30"
+    "--yield-sf 40"
+    "--yield-sf 50"
+    "--yield-sf 100"
+    "--yield-sf 200"
+    "--yield-sf 300"
+    "--yield-sf 400"
+    "--yield-sf 500"
+    "--yield-sf 1000"
+    "--yield-sf 5000"
 
     # ── Multi-axis combinations (each mixes several flags at once) ───────────
     # Both pdfs generic

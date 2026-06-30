@@ -1,6 +1,6 @@
 # Generated workspaces and fit outputs
-*.root
-*.json
+# *.root
+# *.json
 
 # Fit output directories
 output_*

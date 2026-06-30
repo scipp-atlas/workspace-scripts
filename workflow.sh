@@ -86,11 +86,15 @@ VARIANTS=(
     "--yield-sf 0.1"
     "--yield-sf 10"
     "--yield-sf 100"
+    "--yield-sf 1000"
     "--num-channels 1"
     "--num-channels 2"
     "--num-channels 4"
     "--num-channels 5"
     "--num-channels 10"
+    "--num-channels 15"
+    "--num-channels 20"
+    "--num-channels 25"
     "--num-channels 30"
 
     # ── Multi-axis combinations (each mixes several flags at once) ───────────

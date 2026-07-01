@@ -112,6 +112,23 @@ VARIANTS=(
     "--yield-sf 1000"
     "--yield-sf 5000"
 
+    # number of events with 1 channel:
+    "--yield-sf 0.1 --num-channels 1"
+    "--yield-sf 2 --num-channels 1"
+    "--yield-sf 5 --num-channels 1"
+    "--yield-sf 10 --num-channels 1"
+    "--yield-sf 20 --num-channels 1"
+    "--yield-sf 30 --num-channels 1"
+    "--yield-sf 40 --num-channels 1"
+    "--yield-sf 50 --num-channels 1"
+    "--yield-sf 100 --num-channels 1"
+    "--yield-sf 200 --num-channels 1"
+    "--yield-sf 300 --num-channels 1"
+    "--yield-sf 400 --num-channels 1"
+    "--yield-sf 500 --num-channels 1"
+    "--yield-sf 1000 --num-channels 1"
+    "--yield-sf 5000 --num-channels 1"
+
     # ── Multi-axis combinations (each mixes several flags at once) ───────────
     # Both pdfs generic
     "--generic-bkg --generic-sig"

@@ -82,7 +82,6 @@ VARIANTS=(
     "--generic-sig --num-channels 10"
     "--generic-sig --num-channels 30"
     "--constraint poisson"
-    "--constraint none"
     
     # number of channels:
     "--num-channels 1"
@@ -129,6 +128,17 @@ VARIANTS=(
     "--yield-sf 1000 --num-channels 1"
     "--yield-sf 5000 --num-channels 1"
 
+    # workspaces for np comparison:
+    "--no-np"
+    "--no-np --yield-sf 10"
+    "--no-np --yield-sf 100"
+    "--no-np --yield-sf 1000"
+    "--no-np --channels 10"
+    "--no-np --channels 30"
+
+    ""
+
+
     # ── Multi-axis combinations (each mixes several flags at once) ───────────
     # Both pdfs generic
     "--generic-bkg --generic-sig"
@@ -150,9 +160,6 @@ VARIANTS=(
     "--constraint poisson --generic-bkg"
     "--constraint poisson --num-channels 10"
     "--constraint poisson --yield-sf 10"
-    "--constraint none --generic-bkg"
-    "--constraint none --generic-sig"
-    "--constraint none --num-channels 10"
     # Yield scale mixed with channel / pdf axes
     "--yield-sf 0.1 --num-channels 10"
     "--yield-sf 10 --num-channels 10"

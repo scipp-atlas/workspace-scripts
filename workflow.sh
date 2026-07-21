@@ -1,10 +1,12 @@
 #!/bin/bash
-# Full workflow: generate both workspace variants, run fits, export HS3 JSON.
+# Full workflow over the whole variant matrix: generate each workspace, run an
+# unconditional fit, plot the channels, run a mu scan, and export HS3 JSON.
+#
+# Requires the ROOT/quickFit environment; source setup_local.sh first.
 #
 # Usage:  bash workflow.sh [--seed N]   (default seed: 42)
 set -euo pipefail
 cd "$(dirname "$0")"
-#source setup_local.sh
 
 SEED=42
 while [[ $# -gt 0 ]]; do
@@ -133,8 +135,8 @@ VARIANTS=(
     "--no-np --yield-sf 10"
     "--no-np --yield-sf 100"
     "--no-np --yield-sf 1000"
-    "--no-np --channels 10"
-    "--no-np --channels 30"
+    "--no-np --num-channels 10"
+    "--no-np --num-channels 30"
 
     ""
 

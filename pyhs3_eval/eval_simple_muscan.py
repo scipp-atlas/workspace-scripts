@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+# ruff: noqa: T201
+"""Evaluate the pyhs3 NLL at each scan point of a quickFit muscan.json.
+
+Loads a workspace HS3 JSON (exported by ``export_hs3.py``), builds one pyhs3
+``Model`` per per-channel likelihood (``L_ch0``, ``L_ch1``, ...), and sums the
+-log(L) contributions. Prints a comparison table against the quickFit NLL
+values recorded in the matching ``scans/<stem>_muscan.json``.
+
+The ``diff = pyhs3_nll - qf_nll`` column is expected to be a constant offset
+across the scan; how far it deviates from constant (the max absolute residual
+about its mean) measures how well pyhs3 reproduces quickFit for a workspace.
+
+Workspace names are fully-specified by ``workflow.sh``: every make_workspace.py
+option is spelled out in the stem, e.g.
+``3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x``. Each workspace is
+``workspaces/<stem>.json`` and each scan is ``scans/<stem>_muscan.json``.
+
+Run from the repository root (the default paths resolve to this repo's own
+``workspaces/`` and ``scans/`` directories):
+
+    # single workspace/scan (detailed table; defaults to the 3ch base variant)
+    python3 pyhs3_eval/eval_simple_muscan.py
+    python3 pyhs3_eval/eval_simple_muscan.py \\
+        --workspace workspaces/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.json \\
+        --scan      scans/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_muscan.json
+
+    # compare several workspaces, each with its own scan, and rank by flatness:
+    python3 pyhs3_eval/eval_simple_muscan.py \\
+        --pair workspaces/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.json \\
+               scans/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_muscan.json \\
+        --pair workspaces/3ch_bkgGenExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.json \\
+               scans/3ch_bkgGenExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_muscan.json \\
+        --plot-nll
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+from pathlib import Path
+
+import numpy as np
+import pytensor
+from pytensor.graph.traversal import explicit_graph_inputs
+
+from pyhs3 import Workspace
+from pyhs3.model import Model
+
+from plot_residuals import FIELDS
+
+_HERE = Path(__file__).resolve().parent
+# pyhs3_eval/ lives directly under the workspace-scripts repo root, so the
+# workspaces/ and scans/ output directories are one level up.
+_WS_SCRIPTS = _HERE.parent
+_DEFAULT_STEM = "3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x"
+_DEFAULT_WS = _WS_SCRIPTS / "workspaces" / f"{_DEFAULT_STEM}.json"
+_DEFAULT_SCAN = _WS_SCRIPTS / "scans" / f"{_DEFAULT_STEM}_muscan.json"
+
+# Sentinel for a bare ``--plot-*`` flag: the output path is then the default
+# derived below rather than a user-supplied one.
+_PLOT_DEFAULT = object()
+
+
+def _default_nll_plot_path() -> Path:
+    """Default PDF path for the combined NLL-curve plot (next to this script)."""
+    return _HERE / "all_nll_comparisons.pdf"
+
+
+def _default_resid_plot_path() -> Path:
+    """Default PDF path for the residual/offset plot (next to this script)."""
+    return _HERE / "residual_comparison.pdf"
+
+
+def build_channel_models(ws_path: Path) -> list[tuple[Model, dict]]:
+    """Load workspace and compile one NLL function per per-channel likelihood."""
+    print(f"Loading workspace from {ws_path} ...")
+    with ws_path.open() as fh:
+        ws = Workspace(**json.load(fh))
+
+    channel_analyses = sorted(
+        (a for a in ws.analyses if re.match(r"L_ch\d+$", a.name)),
+        key=lambda a: a.name,
+    )
+    print(f"  Per-channel analyses: {[a.name for a in channel_analyses]}")
+
+    channel_models: list[tuple[Model, dict]] = []
+    for analysis in channel_analyses:
+        model = ws.model(analysis, progress=False)
+        nll_expr = -model.log_prob
+        inputs_map = {
+            v.name: v for v in explicit_graph_inputs([nll_expr]) if v.name is not None
+        }
+        input_names = list(inputs_map.keys())
+        fn = pytensor.function(
+            list(inputs_map.values()), nll_expr, on_unused_input="ignore"
+        )
+        print(
+            f"  {analysis.name}: compiled, {len(input_names)} inputs: {sorted(input_names)}"
+        )
+        channel_models.append((model, {"fn": fn, "input_names": input_names}))
+
+    return channel_models
+
+
+def eval_nll(
+    channel_models: list[tuple[Model, dict]], params: dict[str, float]
+) -> float:
+    """Sum -log(L) over all channels at *params*."""
+    total = 0.0
+    for model, compiled in channel_models:
+        # data arrays (e.g. x) take priority over any scalar fallback in params
+        source = {**params, **model.data}
+        fn = compiled["fn"]
+        names = compiled["input_names"]
+        args = [
+            np.asarray(source[n], dtype=np.float64) if n in source else np.float64(0.0)
+            for n in names
+        ]
+        total += float(np.asarray(fn(*args)).item())
+    return total
+
+
+def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
+    """Evaluate one workspace against one scan and summarize the diff.
+
+    Returns a dict with the per-point diffs and the constant-offset statistics:
+    ``mean_offset`` (the average of the diff column) and ``max_abs_resid``
+    (the largest absolute deviation of any point from that mean -- i.e. how
+    far the diff strays from being a perfect constant).
+    """
+    channel_models = build_channel_models(ws_path)
+
+    # Collect nominal free params from all channels (shared params are consistent)
+    nominal: dict[str, float] = {}
+    for model, _ in channel_models:
+        nominal.update(model.free_params)
+
+    num_channels = len(channel_models)
+    num_events = sum(
+        int(np.asarray(arr).size)
+        for model, _ in channel_models
+        for arr in model.data.values()
+    )
+
+    if verbose:
+        print(f"\nLoading scan points from {scan_path} ...")
+    with scan_path.open() as fh:
+        scan = json.load(fh)
+
+    qf_nll_min = scan["metadata"]["nll_min"]
+    bkg_type = scan["metadata"].get("bkg_type", "")
+    points = scan["scan_points"]
+    if verbose:
+        print(f"  {len(points)} scan points, quickFit NLL_min = {qf_nll_min:.6f}\n")
+        header = f"{'mu_sig':>8}  {'qf_nll':>14}  {'pyhs3_nll':>14}  {'diff':>16}"
+        print(header)
+        print("-" * len(header))
+
+    mus: list[float] = []
+    qf_nlls: list[float] = []
+    pyhs3_nlls: list[float] = []
+    diffs: list[float] = []
+    for pt_data in sorted(points, key=lambda p: p["mu_sig"]):
+        mu = pt_data["mu_sig"]
+        qf_nll = pt_data["nll"]
+
+        params: dict[str, float] = dict(nominal)
+        params["mu_sig"] = mu
+        for name, info in pt_data["parameters"].items():
+            val = info["value"]
+            # muscan.json uses ROOT's negative-tau convention for exponential_dist;
+            # HS3/pyhs3 uses positive c — only flip for exponential backgrounds
+            if bkg_type == "exponential" and name.startswith("tau_"):
+                val = -val
+            params[name] = val
+
+        pyhs3_nll = eval_nll(channel_models, params)
+        diff = pyhs3_nll - qf_nll + num_events * np.log(num_channels)
+        mus.append(mu)
+        qf_nlls.append(qf_nll)
+        pyhs3_nlls.append(pyhs3_nll)
+        diffs.append(diff)
+
+        if verbose:
+            print(f"{mu:>8.3f}  {qf_nll:>14.6f}  {pyhs3_nll:>14.6f}  {diff:>10.10f}")
+
+    diff_arr = np.asarray(diffs, dtype=np.float64)
+    mean_offset = float(diff_arr.mean())
+    resid = diff_arr - mean_offset
+    max_abs_resid = float(resid[np.abs(resid).argmax()])
+
+    if verbose:
+        pyhs3_nll_min = min(pyhs3_nlls)
+        print(f"\npyhs3 NLL_min    = {pyhs3_nll_min:.6f}")
+        print(f"quickFit NLL_min = {qf_nll_min:.6f}")
+        print(f"Difference       = {pyhs3_nll_min - qf_nll_min:.6f}")
+        print(f"\nmean offset      = {mean_offset:.6f}")
+        print(
+            f"max |residual|   = {max_abs_resid:.3e}  (deviation of diff from constant)"
+        )
+
+    return {
+        "workspace": ws_path,
+        "scan": scan_path,
+        "mus": mus,
+        "diffs": diffs,
+        "mean_offset": mean_offset,
+        "max_abs_resid": max_abs_resid,
+        "qf_nlls": qf_nlls,
+        "pyhs3_nlls": pyhs3_nlls,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("--workspace", type=Path, default=_DEFAULT_WS)
+    parser.add_argument("--scan", type=Path, default=_DEFAULT_SCAN)
+    parser.add_argument(
+        "--pair",
+        nargs=2,
+        action="append",
+        metavar=("WORKSPACE", "SCAN"),
+        type=Path,
+        help="A workspace/scan pair to evaluate. Repeat to compare several; "
+        "when given, --workspace/--scan are ignored and a ranked "
+        "constant-offset summary is printed.",
+    )
+    parser.add_argument(
+        "--plot-nll",
+        nargs="?",
+        const=_PLOT_DEFAULT,
+        default=None,
+        type=Path,
+        metavar="PATH",
+        help="Plot the pyhs3 vs quickFit NLL curves into a single PDF, one "
+        "panel per workspace. Pass a path to override the default "
+        "(all_nll_comparisons.pdf next to this script).",
+    )
+    parser.add_argument(
+        "--plot-resid",
+        nargs="?",
+        const=_PLOT_DEFAULT,
+        default=None,
+        type=Path,
+        metavar="PATH",
+        help="Plot curves of the residuals and mean offsets of all evaluated "
+        "workspaces (default: residual_comparison.pdf next to this script).",
+    )
+    parser.add_argument(
+        "--plot-resid-field",
+        nargs="+",
+        default=["channels"],
+        choices=FIELDS,
+        metavar="FIELD",
+        help="workspace-name field(s) to use for the residual-plot x labels",
+    )
+    parser.add_argument(
+        "--plot-resid-log-x",
+        action="store_true",
+        help="enables log scale for the x-axis in a residual plot",
+    )
+    parser.add_argument(
+        "--plot-resid-log-y",
+        action="store_true",
+        help="enables log scale for the y-axis in a residual plot",
+    )
+    args = parser.parse_args()
+
+    # Gather the workspace/scan pairs to evaluate: either the repeated --pair
+    # arguments, or the single --workspace/--scan pair.
+    if args.pair:
+        pairs = args.pair
+        summarize = True
+    else:
+        pairs = [(args.workspace, args.scan)]
+        summarize = False
+
+    results = []
+    for ws_path, scan_path in pairs:
+        if summarize:
+            print("=" * 72)
+            print(f"WORKSPACE: {ws_path}")
+            print(f"SCAN:      {scan_path}")
+            print("=" * 72)
+        results.append(run_scan(ws_path, scan_path, verbose=True))
+
+    if args.plot_nll is not None:
+        from plot_muscan_nll import plot_nll_curves  # noqa: PLC0415
+
+        out = (
+            _default_nll_plot_path()
+            if args.plot_nll is _PLOT_DEFAULT
+            else args.plot_nll
+        )
+        plot_nll_curves(results, out)
+
+    if args.plot_resid is not None:
+        from plot_residuals import plot_residual_and_offset  # noqa: PLC0415
+
+        out = (
+            _default_resid_plot_path()
+            if args.plot_resid is _PLOT_DEFAULT
+            else args.plot_resid
+        )
+        plot_residual_and_offset(
+            results,
+            out,
+            label_field=args.plot_resid_field,
+            log_x=args.plot_resid_log_x,
+            log_y=args.plot_resid_log_y,
+        )
+
+    if not summarize:
+        return
+
+    # Rank by how flat the diff is: smaller max |residual| == closer to constant.
+    results.sort(key=lambda r: abs(r["max_abs_resid"]))
+
+    name_width = max(len("workspace"), *(len(r["workspace"].name) for r in results))
+    off_width, res_width = 14, 11
+
+    header = (
+        f"{'workspace':<{name_width}}  {'mean offset':>{off_width}}  "
+        f"{'max |resid|':>{res_width}}"
+    )
+    print("\n" + "=" * len(header))
+    print("CONSTANT-OFFSET SUMMARY  (sorted: flattest diff first)")
+    print("=" * len(header))
+    print(header)
+    print("-" * len(header))
+    for r in results:
+        name = r["workspace"].name
+        print(
+            f"{name:<{name_width}}  {r['mean_offset']:>{off_width}.3e}  "
+            f"{r['max_abs_resid']:>{res_width}.3e}"
+        )
+
+
+if __name__ == "__main__":
+    main()

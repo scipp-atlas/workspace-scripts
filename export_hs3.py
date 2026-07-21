@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Export a RooFit workspace to HS3 (HEP Statistics Serialization Standard) format.
+Export a RooFit workspace to HS3 (HEP Statistics Serialization Standard) JSON.
 
-Export a RooFit workspace to HS3 JSON using ROOT's RooJSONFactoryWSTool.
-Optionally verifies the round-trip by re-importing the HS3 file and checking
-that all key workspace objects are correctly reconstructed.
+Uses ROOT's RooJSONFactoryWSTool to export, then applies an ordered chain of
+in-place fixes so the result is consumable by pyhs3 (each fix is individually
+toggleable; see the --no-fix-* flags). Optionally verifies the round-trip by
+re-importing the HS3 file and checking that all key workspace objects are
+correctly reconstructed.
 
 Usage:
     python3 export_hs3.py [--input simple_workspace.root] [--output-stem simple_workspace]
@@ -16,6 +18,7 @@ Examples:
 """
 
 import argparse
+import os
 import sys
 
 import ROOT
@@ -447,7 +450,6 @@ def main() -> None:
     ws, _f = load_workspace(args.input, args.ws_name)  # _f kept alive intentionally
 
     print("Exporting to HS3 (JSON) ...")
-    import os
     path = export_workspace(
         ws, stem,
         use_aux_distributions=args.aux_constraints,

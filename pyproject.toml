@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "workspace-scripts"
+version = "0.1.0"
+description = "Generate configurable multi-channel RooFit workspaces, scan the POI with quickFit, export to HS3, and validate the same model in pyhs3."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["HEP", "RooFit", "HS3", "pyhs3", "quickFit", "statistics"]
+
+# The generation stage (make_workspace.py, muscan.py, export_hs3.py, ...) needs
+# ROOT + quickFit, which are NOT installable from PyPI — see setup_local.sh.
+# Only the pip-installable dependencies are declared here; there are no required
+# runtime dependencies for the base install.
+dependencies = []
+
+[project.optional-dependencies]
+# Plotting for the generation-stage helpers (plot_workspace.py, plot_muscan.py).
+# These still require ROOT at runtime; only the pure-Python deps are listed.
+plot = ["numpy", "matplotlib"]
+
+# The pyhs3 validation stage (pyhs3_eval/). pytensor is pulled in by pyhs3.
+pyhs3 = ["pyhs3", "numpy", "matplotlib"]
+
+# Linting / formatting.
+dev = ["ruff"]
+
+[project.urls]
+Repository = "https://github.com/scipp-atlas/workspace-scripts"
+
+# This is a collection of directly-run scripts, not an importable package, so
+# nothing is packaged into a wheel. Installing (e.g. `pip install -e ".[pyhs3]"`)
+# just resolves the dependency groups above into the active environment.
+[tool.setuptools]
+py-modules = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# Ruff's default rules (pyflakes + a subset of pycodestyle) catch real errors
+# without flooding this script-heavy repo with style noise.
+extend-select = ["I", "UP"]

@@ -12,6 +12,9 @@ pre_generic/
 make_simple_workspace.py
 simple_workspace.yml
 
+# pyhs3_eval comparison plots
+pyhs3_eval/*.pdf
+
 # Editor backups and temp files
 *~
 *.swp

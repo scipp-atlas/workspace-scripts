@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Generate a simple three-channel RooFit workspace for quickFit testing.
+Generate a simple multi-channel RooFit workspace for quickFit testing.
+
+The number of channels is configurable via --num-channels (default 3, up to 30);
+the examples below use the default three channels ch0, ch1, ch2.
 
 Model (per channel, unbinned, x in [10, 20]):
   Signal   : Gaussian(x, mean=15, sigma_ch), normalization = mu_sig * nsig_ch
@@ -87,9 +90,11 @@ POLY_SLOPE_LO = -0.049
 POLY_SLOPE_HI = 0.049
 
 def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
-    """Return (shape_var, bkg_pdf).  shape_var is named tau_<ch> for 
-  all forms so downstream scripts (muscan/export/snapshot) find it 
-  unchanged."""
+    """Return (shape_var, bkg_pdf).
+
+    shape_var is named tau_<ch> for all forms so downstream scripts
+    (muscan/export/snapshot) find it unchanged.
+    """
     if generic_bkg and bkg_form == "poly":
         init, lo, hi = POLY_SLOPE_INIT, POLY_SLOPE_LO, POLY_SLOPE_HI
     else:
@@ -128,8 +133,8 @@ def build_width_np(constraint, keep):
     np        : the floating NP (alpha_sigma or gamma_sigma)
     constr    : the constraint pdf (or None)
     global_ob : the global observable RooRealVar (or None)
-    kind      : 'add' (sigma = sigma_nom*(1+δ*alpha)) or 'mul' 
-    (sigma = sigma_nom*gamma)
+    kind      : 'add' (sigma = sigma_nom*(1+delta*alpha)) or
+                'mul' (sigma = sigma_nom*gamma)
     """
     if constraint == "poisson":
         gamma = ROOT.RooRealVar("gamma_sigma", "signal width scale NP", 1.0, 0.01, 5.0)
@@ -189,15 +194,7 @@ def build_workspace(
     # Convention follows HS3: constraint PDF is Gaussian(x=nom, mean=alpha, sigma).
     # quickFit adds it to the NLL via --externalConstraint (not via RooProdPdf,
     # which breaks extended-likelihood evaluation for RooSimultaneous in ROOT 6.30+).
-    # if with_np:
-    #     alpha_sigma     = ROOT.RooRealVar("alpha_sigma",     "signal width NP",          0.0, -5.0, 5.0)
-    #     nom_alpha_sigma = ROOT.RooRealVar("nom_alpha_sigma", "global obs: signal width",  0.0)
-    #     nom_alpha_sigma.setConstant(True)
-    #     sigma_constr    = ROOT.RooRealVar("sigma_constr",    "constraint Gaussian sigma", 1.0)
-    #     sigma_constr.setConstant(True)
-    #     constr_alpha_sigma = ROOT.RooGaussian(
-    #         "constr_alpha_sigma", "Gaussian constraint on alpha_sigma",
-    #         nom_alpha_sigma, alpha_sigma, sigma_constr)
+    # The NP and its constraint are built by build_width_np() above.
 
     # ── Per-channel PDFs and toy datasets ───────────────────────────────────
 
@@ -208,13 +205,6 @@ def build_workspace(
     for ch, cfg in islice(CHANNELS.items(), num_channels):
         # Background: exp(tau*x)
         tau, bkg = build_background(ch, cfg, x, generic_bkg=generic_bkg, bkg_form=bkg_form, fix_shape=fix_shape, keep=_keep)
-
-        # if generic_bkg:
-        #     bkg = ROOT.RooGenericPdf(f"bkg_{ch}", f"background pdf ({ch})",
-        #                              "exp(@1*@0)",
-        #                              ROOT.RooArgList(x, tau))
-        # else:
-        #     bkg = ROOT.RooExponential(f"bkg_{ch}", f"background pdf ({ch})", x, tau)
 
         # Signal: Gaussian with fixed mean
         mean      = ROOT.RooRealVar(f"mean_{ch}",      f"signal mean ({ch})",          15.0)
@@ -341,8 +331,19 @@ def build_workspace(
     ws._constr_name = (np_info["constr"].GetName() if (with_np and np_info["constr"] is not None) else None)
     return ws
 
-def _output_stem(*, with_np: bool, generic_bkg: bool, generic_sig: bool, bkg_form: str, fix_shape: bool, constraint: str) -> str:
+def _output_stem(*, with_np: bool, generic_bkg: bool, generic_sig: bool,
+                 bkg_form: str, fix_shape: bool, constraint: str,
+                 yield_sf: float = 1.0, num_channels: int = 3) -> str:
+    """Derive a default workspace file stem from the build options.
+
+    Only non-default aspects are encoded, so the base build is simply
+    ``simple_workspace``. num_channels and yield_sf are included when they
+    differ from their defaults so auto-named variants stay unique.
+    (workflow.sh instead names files via its own fully-explicit canonical_stem.)
+    """
     stem = "simple_workspace"
+    if num_channels != 3:
+        stem += f"_{num_channels}ch"
     if generic_bkg:
         stem += "_generic"
         if bkg_form == "poly":
@@ -357,6 +358,8 @@ def _output_stem(*, with_np: bool, generic_bkg: bool, generic_sig: bool, bkg_for
         stem += "_fixshape"
     if not with_np:
         stem += "_nonp"
+    if yield_sf != 1.0:
+        stem += f"_yield{yield_sf:g}x".replace(".", "p")
     return stem
 
 def main() -> None:
@@ -399,7 +402,8 @@ def main() -> None:
             bkg_form=args.bkg_form,
             fix_shape=args.fix_bkg_shape,
             constraint=args.constraint,
-            yield_sf=args.yield_sf
+            yield_sf=args.yield_sf,
+            num_channels=args.num_channels,
         ) + ".root"
 
     bkg_label = "exponential_dist"

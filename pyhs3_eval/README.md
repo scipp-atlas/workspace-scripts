@@ -8,18 +8,32 @@ statistical model can be checked across both tools.
 These scripts run in a **different environment** from the rest of the repo. The
 generation/scan/export pipeline (`make_workspace.py`, `muscan.py`,
 `export_hs3.py`, ...) needs ROOT + `quickFit` (see `../setup_local.sh`). The
-scripts here instead need:
+scripts here instead need `pyhs3` (with `pytensor`), `numpy`, and `matplotlib`.
 
-- `pyhs3` (with `pytensor`)
-- `numpy`
-- `matplotlib`
+### Recommended: pixi
 
-Install them via the `pyhs3` extra in the repo's `pyproject.toml` (from the
-repo root, into a virtualenv or pixi environment):
+From the repo root, the committed `../pixi.toml` builds the environment from
+conda-forge — including a C++ toolchain and a Python that ships headers, so
+pytensor compiles its C ops with no extra system setup:
 
 ```bash
-pip install -e ".[pyhs3]"
+pixi install                 # create the environment (writes pixi.lock)
+pixi run eval                # single-variant comparison
+pixi run compare-all         # or compare-events / compare-channels
+pixi shell                   # interactive shell in the environment
 ```
+
+### Alternative: pip + venv
+
+Install the dependencies from PyPI into a Python ≥ 3.10 virtualenv:
+
+```bash
+pip install pyhs3 numpy matplotlib
+```
+
+This works, but pytensor JIT-compiles to C at runtime and needs the Python
+development headers, which many base interpreters lack — see Troubleshooting.
+pixi sidesteps this entirely, which is why it's recommended.
 
 ## Inputs
 
@@ -84,3 +98,23 @@ max residual across a set of workspaces versus a varied field (channels, yield,
 
 `../workspace_comparison.sh` drives `eval_simple_muscan.py` over groups of
 workspaces (`--all`, `--events`, `--channels`).
+
+## Troubleshooting
+
+**`fatal error: Python.h: No such file or directory`** — pytensor JIT-compiles
+its ops to C and needs the Python development headers, which the base
+interpreter may lack. The clean fix is to use the **pixi** environment above:
+conda-forge's Python ships headers and `cxx-compiler` provides the toolchain, so
+compilation just works. If you're stuck on a pip/venv setup, either install the
+headers (`sudo dnf install python3.12-devel` on EL9, matching your Python
+version), build the venv from an interpreter that bundles headers (a
+`uv python`-managed or conda Python), or fall back to pytensor's pure-Python ops
+(no compiler needed, but much slower):
+
+```bash
+export PYTENSOR_FLAGS="cxx="
+```
+
+**`No module named 'pytensor.graph.traversal'` / `pytensor<3.0,>=2.33.0` not
+found** — your Python is older than 3.10. pyhs3 and pytensor ≥ 2.33 require
+Python ≥ 3.10; build the venv from a newer interpreter (see the repo README).

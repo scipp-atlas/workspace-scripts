@@ -33,16 +33,28 @@ on a machine without this environment the generation scripts cannot run.
 
 ### pyhs3 setup
 
-The `pyhs3_eval/` scripts run in a separate Python environment. Install their
-dependencies into a virtualenv or pixi environment via the `pyhs3` extra in
-`pyproject.toml`:
+The `pyhs3_eval/` scripts run in a separate Python environment. The recommended
+way to create it is [**pixi**](https://pixi.sh) via the committed `pixi.toml`,
+which pulls Python, `pytensor`, and a C++ toolchain from conda-forge — so
+pytensor's C compilation works out of the box (no system `-devel` package, no
+`PYTENSOR_FLAGS` workaround):
 
 ```bash
-pip install -e ".[pyhs3]"   # pyhs3 (with pytensor), numpy, matplotlib
+pixi install            # create the environment (writes pixi.lock)
+pixi run compare-all    # or: pixi run eval / compare-events / compare-channels
 ```
 
-(`pip install -e .` builds nothing — the scripts are run directly — it only
-resolves the dependency group.) See [`pyhs3_eval/README.md`](pyhs3_eval/README.md).
+If you'd rather not use pixi, install the dependencies straight from PyPI into a
+Python ≥ 3.10 virtualenv:
+
+```bash
+pip install pyhs3 numpy matplotlib
+```
+
+This works, but pytensor JIT-compiles to C at runtime and needs the Python
+development headers, which pixi provides automatically and a bare virtualenv may
+not — see [`pyhs3_eval/README.md`](pyhs3_eval/README.md) for the trade-off and
+troubleshooting.
 
 ## Quick start
 
@@ -52,9 +64,10 @@ source setup_local.sh
 bash workflow.sh            # whole variant matrix, random seed 42
 bash workflow.sh --seed 7   # reproducible toys with a different seed
 
-# 2. Validation stage (pyhs3 environment)
-python3 pyhs3_eval/eval_simple_muscan.py --plot-nll   # single variant
-bash workspace_comparison.sh --all                    # batch comparison
+# 2. Validation stage (pyhs3 environment, via pixi)
+pixi install                                          # one-time env setup
+pixi run eval                                         # single variant
+pixi run compare-all                                  # batch comparison
 ```
 
 `workflow.sh` generates every variant under `workspaces/`, runs a fit and a mu

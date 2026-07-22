@@ -1,0 +1,45 @@
+# Pixi manifest for the pyhs3 VALIDATION stage (pyhs3_eval/).
+#
+# Everything here comes from conda-forge, whose Python ships development headers
+# and whose cxx-compiler provides a matching toolchain — so pytensor compiles its
+# C ops with no system `-devel` package and no PYTENSOR_FLAGS="cxx=" workaround.
+# This mirrors how pyhs3's own pixi environment is set up.
+#
+# The GENERATION stage (make_workspace.py, muscan.py, export_hs3.py, ...) is NOT
+# covered here: it needs ROOT + quickFit from the LCG environment (setup_local.sh),
+# which is provided outside pixi.
+#
+# Usage:
+#   pixi install                     # create the environment (writes pixi.lock)
+#   pixi run eval                    # single-variant pyhs3-vs-quickFit comparison
+#   pixi run compare-events          # batch comparison across yield scale factors
+#   pixi shell                       # drop into the environment interactively
+
+[workspace]
+name = "workspace-scripts"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64"]
+
+[dependencies]
+python = "3.12.*"
+# pytensor >= 2.33 is the first release with pytensor.graph.traversal; the conda
+# package pulls a compatible compiled stack. < 3 keeps it on the 2.x line pyhs3
+# targets. cxx-compiler guarantees a C++ toolchain + headers for JIT compilation.
+pytensor = ">=2.33.0,<3"
+cxx-compiler = "*"
+numpy = "*"
+matplotlib-base = "*"
+ruff = "*"
+
+[pypi-dependencies]
+# pyhs3 is not on conda-forge; install from PyPI. Its pytensor >= 2.33.0
+# requirement is satisfied by the conda-forge pytensor above.
+pyhs3 = ">=0.4.0"
+
+[tasks]
+eval = { cmd = "python pyhs3_eval/eval_simple_muscan.py", description = "Single-variant pyhs3 vs quickFit NLL comparison" }
+compare-all = { cmd = "bash workspace_comparison.sh --all", description = "Compare every exported workspace against its scan" }
+compare-events = { cmd = "bash workspace_comparison.sh --events", description = "Compare the 3ch base variant across yield scale factors" }
+compare-channels = { cmd = "bash workspace_comparison.sh --channels", description = "Compare the base variant across channel counts" }
+lint = { cmd = "ruff check .", description = "Lint the Python scripts with ruff (config in ruff.toml)" }
+format = { cmd = "ruff format .", description = "Format the Python scripts with ruff" }

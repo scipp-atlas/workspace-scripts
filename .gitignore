@@ -12,6 +12,9 @@ pre_generic/
 make_simple_workspace.py
 simple_workspace.yml
 
+# pixi environment (pixi.lock is committed; the env dir is not)
+.pixi/
+
 # pyhs3_eval comparison plots
 pyhs3_eval/*.pdf
 

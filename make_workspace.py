@@ -50,16 +50,16 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 # nbkg : initial background yield estimate     (FLOATING in the fit)
 # sigma: nominal Gaussian width of the signal peak
 CHANNELS = {
-    "ch0":  {"tau": -0.30, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.00},
-    "ch1":  {"tau": -0.25, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.90},
-    "ch2":  {"tau": -0.35, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.10},
-    "ch3":  {"tau": -0.28, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.95},
-    "ch4":  {"tau": -0.32, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.05},
-    "ch5":  {"tau": -0.27, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.85},
-    "ch6":  {"tau": -0.33, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.15},
-    "ch7":  {"tau": -0.31, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.00},
-    "ch8":  {"tau": -0.26, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.92},
-    "ch9":  {"tau": -0.34, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.08},
+    "ch0": {"tau": -0.30, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.00},
+    "ch1": {"tau": -0.25, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.90},
+    "ch2": {"tau": -0.35, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.10},
+    "ch3": {"tau": -0.28, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.95},
+    "ch4": {"tau": -0.32, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.05},
+    "ch5": {"tau": -0.27, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.85},
+    "ch6": {"tau": -0.33, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.15},
+    "ch7": {"tau": -0.31, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.00},
+    "ch8": {"tau": -0.26, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.92},
+    "ch9": {"tau": -0.34, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.08},
     "ch10": {"tau": -0.29, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.97},
     "ch11": {"tau": -0.30, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.03},
     "ch12": {"tau": -0.24, "nsig": 7.0, "nbkg": 23.0, "sigma": 0.88},
@@ -89,6 +89,7 @@ POLY_SLOPE_INIT = -0.02
 POLY_SLOPE_LO = -0.049
 POLY_SLOPE_HI = 0.049
 
+
 def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
     """Return (shape_var, bkg_pdf).
 
@@ -106,7 +107,9 @@ def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
 
     if generic_bkg:
         expr = "1.0 + @1*@0" if bkg_form == "poly" else "exp(@1*@0)"
-        bkg = ROOT.RooGenericPdf(f"bkg_{ch}", f"background pdf ({ch})", expr, ROOT.RooArgList(x, tau))
+        bkg = ROOT.RooGenericPdf(
+            f"bkg_{ch}", f"background pdf ({ch})", expr, ROOT.RooArgList(x, tau)
+        )
     else:
         bkg = ROOT.RooExponential(f"bkg_{ch}", f"background pdf ({ch})", x, tau)
 
@@ -114,17 +117,22 @@ def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
     keep[f"bkg_{ch}"] = bkg
     return tau, bkg
 
+
 def build_signal(ch, x, mean, sigma, *, generic_sig, keep):
-    """Return the signal pdf (RooGaussian, or RooGenericPdf with 
+    """Return the signal pdf (RooGaussian, or RooGenericPdf with
     --generic-sig)."""
     if generic_sig:
-        sig = ROOT.RooGenericPdf(f"sig_{ch}", f"signal pdf ({ch})",
-                                "exp(-0.5*((@0-@1)/@2)**2)",
-                                ROOT.RooArgList(x, mean, sigma))
+        sig = ROOT.RooGenericPdf(
+            f"sig_{ch}",
+            f"signal pdf ({ch})",
+            "exp(-0.5*((@0-@1)/@2)**2)",
+            ROOT.RooArgList(x, mean, sigma),
+        )
     else:
         sig = ROOT.RooGaussian(f"sig_{ch}", f"signal pdf ({ch})", x, mean, sigma)
     keep[f"sig_{ch}"] = sig
     return sig
+
 
 def build_width_np(constraint, keep):
     """Build the shared signal-width NP and (optionally) its constraint pdf.
@@ -138,15 +146,25 @@ def build_width_np(constraint, keep):
     """
     if constraint == "poisson":
         gamma = ROOT.RooRealVar("gamma_sigma", "signal width scale NP", 1.0, 0.01, 5.0)
-        tau_g = 1.0 / (SIGMA_DELTA ** 2)
-        glob  = ROOT.RooRealVar("nom_gamma_sigma", "global obs: poisson count", tau_g)
+        tau_g = 1.0 / (SIGMA_DELTA**2)
+        glob = ROOT.RooRealVar("nom_gamma_sigma", "global obs: poisson count", tau_g)
         tau_c = ROOT.RooRealVar("tau_gamma_sigma", "poisson tau", tau_g)
         glob.setConstant(True)
         tau_c.setConstant(True)
         mean_p = ROOT.RooProduct("mean_gamma_sigma", "tau*gamma", ROOT.RooArgList(tau_c, gamma))
-        constr = ROOT.RooPoisson("constr_gamma_sigma", "Poisson constraint on gamma_sigma", glob, mean_p)
+        constr = ROOT.RooPoisson(
+            "constr_gamma_sigma", "Poisson constraint on gamma_sigma", glob, mean_p
+        )
         constr.setNoRounding(True)
-        keep.update({"gamma_sigma": gamma, "nom_gamma_sigma": glob, "tau_gamma_sigma": tau_c, "mean_gamma_sigma": mean_p, "constr_gamma_sigma": constr})
+        keep.update(
+            {
+                "gamma_sigma": gamma,
+                "nom_gamma_sigma": glob,
+                "tau_gamma_sigma": tau_c,
+                "mean_gamma_sigma": mean_p,
+                "constr_gamma_sigma": constr,
+            }
+        )
         return {"np": gamma, "constr": constr, "global_ob": glob, "kind": "mul"}
 
     # gauss / none -> additive alpha
@@ -157,29 +175,32 @@ def build_width_np(constraint, keep):
         sig_c = ROOT.RooRealVar("sigma_constr", "constraint Gaussian sigma", 1.0)
         glob.setConstant(True)
         sig_c.setConstant(True)
-        constr = ROOT.RooGaussian("constr_alpha_sigma", "Gaussian constraint on alpha_sigma", glob, alpha, sig_c)
+        constr = ROOT.RooGaussian(
+            "constr_alpha_sigma", "Gaussian constraint on alpha_sigma", glob, alpha, sig_c
+        )
         keep.update({"nom_alpha_sigma": glob, "sigma_constr": sig_c, "constr_alpha_sigma": constr})
         return {"np": alpha, "constr": constr, "global_ob": glob, "kind": "add"}
 
     # constraint == "none": free NP, no aux term
-    return {"np": alpha, "constr": None, "global_ob": None, "kind": "add"}    
+    return {"np": alpha, "constr": None, "global_ob": None, "kind": "add"}
+
 
 def build_workspace(
-    seed: int = 42, 
+    seed: int = 42,
     with_np: bool = True,
-    generic_bkg: bool = False, 
+    generic_bkg: bool = False,
     generic_sig: bool = False,
     bkg_form: str = "exp",
     fix_shape: bool = False,
     constraint: str = "gauss",
     yield_sf: float = 1.0,
     num_channels: int = 3,
-    ) -> ROOT.RooWorkspace:
+) -> ROOT.RooWorkspace:
     """Build the workspace."""
     ROOT.gRandom.SetSeed(seed)
 
     # ── Shared observable + channel index ───────────────────────────────────
-    x   = ROOT.RooRealVar("x", "observable [a.u.]", 10.0, 20.0)
+    x = ROOT.RooRealVar("x", "observable [a.u.]", 10.0, 20.0)
     cat = ROOT.RooCategory("index", "channel index")
     for ch in islice(CHANNELS, num_channels):
         cat.defineType(ch)
@@ -200,14 +221,16 @@ def build_workspace(
 
     channel_pdfs: dict[str, ROOT.RooAddPdf] = {}
     channel_data: dict[str, ROOT.RooDataSet] = {}
-    np_vars:      list[ROOT.RooRealVar]       = []
+    np_vars: list[ROOT.RooRealVar] = []
 
     for ch, cfg in islice(CHANNELS.items(), num_channels):
         # Background: exp(tau*x)
-        tau, bkg = build_background(ch, cfg, x, generic_bkg=generic_bkg, bkg_form=bkg_form, fix_shape=fix_shape, keep=_keep)
+        tau, bkg = build_background(
+            ch, cfg, x, generic_bkg=generic_bkg, bkg_form=bkg_form, fix_shape=fix_shape, keep=_keep
+        )
 
         # Signal: Gaussian with fixed mean
-        mean      = ROOT.RooRealVar(f"mean_{ch}",      f"signal mean ({ch})",          15.0)
+        mean = ROOT.RooRealVar(f"mean_{ch}", f"signal mean ({ch})", 15.0)
         sigma_nom = ROOT.RooRealVar(f"sigma_nom_{ch}", f"nominal signal sigma ({ch})", cfg["sigma"])
         mean.setConstant(True)
         sigma_nom.setConstant(True)
@@ -216,12 +239,16 @@ def build_workspace(
         if with_np and np_info["kind"] == "add":
             # sigma_ch = sigma_nom_ch * (1 + SIGMA_DELTA * alpha_sigma)
             sigma = ROOT.RooFormulaVar(
-                f"sigma_{ch}", f"signal sigma ({ch})",
+                f"sigma_{ch}",
+                f"signal sigma ({ch})",
                 f"@0 * (1.0 + {SIGMA_DELTA} * @1)",
-                ROOT.RooArgList(sigma_nom, np_info["np"]))
+                ROOT.RooArgList(sigma_nom, np_info["np"]),
+            )
             _keep[f"sigma_{ch}"] = sigma
         elif with_np and np_info["kind"] == "mul":
-            sigma = ROOT.RooProduct(f"sigma_{ch}", f"signal sigma ({ch})", ROOT.RooArgList(sigma_nom, np_info["np"]))
+            sigma = ROOT.RooProduct(
+                f"sigma_{ch}", f"signal sigma ({ch})", ROOT.RooArgList(sigma_nom, np_info["np"])
+            )
             _keep[f"sigma_{ch}"] = sigma
         else:
             sigma = sigma_nom  # fixed at nominal width
@@ -229,43 +256,57 @@ def build_workspace(
         sig = build_signal(ch, x, mean, sigma, generic_sig=generic_sig, keep=_keep)
 
         # Nominal signal yield (constant — only mu_sig floats the signal norm)
-        nsig_nom = ROOT.RooRealVar(f"nsig_{ch}", f"nominal signal yield ({ch})",
-                                   cfg["nsig"] * yield_sf)
+        nsig_nom = ROOT.RooRealVar(
+            f"nsig_{ch}", f"nominal signal yield ({ch})", cfg["nsig"] * yield_sf
+        )
         nsig_nom.setConstant(True)
 
         # Scaled signal yield: mu_sig * nsig_nom
-        nsig_tot = ROOT.RooProduct(f"nsig_tot_{ch}", f"scaled signal yield ({ch})",
-                                   ROOT.RooArgList(mu_sig, nsig_nom))
+        nsig_tot = ROOT.RooProduct(
+            f"nsig_tot_{ch}", f"scaled signal yield ({ch})", ROOT.RooArgList(mu_sig, nsig_nom)
+        )
 
         # Floating background yield
-        nbkg = ROOT.RooRealVar(f"nbkg_{ch}", f"background yield ({ch})",
-                               cfg["nbkg"] * yield_sf, 0.0, 500.0 * yield_sf)
+        nbkg = ROOT.RooRealVar(
+            f"nbkg_{ch}", f"background yield ({ch})", cfg["nbkg"] * yield_sf, 0.0, 500.0 * yield_sf
+        )
 
         # Extended sum PDF
-        model = ROOT.RooAddPdf(f"model_{ch}", f"full model ({ch})",
-                               ROOT.RooArgList(sig, bkg),
-                               ROOT.RooArgList(nsig_tot, nbkg))
+        model = ROOT.RooAddPdf(
+            f"model_{ch}",
+            f"full model ({ch})",
+            ROOT.RooArgList(sig, bkg),
+            ROOT.RooArgList(nsig_tot, nbkg),
+        )
 
         channel_pdfs[ch] = model
 
         # Generate toy data at nominal parameters
         data_ch = model.generate(ROOT.RooArgSet(x), ROOT.RooFit.Extended())
         channel_data[ch] = data_ch
-        print(f"  {ch}: {data_ch.numEntries():3d} events generated "
-              f"(expected {cfg['nsig'] + cfg['nbkg']:.0f})")
+        print(
+            f"  {ch}: {data_ch.numEntries():3d} events generated "
+            f"(expected {cfg['nsig'] + cfg['nbkg']:.0f})"
+        )
 
         # Unconstrained NPs
         if not fix_shape:
             np_vars.append(tau)
         np_vars.append(nbkg)
 
-        _keep.update({
-            f"tau_{ch}": tau, f"bkg_{ch}": bkg,
-            f"mean_{ch}": mean, f"sigma_nom_{ch}": sigma_nom,
-            f"sig_{ch}": sig,
-            f"nsig_nom_{ch}": nsig_nom, f"nsig_tot_{ch}": nsig_tot,
-            f"nbkg_{ch}": nbkg, f"model_{ch}": model,
-        })
+        _keep.update(
+            {
+                f"tau_{ch}": tau,
+                f"bkg_{ch}": bkg,
+                f"mean_{ch}": mean,
+                f"sigma_nom_{ch}": sigma_nom,
+                f"sig_{ch}": sig,
+                f"nsig_nom_{ch}": nsig_nom,
+                f"nsig_tot_{ch}": nsig_tot,
+                f"nbkg_{ch}": nbkg,
+                f"model_{ch}": model,
+            }
+        )
 
     # ── Simultaneous PDF ────────────────────────────────────────────────────
     sim_pdf = ROOT.RooSimultaneous("sim_pdf", "simultaneous model", cat)
@@ -277,15 +318,16 @@ def build_workspace(
     for ch, d in channel_data.items():
         channel_map[ch] = d
     combined_data = ROOT.RooDataSet(
-        "combData", "combined dataset",
+        "combData",
+        "combined dataset",
         ROOT.RooArgSet(x, cat),
         ROOT.RooFit.Index(cat),
-        ROOT.RooFit.Import(channel_map)
+        ROOT.RooFit.Import(channel_map),
     )
     print(f"  Total: {combined_data.numEntries()} events across all channels")
 
     # ── Workspace ────────────────────────────────────────────────────────────
-    ws       = ROOT.RooWorkspace("combWS", "Simple three-channel test workspace")
+    ws = ROOT.RooWorkspace("combWS", "Simple three-channel test workspace")
     wsImport = getattr(ws, "import")
 
     # Import the simultaneous PDF and (optionally) the constraint PDF separately.
@@ -328,12 +370,23 @@ def build_workspace(
             if v:
                 snap_vars.add(v)
     ws.saveSnapshot("nominal", snap_vars)
-    ws._constr_name = (np_info["constr"].GetName() if (with_np and np_info["constr"] is not None) else None)
+    ws._constr_name = (
+        np_info["constr"].GetName() if (with_np and np_info["constr"] is not None) else None
+    )
     return ws
 
-def _output_stem(*, with_np: bool, generic_bkg: bool, generic_sig: bool,
-                 bkg_form: str, fix_shape: bool, constraint: str,
-                 yield_sf: float = 1.0, num_channels: int = 3) -> str:
+
+def _output_stem(
+    *,
+    with_np: bool,
+    generic_bkg: bool,
+    generic_sig: bool,
+    bkg_form: str,
+    fix_shape: bool,
+    constraint: str,
+    yield_sf: float = 1.0,
+    num_channels: int = 3,
+) -> str:
     """Derive a default workspace file stem from the build options.
 
     Only non-default aspects are encoded, so the base build is simply
@@ -362,32 +415,57 @@ def _output_stem(*, with_np: bool, generic_bkg: bool, generic_sig: bool,
         stem += f"_yield{yield_sf:g}x".replace(".", "p")
     return stem
 
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--no-np", action="store_true",
-                        help="Omit the signal-width nuisance parameter (alpha_sigma). "
-                             "Default output name becomes simple_workspace_nonp.root.")
-    parser.add_argument("--generic-bkg", action="store_true",
-                        help="Use RooGenericPdf instead of RooExponential for backgrounds "
-                             "(same exp(tau*x) shape; exports as generic_dist in HS3).")
-    parser.add_argument("--bkg-form", choices = ["exp", "poly"], default="exp",
-                        help="Generic background functional form (only with --generic-bkg)")
-    parser.add_argument("--generic-sig", action="store_true",
-                        help="express the signal gaussian as a RooGenericPdf")
-    parser.add_argument("--fix-bkg-shape", action="store_true",
-                        help="Hold tau_ch/slope_ch constant so the bkg normalization is frozen against the mu scan")
-    parser.add_argument("--constraint", choices=["gauss", "poisson", "none"], default="gauss",
-                        help="Aux/constraint form for the width NP -> gauss poisson or None (free NP)")
-    parser.add_argument("--output", default=None,
-                        help="Output ROOT file name "
-                             "(default: simple_workspace.root or simple_workspace_nonp.root)")
-    parser.add_argument("--seed", type=int, default=42,
-                        help="Random seed for toy data generation (default: 42)")
-    parser.add_argument("--yield-sf", type=float, default=1.0,
-                        help="scale all yields by a constant factor")
-    parser.add_argument("--num-channels", type=int, default=3,
-                        help="specify the number of channels used")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--no-np",
+        action="store_true",
+        help="Omit the signal-width nuisance parameter (alpha_sigma). "
+        "Default output name becomes simple_workspace_nonp.root.",
+    )
+    parser.add_argument(
+        "--generic-bkg",
+        action="store_true",
+        help="Use RooGenericPdf instead of RooExponential for backgrounds "
+        "(same exp(tau*x) shape; exports as generic_dist in HS3).",
+    )
+    parser.add_argument(
+        "--bkg-form",
+        choices=["exp", "poly"],
+        default="exp",
+        help="Generic background functional form (only with --generic-bkg)",
+    )
+    parser.add_argument(
+        "--generic-sig", action="store_true", help="express the signal gaussian as a RooGenericPdf"
+    )
+    parser.add_argument(
+        "--fix-bkg-shape",
+        action="store_true",
+        help="Hold tau_ch/slope_ch constant so the bkg normalization is frozen against the mu scan",
+    )
+    parser.add_argument(
+        "--constraint",
+        choices=["gauss", "poisson", "none"],
+        default="gauss",
+        help="Aux/constraint form for the width NP -> gauss poisson or None (free NP)",
+    )
+    parser.add_argument(
+        "--output",
+        default=None,
+        help="Output ROOT file name (default: simple_workspace.root or simple_workspace_nonp.root)",
+    )
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for toy data generation (default: 42)"
+    )
+    parser.add_argument(
+        "--yield-sf", type=float, default=1.0, help="scale all yields by a constant factor"
+    )
+    parser.add_argument(
+        "--num-channels", type=int, default=3, help="specify the number of channels used"
+    )
     args = parser.parse_args()
 
     with_np = not args.no_np
@@ -395,16 +473,19 @@ def main() -> None:
         print("Note: --bkg-form poly only applies with --generic-bkg; ignoring.")
 
     if args.output is None:
-        args.output = _output_stem(
-            with_np=with_np,
-            generic_bkg=args.generic_bkg,
-            generic_sig=args.generic_sig,
-            bkg_form=args.bkg_form,
-            fix_shape=args.fix_bkg_shape,
-            constraint=args.constraint,
-            yield_sf=args.yield_sf,
-            num_channels=args.num_channels,
-        ) + ".root"
+        args.output = (
+            _output_stem(
+                with_np=with_np,
+                generic_bkg=args.generic_bkg,
+                generic_sig=args.generic_sig,
+                bkg_form=args.bkg_form,
+                fix_shape=args.fix_bkg_shape,
+                constraint=args.constraint,
+                yield_sf=args.yield_sf,
+                num_channels=args.num_channels,
+            )
+            + ".root"
+        )
 
     bkg_label = "exponential_dist"
     if args.generic_bkg:
@@ -412,12 +493,20 @@ def main() -> None:
     sig_label = "generic_dist" if args.generic_sig else "gaussian_dist"
     np_label = "no NP" if not with_np else f"NP(constraint={args.constraint})"
     shape_label = "fixed-shape" if args.fix_bkg_shape else "floating-shape"
-    print(f"Building workspace [{np_label}, bkg={bkg_label}, sig={sig_label}, {shape_label}] (seed={args.seed}) ...")
+    print(
+        f"Building workspace [{np_label}, bkg={bkg_label}, sig={sig_label}, {shape_label}] (seed={args.seed}) ..."
+    )
     ws = build_workspace(
-        seed=args.seed, with_np=with_np, generic_bkg=args.generic_bkg,
-        generic_sig=args.generic_sig, bkg_form=args.bkg_form,
-        fix_shape=args.fix_bkg_shape, constraint=args.constraint,
-        yield_sf=args.yield_sf, num_channels=args.num_channels)
+        seed=args.seed,
+        with_np=with_np,
+        generic_bkg=args.generic_bkg,
+        generic_sig=args.generic_sig,
+        bkg_form=args.bkg_form,
+        fix_shape=args.fix_bkg_shape,
+        constraint=args.constraint,
+        yield_sf=args.yield_sf,
+        num_channels=args.num_channels,
+    )
 
     ws.Print("v")
 

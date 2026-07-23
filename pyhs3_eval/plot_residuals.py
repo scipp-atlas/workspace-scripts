@@ -138,9 +138,7 @@ def plot_residual_and_offset(
 
     diffs, resids, workspaces, names, values = zip(*rows)
 
-    axis_label = (
-        label_field if isinstance(label_field, str) else ", ".join(label_field)
-    )
+    axis_label = label_field if isinstance(label_field, str) else ", ".join(label_field)
 
     if use_numeric:
         x = list(values)
@@ -169,9 +167,7 @@ def plot_residual_and_offset(
     if log_x:
         ax2.set_xscale("log")
 
-    varied_label = (
-        label_field if isinstance(label_field, str) else ", ".join(label_field)
-    )
+    varied_label = label_field if isinstance(label_field, str) else ", ".join(label_field)
     fixed = ", ".join(describe_fixed(workspaces, label_field))
     fig.suptitle(f"{fixed}\nvarying: {varied_label}")
 

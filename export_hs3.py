@@ -83,7 +83,7 @@ def fix_exponential_functions(doc: dict) -> dict:
 
     # Flip the sign of affected variables in domains (min/max) and parameter_points.
     for domain in doc.get("domains", []):
-        for axis in (domain.get("axes") or []):
+        for axis in domain.get("axes") or []:
             if axis["name"] in affected_vars:
                 axis["min"], axis["max"] = -axis["max"], -axis["min"]
 
@@ -94,11 +94,10 @@ def fix_exponential_functions(doc: dict) -> dict:
 
     # Remove the inversion generic_function entries.
     removed = {name for name, orig in inversions.items() if orig in affected_vars}
-    doc["functions"] = [f for f in doc.get("functions", [])
-                        if f["name"] not in removed]
+    doc["functions"] = [f for f in doc.get("functions", []) if f["name"] not in removed]
 
     # Remove their roofit_skip attributes from ROOT_internal.
-    attrs = (doc.get("misc", {}).get("ROOT_internal", {}).get("attributes") or {})
+    attrs = doc.get("misc", {}).get("ROOT_internal", {}).get("attributes") or {}
     for name in removed:
         attrs.pop(name, None)
 
@@ -118,11 +117,11 @@ def fix_dataset_axes(doc: dict) -> dict:
     obs_ranges: dict[str, dict] = {}
     for domain in doc.get("domains", []):
         if domain.get("name") == "default_domain":
-            for ax in (domain.get("axes") or []):
+            for ax in domain.get("axes") or []:
                 obs_ranges[ax["name"]] = {"min": ax["min"], "max": ax["max"]}
 
     for dataset in doc.get("data", []):
-        for ax in (dataset.get("axes") or []):
+        for ax in dataset.get("axes") or []:
             if ax["name"] in obs_ranges:
                 ax["min"] = obs_ranges[ax["name"]]["min"]
                 ax["max"] = obs_ranges[ax["name"]]["max"]
@@ -142,13 +141,15 @@ def fix_split_likelihoods(doc: dict) -> dict:
         if len(data_list) >= 1 and len(data_list) == len(dist_list):
             new_names = []
             for data_name, dist_name in zip(data_list, dist_list):
-                suffix  = data_name.split("_", 1)[1] if "_" in data_name else data_name
+                suffix = data_name.split("_", 1)[1] if "_" in data_name else data_name
                 lh_name = f"L_{suffix}"
-                new_likelihoods.append({
-                    "name":          lh_name,
-                    "distributions": [dist_name],
-                    "data":          [data_name],
-                })
+                new_likelihoods.append(
+                    {
+                        "name": lh_name,
+                        "distributions": [dist_name],
+                        "data": [data_name],
+                    }
+                )
                 new_names.append(lh_name)
             old_to_new[lh["name"]] = new_names
         else:
@@ -183,13 +184,14 @@ def fix_remove_obs_from_params(doc: dict) -> dict:
     eval time. Constant parameters (global observables) are kept even if in a dataset."""
     obs_names: set[str] = set()
     for dataset in doc.get("data", []):
-        for ax in (dataset.get("axes") or []):
+        for ax in dataset.get("axes") or []:
             obs_names.add(ax["name"])
 
     for pp in doc.get("parameter_points", []):
         if pp.get("name") == "default_values":
-            pp["parameters"] = [p for p in pp["parameters"]
-                                 if p["name"] not in obs_names or p.get("const", False)]
+            pp["parameters"] = [
+                p for p in pp["parameters"] if p["name"] not in obs_names or p.get("const", False)
+            ]
     return doc
 
 
@@ -201,8 +203,7 @@ def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
     When use_aux_distributions=True (default), constraints are placed under
     "aux_distributions"/"aux_data" so tools normalise them correctly.
     When False, constraints are placed under "distributions"/"data" (old behaviour)."""
-    referenced = {d for lh in doc.get("likelihoods", [])
-                  for d in (lh.get("distributions") or [])}
+    referenced = {d for lh in doc.get("likelihoods", []) for d in (lh.get("distributions") or [])}
     unreferenced = {d["name"] for d in doc.get("distributions", [])} - referenced
 
     if not unreferenced or not doc.get("likelihoods"):
@@ -247,7 +248,7 @@ def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
     # Attach each constraint to the first likelihood.
     first_lh = doc["likelihoods"][0]
     dist_key = "aux_distributions" if use_aux_distributions else "distributions"
-    data_key = "aux_data"           if use_aux_distributions else "data"
+    data_key = "aux_data" if use_aux_distributions else "data"
     for cname in constr_to_go:
         first_lh.setdefault(dist_key, []).append(cname)
         first_lh.setdefault(data_key, []).append("global_obs_data")
@@ -255,8 +256,9 @@ def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
     # Populate the global-observables domain that ROOT left empty.
     for domain in doc.get("domains", []):
         if "global_observables" in domain.get("name", ""):
-            domain["axes"] = [{"name": n, "min": v - 5.0, "max": v + 5.0}
-                               for n, v in go_info.items()]
+            domain["axes"] = [
+                {"name": n, "min": v - 5.0, "max": v + 5.0} for n, v in go_info.items()
+            ]
 
     # Remove const flag from global observables in default_values.
     # Their value is provided by global_obs_data at evaluation time;
@@ -270,16 +272,20 @@ def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
     return doc
 
 
-def export_workspace(ws: ROOT.RooWorkspace, stem: str,
-                     use_aux_distributions: bool = True,
-                     do_fix_exponential: bool = True,
-                     do_fix_null_axes: bool = True,
-                     do_fix_dataset_axes: bool = True,
-                     do_fix_split_likelihoods: bool = True,
-                     do_fix_analysis_init: bool = True,
-                     do_fix_remove_obs: bool = True,
-                     do_fix_constraints: bool = True) -> str:
+def export_workspace(
+    ws: ROOT.RooWorkspace,
+    stem: str,
+    use_aux_distributions: bool = True,
+    do_fix_exponential: bool = True,
+    do_fix_null_axes: bool = True,
+    do_fix_dataset_axes: bool = True,
+    do_fix_split_likelihoods: bool = True,
+    do_fix_analysis_init: bool = True,
+    do_fix_remove_obs: bool = True,
+    do_fix_constraints: bool = True,
+) -> str:
     import json as _json
+
     path = f"{stem}.json" if use_aux_distributions else f"{stem}_noaux.json"
     ROOT.RooJSONFactoryWSTool(ws).exportJSON(path)
     with open(path) as fh:
@@ -322,8 +328,8 @@ def verify_roundtrip(hs3_file: str, ws_name: str = "combWS") -> bool:
     # ModelConfig is not part of HS3 and is intentionally excluded from checks.
     checks = {
         "sim_pdf (RooSimultaneous)": ws2.pdf("sim_pdf"),
-        "combData (RooDataSet)":     ws2.data("combData"),
-        "mu_sig (POI)":              ws2.var("mu_sig"),
+        "combData (RooDataSet)": ws2.data("combData"),
+        "mu_sig (POI)": ws2.var("mu_sig"),
     }
     print("  Round-trip verification:")
     for label, obj in checks.items():
@@ -365,71 +371,118 @@ def summarise(hs3_file: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--input",       default="simple_workspace.root",
-                        help="Input ROOT workspace file (default: simple_workspace.root)")
-    parser.add_argument("--ws-name",     default="combWS",
-                        help="Workspace name inside the ROOT file (default: combWS)")
-    parser.add_argument("--output-stem", default=None,
-                        help="Output file stem without extension "
-                             "(default: input filename without .root)")
-    parser.add_argument("--verify",      action="store_true",
-                        help="Re-import the exported file and verify round-trip")
-    parser.add_argument("--check-json", metavar="FILE",
-                        help="Load an existing HS3 JSON file into ROOT and verify it "
-                             "(skips export; --ws-name still applies)")
-    parser.add_argument("--aux-constraints", dest="aux_constraints",
-                        action="store_true", default=True,
-                        help="Export constraint PDFs under aux_distributions/aux_data "
-                             "(default; correct HS3 normalisation)")
-    parser.add_argument("--no-aux-constraints", dest="aux_constraints",
-                        action="store_false",
-                        help="Export constraint PDFs under distributions/data (old behaviour)")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--input",
+        default="simple_workspace.root",
+        help="Input ROOT workspace file (default: simple_workspace.root)",
+    )
+    parser.add_argument(
+        "--ws-name", default="combWS", help="Workspace name inside the ROOT file (default: combWS)"
+    )
+    parser.add_argument(
+        "--output-stem",
+        default=None,
+        help="Output file stem without extension (default: input filename without .root)",
+    )
+    parser.add_argument(
+        "--verify", action="store_true", help="Re-import the exported file and verify round-trip"
+    )
+    parser.add_argument(
+        "--check-json",
+        metavar="FILE",
+        help="Load an existing HS3 JSON file into ROOT and verify it "
+        "(skips export; --ws-name still applies)",
+    )
+    parser.add_argument(
+        "--aux-constraints",
+        dest="aux_constraints",
+        action="store_true",
+        default=True,
+        help="Export constraint PDFs under aux_distributions/aux_data "
+        "(default; correct HS3 normalisation)",
+    )
+    parser.add_argument(
+        "--no-aux-constraints",
+        dest="aux_constraints",
+        action="store_false",
+        help="Export constraint PDFs under distributions/data (old behaviour)",
+    )
 
     # Individual fix toggles
     fix_group = parser.add_argument_group(
         "cleanup toggles",
         "Disable individual post-export fixes (all enabled by default). "
-        "Use --no-cleanup to disable all at once.")
-    fix_group.add_argument("--no-cleanup", action="store_true", default=False,
-                           help="Disable all fixes; write raw ROOT HS3 output")
-    fix_group.add_argument("--no-fix-exponential", dest="do_fix_exponential",
-                           action="store_false", default=True,
-                           help="Skip fix: remove sign-inversion intermediates for "
-                                "RooExponential")
-    fix_group.add_argument("--no-fix-null-axes", dest="do_fix_null_axes",
-                           action="store_false", default=True,
-                           help="Skip fix 1: replace null axes in empty domains with []")
-    fix_group.add_argument("--no-fix-dataset-axes", dest="do_fix_dataset_axes",
-                           action="store_false", default=True,
-                           help="Skip fix 2: add min/max to dataset axes, drop value field")
-    fix_group.add_argument("--no-fix-split-likelihoods", dest="do_fix_split_likelihoods",
-                           action="store_false", default=True,
-                           help="Skip fix 3: split combined likelihood into per-channel "
-                                "likelihoods")
-    fix_group.add_argument("--no-fix-analysis-init", dest="do_fix_analysis_init",
-                           action="store_false", default=True,
-                           help="Skip fix 4: add init: default_values to each analysis")
-    fix_group.add_argument("--no-fix-remove-obs", dest="do_fix_remove_obs",
-                           action="store_false", default=True,
-                           help="Skip fix 5: remove non-const observables from "
-                                "default_values")
-    fix_group.add_argument("--no-fix-constraints", dest="do_fix_constraints",
-                           action="store_false", default=True,
-                           help="Skip fix 6: wire standalone constraint PDFs into the "
-                                "first likelihood")
+        "Use --no-cleanup to disable all at once.",
+    )
+    fix_group.add_argument(
+        "--no-cleanup",
+        action="store_true",
+        default=False,
+        help="Disable all fixes; write raw ROOT HS3 output",
+    )
+    fix_group.add_argument(
+        "--no-fix-exponential",
+        dest="do_fix_exponential",
+        action="store_false",
+        default=True,
+        help="Skip fix: remove sign-inversion intermediates for RooExponential",
+    )
+    fix_group.add_argument(
+        "--no-fix-null-axes",
+        dest="do_fix_null_axes",
+        action="store_false",
+        default=True,
+        help="Skip fix 1: replace null axes in empty domains with []",
+    )
+    fix_group.add_argument(
+        "--no-fix-dataset-axes",
+        dest="do_fix_dataset_axes",
+        action="store_false",
+        default=True,
+        help="Skip fix 2: add min/max to dataset axes, drop value field",
+    )
+    fix_group.add_argument(
+        "--no-fix-split-likelihoods",
+        dest="do_fix_split_likelihoods",
+        action="store_false",
+        default=True,
+        help="Skip fix 3: split combined likelihood into per-channel likelihoods",
+    )
+    fix_group.add_argument(
+        "--no-fix-analysis-init",
+        dest="do_fix_analysis_init",
+        action="store_false",
+        default=True,
+        help="Skip fix 4: add init: default_values to each analysis",
+    )
+    fix_group.add_argument(
+        "--no-fix-remove-obs",
+        dest="do_fix_remove_obs",
+        action="store_false",
+        default=True,
+        help="Skip fix 5: remove non-const observables from default_values",
+    )
+    fix_group.add_argument(
+        "--no-fix-constraints",
+        dest="do_fix_constraints",
+        action="store_false",
+        default=True,
+        help="Skip fix 6: wire standalone constraint PDFs into the first likelihood",
+    )
     args = parser.parse_args()
 
     # --no-cleanup disables everything
     if args.no_cleanup:
-        args.do_fix_exponential     = False
-        args.do_fix_null_axes       = False
-        args.do_fix_dataset_axes    = False
+        args.do_fix_exponential = False
+        args.do_fix_null_axes = False
+        args.do_fix_dataset_axes = False
         args.do_fix_split_likelihoods = False
-        args.do_fix_analysis_init   = False
-        args.do_fix_remove_obs      = False
-        args.do_fix_constraints     = False
+        args.do_fix_analysis_init = False
+        args.do_fix_remove_obs = False
+        args.do_fix_constraints = False
 
     if args.check_json:
         summarise(args.check_json)
@@ -451,7 +504,8 @@ def main() -> None:
 
     print("Exporting to HS3 (JSON) ...")
     path = export_workspace(
-        ws, stem,
+        ws,
+        stem,
         use_aux_distributions=args.aux_constraints,
         do_fix_exponential=args.do_fix_exponential,
         do_fix_null_axes=args.do_fix_null_axes,

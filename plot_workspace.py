@@ -40,6 +40,7 @@ import sys
 import numpy as np
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -48,12 +49,12 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
 
-COL_MODEL = "C0"     # total S+B model
-COL_BKG   = "C3"     # background
-COL_SIG   = "C2"     # signal
-COL_DATA  = "black"  # toy data points
+COL_MODEL = "C0"  # total S+B model
+COL_BKG = "C3"  # background
+COL_SIG = "C2"  # signal
+COL_DATA = "black"  # toy data points
 
-CURVE_POINTS = 300   # grid resolution for smooth PDF curves
+CURVE_POINTS = 300  # grid resolution for smooth PDF curves
 
 
 def channel_names(sim) -> list[str]:
@@ -101,8 +102,7 @@ def yields(ws, ch: str) -> tuple[float, float]:
     from the current parameter values."""
     nsig = ws.function(f"nsig_tot_{ch}")
     nbkg = ws.var(f"nbkg_{ch}")
-    return (nsig.getVal() if nsig else float("nan"),
-            nbkg.getVal() if nbkg else float("nan"))
+    return (nsig.getVal() if nsig else float("nan"), nbkg.getVal() if nbkg else float("nan"))
 
 
 def data_hist(data, x, ch: str, bins: int, xlo: float, xhi: float):
@@ -161,12 +161,19 @@ def plot_channel(ax, ws, x, data, ch: str, bins: int):
     chi2 = float(np.sum((counts[mask] - exp[mask]) ** 2 / exp[mask]) / bins)
 
     ax.plot(grid, y_model, color=COL_MODEL, lw=2.0, label="S+B model")
-    ax.plot(grid, y_bkg, color=COL_BKG, lw=1.8, ls="--",
-            label=f"background (B={n_bkg:.1f})")
-    ax.plot(grid, y_sig, color=COL_SIG, lw=1.8, ls=":",
-            label=f"signal (S={n_sig:.1f})")
-    ax.errorbar(centres, counts, yerr=errors, fmt="o", color=COL_DATA,
-                ms=4, capsize=2, lw=1, label="toy data")
+    ax.plot(grid, y_bkg, color=COL_BKG, lw=1.8, ls="--", label=f"background (B={n_bkg:.1f})")
+    ax.plot(grid, y_sig, color=COL_SIG, lw=1.8, ls=":", label=f"signal (S={n_sig:.1f})")
+    ax.errorbar(
+        centres,
+        counts,
+        yerr=errors,
+        fmt="o",
+        color=COL_DATA,
+        ms=4,
+        capsize=2,
+        lw=1,
+        label="toy data",
+    )
 
     ax.set_title(ch, fontsize=11)
     ax.set_xlabel("x")
@@ -176,18 +183,16 @@ def plot_channel(ax, ws, x, data, ch: str, bins: int):
     ax.margins(x=0)
 
     handles, labels = ax.get_legend_handles_labels()
-    info_line = (f"obs {int(round(n_obs))} / exp {n_sig + n_bkg:.1f}\n"
-                 f"$\\chi^2$/bins = {chi2:.2f}")
-    leg = ax.legend(handles, labels, fontsize=8, framealpha=0.0,
-                    loc="upper right", title=info_line)
+    info_line = f"obs {int(round(n_obs))} / exp {n_sig + n_bkg:.1f}\n$\\chi^2$/bins = {chi2:.2f}"
+    leg = ax.legend(handles, labels, fontsize=8, framealpha=0.0, loc="upper right", title=info_line)
     leg.get_title().set_fontsize(8)
 
-    return dict(n_obs=int(round(n_obs)), n_exp=n_sig + n_bkg, n_sig=n_sig,
-                n_bkg=n_bkg, chi2=chi2)
+    return dict(n_obs=int(round(n_obs)), n_exp=n_sig + n_bkg, n_sig=n_sig, n_bkg=n_bkg, chi2=chi2)
 
 
-def plot_workspace(path: str, out_path: str, *, bins: int,
-                   fit_result: str | None, snapshot: str) -> None:
+def plot_workspace(
+    path: str, out_path: str, *, bins: int, fit_result: str | None, snapshot: str
+) -> None:
     f = ROOT.TFile.Open(path)
     if not f or f.IsZombie():
         print(f"ERROR: cannot open {path}")
@@ -214,8 +219,7 @@ def plot_workspace(path: str, out_path: str, *, bins: int,
     ncols = math.ceil(math.sqrt(len(chans)))
     nrows = math.ceil(len(chans) / ncols)
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 3.6 * nrows),
-                             squeeze=False)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 3.6 * nrows), squeeze=False)
     flat = axes.flatten()
 
     stem = os.path.splitext(os.path.basename(path))[0]
@@ -225,10 +229,12 @@ def plot_workspace(path: str, out_path: str, *, bins: int,
     print(f"  {'channel':<8} {'obs':>5} {'exp':>8} {'S':>7} {'B':>7} {'chi2/bins':>10}")
     for i, ch in enumerate(chans):
         info = plot_channel(flat[i], ws, x, data, ch, bins)
-        print(f"  {ch:<8} {info['n_obs']:>5d} {info['n_exp']:>8.1f} "
-              f"{info['n_sig']:>7.1f} {info['n_bkg']:>7.1f} {info['chi2']:>10.2f}")
+        print(
+            f"  {ch:<8} {info['n_obs']:>5d} {info['n_exp']:>8.1f} "
+            f"{info['n_sig']:>7.1f} {info['n_bkg']:>7.1f} {info['chi2']:>10.2f}"
+        )
 
-    for ax in flat[len(chans):]:
+    for ax in flat[len(chans) :]:
         ax.axis("off")
 
     fig.tight_layout(rect=(0, 0, 1, 0.98))
@@ -241,41 +247,59 @@ def plot_workspace(path: str, out_path: str, *, bins: int,
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("inputs", nargs="*",
-                        help="Workspace .root files (default: workspaces/*.root)")
-    parser.add_argument("-o", "--output", default=None,
-                        help="Output file for a single input, or a directory for "
-                             "multiple inputs (default: plots/<stem>_channels.png)")
-    parser.add_argument("--outdir", default="plots",
-                        help="Directory for per-workspace PNGs (default: plots/)")
-    parser.add_argument("--bins", type=int, default=25,
-                        help="Number of bins for the observable x (default: 25)")
-    parser.add_argument("--fit-result", default=None,
-                        help="quickFit result .root file; overlay post-fit model "
-                             "instead of the nominal snapshot")
-    parser.add_argument("--snapshot", default="nominal",
-                        help="Parameter snapshot to load (default: nominal)")
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "inputs", nargs="*", help="Workspace .root files (default: workspaces/*.root)"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=None,
+        help="Output file for a single input, or a directory for "
+        "multiple inputs (default: plots/<stem>_channels.png)",
+    )
+    parser.add_argument(
+        "--outdir", default="plots", help="Directory for per-workspace PNGs (default: plots/)"
+    )
+    parser.add_argument(
+        "--bins", type=int, default=25, help="Number of bins for the observable x (default: 25)"
+    )
+    parser.add_argument(
+        "--fit-result",
+        default=None,
+        help="quickFit result .root file; overlay post-fit model instead of the nominal snapshot",
+    )
+    parser.add_argument(
+        "--snapshot", default="nominal", help="Parameter snapshot to load (default: nominal)"
+    )
     args = parser.parse_args()
 
     paths = args.inputs or sorted(glob.glob("workspaces/*.root"))
     if not paths:
-        print("No workspace files found (looked in workspaces/*.root). "
-              "Pass paths explicitly.")
+        print("No workspace files found (looked in workspaces/*.root). Pass paths explicitly.")
         sys.exit(1)
 
     single = len(paths) == 1
     for path in paths:
         stem = os.path.splitext(os.path.basename(path))[0]
-        if single and args.output and not args.output.endswith("/") \
-                and not os.path.isdir(args.output):
+        if (
+            single
+            and args.output
+            and not args.output.endswith("/")
+            and not os.path.isdir(args.output)
+        ):
             out_path = args.output
         else:
-            outdir = args.output if (args.output and (args.output.endswith("/")
-                     or os.path.isdir(args.output))) else args.outdir
+            outdir = (
+                args.output
+                if (args.output and (args.output.endswith("/") or os.path.isdir(args.output)))
+                else args.outdir
+            )
             out_path = os.path.join(outdir, f"{stem}_channels.png")
-        plot_workspace(path, out_path, bins=args.bins,
-                       fit_result=args.fit_result, snapshot=args.snapshot)
+        plot_workspace(
+            path, out_path, bins=args.bins, fit_result=args.fit_result, snapshot=args.snapshot
+        )
 
 
 if __name__ == "__main__":

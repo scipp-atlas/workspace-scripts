@@ -89,24 +89,16 @@ def build_channel_models(ws_path: Path) -> list[tuple[Model, dict]]:
     for analysis in channel_analyses:
         model = ws.model(analysis, progress=False)
         nll_expr = -model.log_prob
-        inputs_map = {
-            v.name: v for v in explicit_graph_inputs([nll_expr]) if v.name is not None
-        }
+        inputs_map = {v.name: v for v in explicit_graph_inputs([nll_expr]) if v.name is not None}
         input_names = list(inputs_map.keys())
-        fn = pytensor.function(
-            list(inputs_map.values()), nll_expr, on_unused_input="ignore"
-        )
-        print(
-            f"  {analysis.name}: compiled, {len(input_names)} inputs: {sorted(input_names)}"
-        )
+        fn = pytensor.function(list(inputs_map.values()), nll_expr, on_unused_input="ignore")
+        print(f"  {analysis.name}: compiled, {len(input_names)} inputs: {sorted(input_names)}")
         channel_models.append((model, {"fn": fn, "input_names": input_names}))
 
     return channel_models
 
 
-def eval_nll(
-    channel_models: list[tuple[Model, dict]], params: dict[str, float]
-) -> float:
+def eval_nll(channel_models: list[tuple[Model, dict]], params: dict[str, float]) -> float:
     """Sum -log(L) over all channels at *params*."""
     total = 0.0
     for model, compiled in channel_models:
@@ -139,9 +131,7 @@ def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
 
     num_channels = len(channel_models)
     num_events = sum(
-        int(np.asarray(arr).size)
-        for model, _ in channel_models
-        for arr in model.data.values()
+        int(np.asarray(arr).size) for model, _ in channel_models for arr in model.data.values()
     )
 
     if verbose:
@@ -197,9 +187,7 @@ def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
         print(f"quickFit NLL_min = {qf_nll_min:.6f}")
         print(f"Difference       = {pyhs3_nll_min - qf_nll_min:.6f}")
         print(f"\nmean offset      = {mean_offset:.6f}")
-        print(
-            f"max |residual|   = {max_abs_resid:.3e}  (deviation of diff from constant)"
-        )
+        print(f"max |residual|   = {max_abs_resid:.3e}  (deviation of diff from constant)")
 
     return {
         "workspace": ws_path,
@@ -291,21 +279,13 @@ def main() -> None:
     if args.plot_nll is not None:
         from plot_muscan_nll import plot_nll_curves  # noqa: PLC0415
 
-        out = (
-            _default_nll_plot_path()
-            if args.plot_nll is _PLOT_DEFAULT
-            else args.plot_nll
-        )
+        out = _default_nll_plot_path() if args.plot_nll is _PLOT_DEFAULT else args.plot_nll
         plot_nll_curves(results, out)
 
     if args.plot_resid is not None:
         from plot_residuals import plot_residual_and_offset  # noqa: PLC0415
 
-        out = (
-            _default_resid_plot_path()
-            if args.plot_resid is _PLOT_DEFAULT
-            else args.plot_resid
-        )
+        out = _default_resid_plot_path() if args.plot_resid is _PLOT_DEFAULT else args.plot_resid
         plot_residual_and_offset(
             results,
             out,
@@ -324,8 +304,7 @@ def main() -> None:
     off_width, res_width = 14, 11
 
     header = (
-        f"{'workspace':<{name_width}}  {'mean offset':>{off_width}}  "
-        f"{'max |resid|':>{res_width}}"
+        f"{'workspace':<{name_width}}  {'mean offset':>{off_width}}  {'max |resid|':>{res_width}}"
     )
     print("\n" + "=" * len(header))
     print("CONSTANT-OFFSET SUMMARY  (sorted: flattest diff first)")

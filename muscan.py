@@ -30,6 +30,7 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
+
 def arange(start: float, stop: float, step: float) -> list[float]:
     """Inclusive float range robust to floating-point drift."""
     vals, x = [], start
@@ -39,8 +40,7 @@ def arange(start: float, stop: float, step: float) -> list[float]:
     return vals
 
 
-def detect_poi(wsfile: str, ws_name: str = "combWS",
-               mc_name: str = "ModelConfig") -> str | None:
+def detect_poi(wsfile: str, ws_name: str = "combWS", mc_name: str = "ModelConfig") -> str | None:
     """Return the first POI name from the ModelConfig, or None on failure."""
     f = ROOT.TFile(wsfile)
     if f.IsZombie():
@@ -75,8 +75,7 @@ def detect_constraint(wsfile: str, ws_name: str = "combWS") -> str | None:
     return ",".join(names) if names else None
 
 
-def detect_bkg_type(wsfile: str, ws_name: str = "combWS",
-                    probe: str = "bkg_ch0") -> str:
+def detect_bkg_type(wsfile: str, ws_name: str = "combWS", probe: str = "bkg_ch0") -> str:
     """Return 'exponential' or 'generic' based on the background PDF class."""
     f = ROOT.TFile(wsfile)
     if f.IsZombie():
@@ -92,15 +91,24 @@ def detect_bkg_type(wsfile: str, ws_name: str = "combWS",
     return cls or "unknown"
 
 
-def run_quickfit(wsfile: str, mu_val: float, result_file: str,
-                 poi: str, extra_args: list[str]) -> tuple[bool, str]:
+def run_quickfit(
+    wsfile: str, mu_val: float, result_file: str, poi: str, extra_args: list[str]
+) -> tuple[bool, str]:
     """Run quickFit with the POI fixed; return (converged, combined log)."""
     cmd = [
         "quickFit",
-        "-f", wsfile,
-        "-w", "combWS", "-m", "ModelConfig", "-d", "combData",
-        "-p", f"{poi}={mu_val}",
-        "-o", result_file,
+        "-f",
+        wsfile,
+        "-w",
+        "combWS",
+        "-m",
+        "ModelConfig",
+        "-d",
+        "combData",
+        "-p",
+        f"{poi}={mu_val}",
+        "-o",
+        result_file,
         *extra_args,
     ]
     proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -118,7 +126,7 @@ def read_result(result_file: str) -> dict | None:
         f.Close()
         return None
     tree.GetEntry(0)
-    nll    = float(tree.nll)
+    nll = float(tree.nll)
     status = int(tree.status)
 
     fr = f.Get("fitResult")
@@ -133,31 +141,43 @@ def read_result(result_file: str) -> dict | None:
 
 # ── main ─────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
     mu_group = parser.add_mutually_exclusive_group()
-    mu_group.add_argument("--mu-vals", type=str,
-                          help="Space-separated list of mu values to scan")
-    mu_group.add_argument("--mu-min",  type=float, default=0.0,
-                          help="Scan start (default: 0.0)")
+    mu_group.add_argument("--mu-vals", type=str, help="Space-separated list of mu values to scan")
+    mu_group.add_argument("--mu-min", type=float, default=0.0, help="Scan start (default: 0.0)")
 
-    parser.add_argument("--mu-max",  type=float, default=3.0,
-                        help="Scan end (default: 3.0)")
-    parser.add_argument("--mu-step", type=float, default=0.25,
-                        help="Scan step size (default: 0.25)")
-    parser.add_argument("--input",   default="simple_workspace.root",
-                        help="Input ROOT workspace file (default: simple_workspace.root)")
-    parser.add_argument("--output",  default="muscan.json",
-                        help="Output JSON file (default: muscan.json)")
-    parser.add_argument("--logdir",  default="output_simple",
-                        help="Directory for per-mu quickFit logs and result files "
-                             "(default: output_simple)")
-    parser.add_argument("--poi",     default=None,
-                        help="Parameter of interest name (default: auto-detect from ModelConfig)")
-    parser.add_argument("--nll-offset", action="store_true",
-                        help="Pass --nllOffset 0 to quickFit (suppresses automatic NLL offsetting)")
+    parser.add_argument("--mu-max", type=float, default=3.0, help="Scan end (default: 3.0)")
+    parser.add_argument(
+        "--mu-step", type=float, default=0.25, help="Scan step size (default: 0.25)"
+    )
+    parser.add_argument(
+        "--input",
+        default="simple_workspace.root",
+        help="Input ROOT workspace file (default: simple_workspace.root)",
+    )
+    parser.add_argument(
+        "--output", default="muscan.json", help="Output JSON file (default: muscan.json)"
+    )
+    parser.add_argument(
+        "--logdir",
+        default="output_simple",
+        help="Directory for per-mu quickFit logs and result files (default: output_simple)",
+    )
+    parser.add_argument(
+        "--poi",
+        default=None,
+        help="Parameter of interest name (default: auto-detect from ModelConfig)",
+    )
+    parser.add_argument(
+        "--nll-offset",
+        action="store_true",
+        help="Pass --nllOffset 0 to quickFit (suppresses automatic NLL offsetting)",
+    )
     args = parser.parse_args()
 
     if args.mu_vals:
@@ -179,8 +199,7 @@ def main() -> None:
         quickfit_extra += ["--nllOffset", "0"]
     bkg_type = detect_bkg_type(args.input)
 
-    print(f"Scanning {len(mu_values)} mu values: "
-          f"{mu_values[0]:.3g} → {mu_values[-1]:.3g}")
+    print(f"Scanning {len(mu_values)} mu values: {mu_values[0]:.3g} → {mu_values[-1]:.3g}")
     print(f"Workspace : {args.input}")
     print(f"POI       : {args.poi}")
     print(f"Background: {bkg_type}")
@@ -193,9 +212,9 @@ def main() -> None:
     scan_points = []
 
     for mu in mu_values:
-        mu_tag     = f"{mu:+.4f}".replace("+", "p").replace("-", "m").replace(".", "d")
-        result_f   = f"{args.logdir}/result_mu_{mu_tag}.root"
-        log_f      = f"{args.logdir}/log_mu_{mu_tag}.txt"
+        mu_tag = f"{mu:+.4f}".replace("+", "p").replace("-", "m").replace(".", "d")
+        result_f = f"{args.logdir}/result_mu_{mu_tag}.root"
+        log_f = f"{args.logdir}/log_mu_{mu_tag}.txt"
 
         converged, log_text = run_quickfit(args.input, mu, result_f, args.poi, quickfit_extra)
 
@@ -206,8 +225,7 @@ def main() -> None:
         point = read_result(result_f)
         if point is None:
             print(f"  mu={mu:+.4f}  ERROR: could not read result file")
-            scan_points.append({args.poi: mu, "nll": None, "fit_status": -1,
-                                 "parameters": {}})
+            scan_points.append({args.poi: mu, "nll": None, "fit_status": -1, "parameters": {}})
             continue
 
         # Treat NaN NLL (fit diverged) as a failed point
@@ -224,9 +242,10 @@ def main() -> None:
             print(f"  {args.poi}={mu:+.6f}  nll={point['nll']:+.6f}  {status_str}")
 
     # Compute delta_nll = 2*(nll - nll_min) across all converged points
-    valid_nlls = [p["nll"] for p in scan_points
-                  if p["nll"] is not None and not math.isnan(p["nll"])]
-    nll_min    = min(valid_nlls) if valid_nlls else None
+    valid_nlls = [
+        p["nll"] for p in scan_points if p["nll"] is not None and not math.isnan(p["nll"])
+    ]
+    nll_min = min(valid_nlls) if valid_nlls else None
     for p in scan_points:
         if p["nll"] is not None and nll_min is not None:
             p["delta_nll"] = 2.0 * (p["nll"] - nll_min)
@@ -238,13 +257,13 @@ def main() -> None:
 
     output = {
         "metadata": {
-            "workspace":  args.input,
-            "poi":        args.poi,
-            "bkg_type":   bkg_type,
+            "workspace": args.input,
+            "poi": args.poi,
+            "bkg_type": bkg_type,
             "constraint": constraint,
-            "n_points":   len(scan_points),
-            "nll_min":    nll_min,
-            "created":    datetime.now(timezone.utc).isoformat(),
+            "n_points": len(scan_points),
+            "nll_min": nll_min,
+            "created": datetime.now(timezone.utc).isoformat(),
         },
         "scan_points": scan_points,
     }

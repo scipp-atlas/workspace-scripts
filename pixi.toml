@@ -23,10 +23,9 @@ platforms = ["linux-64", "osx-arm64", "osx-64"]
 [dependencies]
 python = "3.12.*"
 pyhs3 = ">=0.4.0"
-# pytensor >= 2.33 is the first release with pytensor.graph.traversal; pinning it
-# explicitly (< 3 keeps it on the 2.x line pyhs3 targets) also constrains pyhs3's
-# own pytensor dependency. cxx-compiler guarantees a C++ toolchain + headers for
-# pytensor's JIT compilation.
+# pytensor >= 2.33 is the first release with pytensor.graph.traversal; the conda
+# package pulls a compatible compiled stack. < 3 keeps it on the 2.x line pyhs3
+# targets. cxx-compiler guarantees a C++ toolchain + headers for JIT compilation.
 pytensor = ">=2.33.0,<3"
 cxx-compiler = "*"
 numpy = "*"

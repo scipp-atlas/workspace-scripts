@@ -3,18 +3,23 @@
 """Evaluate the pyhs3 NLL at each scan point of a quickFit muscan.json.
 
 Loads a workspace HS3 JSON (exported by ``export_hs3.py``), builds one pyhs3
-``Model`` per per-channel likelihood (``L_ch0``, ``L_ch1``, ...), and sums the
--log(L) contributions. Prints a comparison table against the quickFit NLL
-values recorded in the matching ``scans/<stem>_muscan.json``.
+``Model`` per matched analysis, and sums the -log(L) contributions. Prints a
+comparison table against the quickFit NLL values recorded in the scan JSON
+(written by ``muscan.py``, or backfilled from legacy logs by
+``logs_to_muscan.py``).
 
-The ``diff = pyhs3_nll - qf_nll`` column is expected to be a constant offset
-across the scan; how far it deviates from constant (the max absolute residual
-about its mean) measures how well pyhs3 reproduces quickFit for a workspace.
+The POI name is read from the scan's ``metadata.poi``, so the same script works
+for toy workspaces (``mu_sig``) and real ones (e.g. ``mu_HH``). Which analyses
+to evaluate is controlled by ``--analysis``, a regex fully matched against
+analysis names: the default ``L_ch\\d+`` picks up the split per-channel toy
+likelihoods; for a real workspace pass its combined analysis name, e.g.
+``--analysis CombinedPdf_combData``.
 
-Workspace names are fully-specified by ``workflow.sh``: every make_workspace.py
-option is spelled out in the stem, e.g.
-``3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x``. Each workspace is
-``workspaces/<stem>.json`` and each scan is ``scans/<stem>_muscan.json``.
+The ``diff = pyhs3_nll - qf_nll + N*ln(C)`` column is expected to be a constant
+offset across the scan (``N*ln(C)`` corrects the known RooSimultaneous
+category-normalization offset; ``N`` = total event weight, ``C`` = number of
+channel distributions). How far it deviates from constant (the max absolute
+residual about its mean) measures how well pyhs3 reproduces quickFit.
 
 Run from the repository root (the default paths resolve to this repo's own
 ``workspaces/`` and ``scans/`` directories):
@@ -24,6 +29,11 @@ Run from the repository root (the default paths resolve to this repo's own
     python3 pyhs3_eval/eval_simple_muscan.py \\
         --workspace workspaces/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.json \\
         --scan      scans/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_muscan.json
+
+    # a real workspace with one combined likelihood; cache the compiled model
+    python3 pyhs3_eval/eval_simple_muscan.py \\
+        --workspace path/to/bbyy.json --scan scans/bbyy_muscan.json \\
+        --analysis CombinedPdf_combData --cache-dir pyhs3_eval/cache
 
     # compare several workspaces, each with its own scan, and rank by flatness:
     python3 pyhs3_eval/eval_simple_muscan.py \\
@@ -38,17 +48,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import pickle
 import re
 from pathlib import Path
 
 import numpy as np
 import pytensor
-from pytensor.graph.traversal import explicit_graph_inputs
-
-from pyhs3 import Workspace
-from pyhs3.model import Model
-
 from plot_residuals import FIELDS
+from pyhs3 import Workspace
+from pytensor.graph.traversal import explicit_graph_inputs
 
 _HERE = Path(__file__).resolve().parent
 # pyhs3_eval/ lives directly under the workspace-scripts repo root, so the
@@ -73,48 +81,128 @@ def _default_resid_plot_path() -> Path:
     return _HERE / "residual_comparison.pdf"
 
 
-def build_channel_models(ws_path: Path) -> list[tuple[Model, dict]]:
-    """Load workspace and compile one NLL function per per-channel likelihood."""
+def category_offset(ws_json: dict, analysis_names: list[str]) -> tuple[float, int, float]:
+    """RooSimultaneous category-normalization offset for the matched analyses.
+
+    Returns ``(offset, n_channels, n_events)`` where ``n_channels`` is the total
+    number of channel distributions across the matched likelihoods, ``n_events``
+    is the total event weight of their datasets (sum of weights when present,
+    raw entry count otherwise; aux/constraint data excluded), and
+    ``offset = n_events * ln(n_channels)``.
+    """
+    analyses = {a["name"]: a for a in ws_json["analyses"]}
+    likelihoods = {lk["name"]: lk for lk in ws_json["likelihoods"]}
+    data = {d["name"]: d for d in ws_json["data"]}
+
+    n_channels = 0
+    n_events = 0.0
+    for name in analysis_names:
+        lik_name = analyses[name].get("likelihood", name)
+        lik = likelihoods[lik_name]
+        n_channels += len(lik["distributions"])
+        for dname in lik["data"]:
+            d = data[dname]
+            weights = d.get("weights")
+            n_events += sum(weights) if weights is not None else len(d["entries"])
+
+    offset = n_events * np.log(n_channels) if n_channels > 0 else 0.0
+    return float(offset), n_channels, n_events
+
+
+def build_channel_models(
+    ws_path: Path,
+    analysis_pattern: str = r"L_ch\d+",
+    cache_dir: Path | None = None,
+) -> tuple[list[dict], float]:
+    """Load workspace, compile one NLL function per matched analysis.
+
+    Analyses whose name fully matches *analysis_pattern* are compiled. Returns
+    ``(channels, offset)`` where each channel is a dict with the compiled
+    ``fn``, its ``input_names``, and the model's ``data`` arrays and
+    ``free_params``; ``offset`` is the ``N*ln(C)`` category-normalization term.
+
+    With *cache_dir* set, the compiled channels are pickled per workspace/
+    pattern and reloaded on later runs (useful for large real workspaces where
+    compilation dominates; delete the cache after changing pyhs3 versions).
+    """
     print(f"Loading workspace from {ws_path} ...")
     with ws_path.open() as fh:
-        ws = Workspace(**json.load(fh))
+        ws_json = json.load(fh)
 
-    channel_analyses = sorted(
-        (a for a in ws.analyses if re.match(r"L_ch\d+$", a.name)),
+    cache_file = None
+    if cache_dir is not None:
+        slug = re.sub(r"[^A-Za-z0-9_.-]", "_", analysis_pattern)
+        cache_file = cache_dir / f"{ws_path.stem}__{slug}.pkl"
+        if cache_file.exists():
+            print(f"  Loading compiled channels from cache: {cache_file}")
+            with cache_file.open("rb") as fh:
+                channels, offset = pickle.load(fh)
+            print(f"  {len(channels)} channel model(s) loaded")
+            return channels, offset
+
+    ws = Workspace(**ws_json)
+    matched = sorted(
+        (a for a in ws.analyses if re.fullmatch(analysis_pattern, a.name)),
         key=lambda a: a.name,
     )
-    print(f"  Per-channel analyses: {[a.name for a in channel_analyses]}")
+    if not matched:
+        available = sorted(a.name for a in ws.analyses)
+        msg = f"No analysis matches --analysis '{analysis_pattern}'; available: {available}"
+        raise SystemExit(msg)
+    print(f"  Matched analyses: {[a.name for a in matched]}")
 
-    channel_models: list[tuple[Model, dict]] = []
-    for analysis in channel_analyses:
+    channels: list[dict] = []
+    for analysis in matched:
         model = ws.model(analysis, progress=False)
         nll_expr = -model.log_prob
         inputs_map = {v.name: v for v in explicit_graph_inputs([nll_expr]) if v.name is not None}
         input_names = list(inputs_map.keys())
         fn = pytensor.function(list(inputs_map.values()), nll_expr, on_unused_input="ignore")
         print(f"  {analysis.name}: compiled, {len(input_names)} inputs: {sorted(input_names)}")
-        channel_models.append((model, {"fn": fn, "input_names": input_names}))
+        channels.append(
+            {
+                "name": analysis.name,
+                "fn": fn,
+                "input_names": input_names,
+                "data": {k: np.asarray(v) for k, v in model.data.items()},
+                "free_params": dict(model.free_params),
+            }
+        )
 
-    return channel_models
+    offset, n_channels, n_events = category_offset(ws_json, [a.name for a in matched])
+    print(f"  Offset N*ln(C): N = {n_events:.6g}, C = {n_channels} -> {offset:.6f}")
+
+    if cache_file is not None:
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        with cache_file.open("wb") as fh:
+            pickle.dump((channels, offset), fh)
+        print(f"  Cached compiled channels to {cache_file}")
+
+    return channels, offset
 
 
-def eval_nll(channel_models: list[tuple[Model, dict]], params: dict[str, float]) -> float:
+def eval_nll(channels: list[dict], params: dict[str, float]) -> float:
     """Sum -log(L) over all channels at *params*."""
     total = 0.0
-    for model, compiled in channel_models:
+    for ch in channels:
         # data arrays (e.g. x) take priority over any scalar fallback in params
-        source = {**params, **model.data}
-        fn = compiled["fn"]
-        names = compiled["input_names"]
+        source = {**params, **ch["data"]}
         args = [
             np.asarray(source[n], dtype=np.float64) if n in source else np.float64(0.0)
-            for n in names
+            for n in ch["input_names"]
         ]
-        total += float(np.asarray(fn(*args)).item())
+        total += float(np.asarray(ch["fn"](*args)).item())
     return total
 
 
-def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
+def run_scan(
+    ws_path: Path,
+    scan_path: Path,
+    *,
+    analysis_pattern: str = r"L_ch\d+",
+    cache_dir: Path | None = None,
+    verbose: bool = True,
+) -> dict:
     """Evaluate one workspace against one scan and summarize the diff.
 
     Returns a dict with the per-point diffs and the constant-offset statistics:
@@ -122,29 +210,25 @@ def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
     (the largest absolute deviation of any point from that mean -- i.e. how
     far the diff strays from being a perfect constant).
     """
-    channel_models = build_channel_models(ws_path)
+    channels, offset = build_channel_models(ws_path, analysis_pattern, cache_dir)
 
     # Collect nominal free params from all channels (shared params are consistent)
     nominal: dict[str, float] = {}
-    for model, _ in channel_models:
-        nominal.update(model.free_params)
-
-    num_channels = len(channel_models)
-    num_events = sum(
-        int(np.asarray(arr).size) for model, _ in channel_models for arr in model.data.values()
-    )
+    for ch in channels:
+        nominal.update(ch["free_params"])
 
     if verbose:
         print(f"\nLoading scan points from {scan_path} ...")
     with scan_path.open() as fh:
         scan = json.load(fh)
 
+    poi = scan["metadata"].get("poi", "mu_sig")
     qf_nll_min = scan["metadata"]["nll_min"]
     bkg_type = scan["metadata"].get("bkg_type", "")
     points = scan["scan_points"]
     if verbose:
-        print(f"  {len(points)} scan points, quickFit NLL_min = {qf_nll_min:.6f}\n")
-        header = f"{'mu_sig':>8}  {'qf_nll':>14}  {'pyhs3_nll':>14}  {'diff':>16}"
+        print(f"  {len(points)} scan points, POI = {poi}, quickFit NLL_min = {qf_nll_min:.6f}\n")
+        header = f"{poi:>8}  {'qf_nll':>14}  {'pyhs3_nll':>14}  {'diff':>16}"
         print(header)
         print("-" * len(header))
 
@@ -152,12 +236,12 @@ def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
     qf_nlls: list[float] = []
     pyhs3_nlls: list[float] = []
     diffs: list[float] = []
-    for pt_data in sorted(points, key=lambda p: p["mu_sig"]):
-        mu = pt_data["mu_sig"]
+    for pt_data in sorted(points, key=lambda p: p[poi]):
+        mu = pt_data[poi]
         qf_nll = pt_data["nll"]
 
         params: dict[str, float] = dict(nominal)
-        params["mu_sig"] = mu
+        params[poi] = mu
         for name, info in pt_data["parameters"].items():
             val = info["value"]
             # muscan.json uses ROOT's negative-tau convention for exponential_dist;
@@ -166,8 +250,8 @@ def run_scan(ws_path: Path, scan_path: Path, *, verbose: bool = True) -> dict:
                 val = -val
             params[name] = val
 
-        pyhs3_nll = eval_nll(channel_models, params)
-        diff = pyhs3_nll - qf_nll + num_events * np.log(num_channels)
+        pyhs3_nll = eval_nll(channels, params)
+        diff = pyhs3_nll - qf_nll + offset
         mus.append(mu)
         qf_nlls.append(qf_nll)
         pyhs3_nlls.append(pyhs3_nll)
@@ -207,6 +291,23 @@ def main() -> None:
     )
     parser.add_argument("--workspace", type=Path, default=_DEFAULT_WS)
     parser.add_argument("--scan", type=Path, default=_DEFAULT_SCAN)
+    parser.add_argument(
+        "--analysis",
+        default=r"L_ch\d+",
+        metavar="REGEX",
+        help="Regex fully matched against analysis names to select which "
+        "likelihoods to evaluate (default: the split per-channel toy "
+        "analyses 'L_ch\\d+'; for a real workspace pass its combined "
+        "analysis name, e.g. 'CombinedPdf_combData')",
+    )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=None,
+        metavar="DIR",
+        help="Cache compiled channel models here (recommended for large real "
+        "workspaces; delete the cache after changing pyhs3 versions)",
+    )
     parser.add_argument(
         "--pair",
         nargs=2,
@@ -274,7 +375,15 @@ def main() -> None:
             print(f"WORKSPACE: {ws_path}")
             print(f"SCAN:      {scan_path}")
             print("=" * 72)
-        results.append(run_scan(ws_path, scan_path, verbose=True))
+        results.append(
+            run_scan(
+                ws_path,
+                scan_path,
+                analysis_pattern=args.analysis,
+                cache_dir=args.cache_dir,
+                verbose=True,
+            )
+        )
 
     if args.plot_nll is not None:
         from plot_muscan_nll import plot_nll_curves  # noqa: PLC0415

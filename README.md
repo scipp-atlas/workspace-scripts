@@ -198,7 +198,33 @@ python3 muscan.py --input workspaces/<stem>.root --output scans/<stem>_muscan.js
 | `--input` / `--output` | Input workspace / output JSON |
 | `--logdir` | Directory for per-mu quickFit logs and result files (default `output_simple`) |
 | `--poi` | POI name (default: auto-detected from ModelConfig) |
+| `--workspace-name` / `--modelconfig-name` / `--dataset-name` | Object names inside the ROOT file (defaults `combWS` / `ModelConfig` / `combData`); override for real workspaces with different conventions |
 | `--nll-offset` | Pass `--nllOffset 0` to quickFit (suppresses automatic NLL offsetting) |
+
+The JSON is the single interchange contract with the pyhs3 side: it works
+identically for toy and real workspaces (see `test_muscan.sh` for a real
+example), and its `metadata` records the POI, object names, NLL convention
+(RooFit single `-log L`), and the exact quickFit command used.
+
+### `logs_to_muscan.py`
+
+Backfill converter for legacy real-workspace scans that only left behind an
+`nlls.txt` plus per-point Minuit logs (`log__mu_*.txt`): converts such a
+directory into the same `muscan.json` schema that `muscan.py` writes. Pure
+Python — no ROOT needed; new scans should use `muscan.py` directly.
+
+```bash
+python3 logs_to_muscan.py --log-dir output__workspace_FINAL_ISOBUGFIX \
+    --poi mu_HH --output scans/bbyy_muscan.json
+```
+
+| Option | Description |
+|--------|-------------|
+| `--log-dir` | Directory containing `nlls.txt` and the per-mu log files |
+| `--poi` | POI name keying the scan points (e.g. `mu_HH`) |
+| `--nlls` / `--log-pattern` | Override `nlls.txt` path / log glob (default `log__mu_*.txt`) |
+| `--workspace` | Workspace label recorded in metadata |
+| `--output` | Output JSON (default `<log-dir>/muscan.json`) |
 
 ### `export_hs3.py`
 

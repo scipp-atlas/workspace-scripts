@@ -78,6 +78,8 @@ python3 pyhs3_eval/eval_simple_muscan.py \
 |--------|-------------|
 | `--workspace` / `--scan` | Single workspace HS3 JSON and its muscan JSON (defaults to the 3ch base variant) |
 | `--pair WS SCAN` | A workspace/scan pair; repeat to compare several and print a ranked constant-offset summary |
+| `--analysis REGEX` | Regex fully matched against analysis names to select the likelihoods (default `L_ch\d+`, the split toy channels; for a real workspace pass its combined analysis name, e.g. `CombinedPdf_combData`) |
+| `--cache-dir DIR` | Pickle the compiled channel models per workspace/pattern and reload on later runs (recommended for large real workspaces; delete after changing pyhs3 versions) |
 | `--plot-nll [PATH]` | Plot pyhs3 vs quickFit ΔNLL curves (one panel per workspace) via `plot_muscan_nll.py` |
 | `--plot-resid [PATH]` | Plot mean offset and max residual per workspace via `plot_residuals.py` |
 | `--plot-resid-field FIELD…` | Workspace-name field(s) for the residual-plot x labels (default `channels`) |

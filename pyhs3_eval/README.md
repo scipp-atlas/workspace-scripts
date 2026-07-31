@@ -80,7 +80,7 @@ python3 pyhs3_eval/eval_simple_muscan.py \
 | `--pair WS SCAN` | A workspace/scan pair; repeat to compare several and print a ranked constant-offset summary |
 | `--analysis REGEX` | Regex fully matched against analysis names to select the likelihoods (default `L_ch\d+`, the split toy channels; for a real workspace pass its combined analysis name, e.g. `CombinedPdf_combData`) |
 | `--cache-dir DIR` | Pickle each compiled channel model (written right after it compiles, so an interrupted run keeps finished channels) and reload on later runs; recommended for large real workspaces; delete after changing pyhs3 versions |
-| `--pytensor-mode MODE` | Override the pytensor compilation mode, e.g. `FAST_COMPILE` for a quick python-backend build (default: `FAST_RUN`); part of the cache key |
+| `--pytensor-mode MODE` | Override the pytensor compilation mode (default: `FAST_RUN`). `NO_REWRITES` skips pytensor's graph-rewrite phase entirely and evaluates in pure Python — use it for large real workspaces where `FAST_RUN`/`FAST_COMPILE` pin the CPU for hours during rewriting (evaluation is slower per point, but with ~30 scan points that's seconds, not hours); part of the cache key |
 | `--plot-nll [PATH]` | Plot pyhs3 vs quickFit ΔNLL curves (one panel per workspace) via `plot_muscan_nll.py` |
 | `--plot-resid [PATH]` | Plot mean offset and max residual per workspace via `plot_residuals.py` |
 | `--plot-resid-field FIELD…` | Workspace-name field(s) for the residual-plot x labels (default `channels`) |

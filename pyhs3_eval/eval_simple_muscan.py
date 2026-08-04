@@ -401,17 +401,29 @@ def build_channel_models(
     for analysis in matched:
         cache_file = channel_cache_file(analysis.name)
         if cache_file is not None and cache_file.exists():
-            print(f"  {analysis.name}: loading from cache {cache_file}")
+            print(f"  {analysis.name}: loading from cache {cache_file}", flush=True)
+            # Unpickling re-runs the linker: cheap for the py linker
+            # (NO_REWRITES), but with the default C/cvm linker it recomputes
+            # per-node C-module cache keys and can rival the original compile.
+            t0 = time.perf_counter()
             with cache_file.open("rb") as fh:
                 channels.append(pickle.load(fh))
+            print(f"  {analysis.name}: cache loaded in {time.perf_counter() - t0:.1f}s", flush=True)
             continue
 
+        if cache_file is not None:
+            print(f"  {analysis.name}: no cache at {cache_file}; compiling", flush=True)
         channel = compile_channel(ws, analysis, mode, extra_free, json_nominal)
         if cache_file is not None:
             cache_file.parent.mkdir(parents=True, exist_ok=True)
+            t0 = time.perf_counter()
             with cache_file.open("wb") as fh:
                 pickle.dump(channel, fh)
-            print(f"  {analysis.name}: cached to {cache_file}")
+            print(
+                f"  {analysis.name}: cached to {cache_file} "
+                f"in {time.perf_counter() - t0:.1f}s",
+                flush=True,
+            )
         channels.append(channel)
 
     offset, n_channels, n_events = category_offset(ws_json, [a.name for a in matched])

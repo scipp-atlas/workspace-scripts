@@ -10,13 +10,9 @@
 #       --workspace <real-workspace HS3 .json> \
 #       --scan      <outdir>/<wsName>_muscan.json \
 #       --analysis  CombinedPdf_combData --cache-dir pyhs3_eval/cache
-#
-# Edit the paths below for the workspace under test. If the internal object
-# names differ from the toy convention, override with --workspace-name /
-# --modelconfig-name / --dataset-name (defaults: combWS/ModelConfig/combData).
+
 basedir=/home/mhance/pyhs3
 export XML=workspace_FINAL_ISOBUGFIX
-#export XML=workspace
 export wsName=WS-bbyy-non-resonant-non-param
 export wsFile=${basedir}/${XML}/${wsName}.root
 export outdir=output__${XML}

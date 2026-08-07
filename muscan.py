@@ -40,7 +40,7 @@ def arange(start: float, stop: float, step: float) -> list[float]:
     return vals
 
 
-def detect_poi(wsfile: str, ws_name: str = "combWS", mc_name: str = "ModelConfig") -> str | None:
+def detect_poi(wsfile: str, ws_name: str, mc_name: str) -> str | None:
     """Return the first POI name from the ModelConfig, or None on failure."""
     f = ROOT.TFile(wsfile)
     if f.IsZombie():
@@ -56,7 +56,7 @@ def detect_poi(wsfile: str, ws_name: str = "combWS", mc_name: str = "ModelConfig
     return poi
 
 
-def detect_constraint(wsfile: str, ws_name: str = "combWS") -> str | None:
+def detect_constraint(wsfile: str, ws_name: str) -> str | None:
     """Return a comma-separated list of all constraint PDFs (constr_*), or None.
     Detects e.g. constr_alpha_sigma (Gaussian) or constr_gamma_sigma (Poisson)
     so the right --externalConstraint is passed for every workspace variant.
@@ -75,7 +75,7 @@ def detect_constraint(wsfile: str, ws_name: str = "combWS") -> str | None:
     return ",".join(names) if names else None
 
 
-def detect_bkg_type(wsfile: str, ws_name: str = "combWS", probe: str = "bkg_ch0") -> str:
+def detect_bkg_type(wsfile: str, ws_name: str, probe: str = "bkg_ch0") -> str:
     """Return 'exponential' or 'generic' based on the background PDF class."""
     f = ROOT.TFile(wsfile)
     if f.IsZombie():
@@ -91,26 +91,35 @@ def detect_bkg_type(wsfile: str, ws_name: str = "combWS", probe: str = "bkg_ch0"
     return cls or "unknown"
 
 
-def run_quickfit(
-    wsfile: str, mu_val: float, result_file: str, poi: str, extra_args: list[str]
-) -> tuple[bool, str]:
-    """Run quickFit with the POI fixed; return (converged, combined log)."""
-    cmd = [
+def quickfit_cmd(
+    wsfile: str,
+    mu_val: float,
+    result_file: str,
+    poi: str,
+    names: dict[str, str],
+    extra_args: list[str],
+) -> list[str]:
+    """Build the quickFit command for one scan point."""
+    return [
         "quickFit",
         "-f",
         wsfile,
         "-w",
-        "combWS",
+        names["workspace"],
         "-m",
-        "ModelConfig",
+        names["modelconfig"],
         "-d",
-        "combData",
+        names["dataset"],
         "-p",
         f"{poi}={mu_val}",
         "-o",
         result_file,
         *extra_args,
     ]
+
+
+def run_quickfit(cmd: list[str]) -> tuple[bool, str]:
+    """Run quickFit; return (converged, combined log)."""
     proc = subprocess.run(cmd, capture_output=True, text=True)
     return proc.returncode == 0, proc.stdout + proc.stderr
 
@@ -174,6 +183,21 @@ def main() -> None:
         help="Parameter of interest name (default: auto-detect from ModelConfig)",
     )
     parser.add_argument(
+        "--workspace-name",
+        default="combWS",
+        help="Name of the RooWorkspace object inside the ROOT file (default: combWS)",
+    )
+    parser.add_argument(
+        "--modelconfig-name",
+        default="ModelConfig",
+        help="Name of the ModelConfig inside the workspace (default: ModelConfig)",
+    )
+    parser.add_argument(
+        "--dataset-name",
+        default="combData",
+        help="Name of the dataset inside the workspace (default: combData)",
+    )
+    parser.add_argument(
         "--nll-offset",
         action="store_true",
         help="Pass --nllOffset 0 to quickFit (suppresses automatic NLL offsetting)",
@@ -187,20 +211,29 @@ def main() -> None:
 
     os.makedirs(args.logdir, exist_ok=True)
 
+    names = {
+        "workspace": args.workspace_name,
+        "modelconfig": args.modelconfig_name,
+        "dataset": args.dataset_name,
+    }
+
     # Auto-detect workspace properties.
     if args.poi is None:
-        args.poi = detect_poi(args.input)
+        args.poi = detect_poi(args.input, args.workspace_name, args.modelconfig_name)
         if args.poi is None:
             print("ERROR: could not detect POI from ModelConfig; use --poi to specify it")
             sys.exit(1)
-    constraint = detect_constraint(args.input)
+    constraint = detect_constraint(args.input, args.workspace_name)
     quickfit_extra = ["--externalConstraint", constraint] if constraint else []
     if args.nll_offset:
         quickfit_extra += ["--nllOffset", "0"]
-    bkg_type = detect_bkg_type(args.input)
+    bkg_type = detect_bkg_type(args.input, args.workspace_name)
 
     print(f"Scanning {len(mu_values)} mu values: {mu_values[0]:.3g} → {mu_values[-1]:.3g}")
     print(f"Workspace : {args.input}")
+    print(
+        f"Names     : ws={args.workspace_name}  mc={args.modelconfig_name}  data={args.dataset_name}"
+    )
     print(f"POI       : {args.poi}")
     print(f"Background: {bkg_type}")
     print(f"Constraint: {constraint or '(none)'}")
@@ -216,7 +249,8 @@ def main() -> None:
         result_f = f"{args.logdir}/result_mu_{mu_tag}.root"
         log_f = f"{args.logdir}/log_mu_{mu_tag}.txt"
 
-        converged, log_text = run_quickfit(args.input, mu, result_f, args.poi, quickfit_extra)
+        cmd = quickfit_cmd(args.input, mu, result_f, args.poi, names, quickfit_extra)
+        converged, log_text = run_quickfit(cmd)
 
         # Write per-mu log regardless of convergence
         with open(log_f, "w") as fh:
@@ -255,12 +289,25 @@ def main() -> None:
     # Sort by POI value for clean output
     scan_points.sort(key=lambda p: p[args.poi])
 
+    # Template command with the per-point POI value and result path elided,
+    # recorded so the scan JSON documents exactly how it was produced.
+    cmd_template = quickfit_cmd(
+        args.input, float("nan"), "<result.root>", args.poi, names, quickfit_extra
+    )
+    cmd_template[cmd_template.index(f"{args.poi}=nan")] = f"{args.poi}=<mu>"
+
     output = {
         "metadata": {
             "workspace": args.input,
+            "workspace_name": args.workspace_name,
+            "modelconfig_name": args.modelconfig_name,
+            "dataset_name": args.dataset_name,
             "poi": args.poi,
             "bkg_type": bkg_type,
             "constraint": constraint,
+            "nll_convention": "-log L (RooFit single negative log-likelihood)",
+            "quickfit_command": " ".join(cmd_template),
+            "source": "muscan.py",
             "n_points": len(scan_points),
             "nll_min": nll_min,
             "created": datetime.now(timezone.utc).isoformat(),

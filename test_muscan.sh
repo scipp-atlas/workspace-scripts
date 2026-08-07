@@ -1,3 +1,19 @@
+#!/bin/bash
+# Run the standardized mu scan against a real (non-toy) workspace on the
+# remote (requires ROOT + quickFit; source setup_local.sh first).
+#
+# muscan.py reads the post-fit parameters from the quickFit result .root files
+# and writes the same muscan.json schema used for the toy workspaces, so the
+# pyhs3 evaluation is identical for both:
+#
+#   python3 pyhs3_eval/eval_simple_muscan.py \
+#       --workspace <real-workspace HS3 .json> \
+#       --scan      <outdir>/<wsName>_muscan.json \
+#       --analysis  CombinedPdf_combData --cache-dir pyhs3_eval/cache
+#
+# Edit the paths below for the workspace under test. If the internal object
+# names differ from the toy convention, override with --workspace-name /
+# --modelconfig-name / --dataset-name (defaults: combWS/ModelConfig/combData).
 basedir=/home/mhance/pyhs3
 export XML=workspace_FINAL_ISOBUGFIX
 #export XML=workspace
@@ -12,4 +28,4 @@ python3 muscan.py \
     --mu-vals "${muvals}" \
     --nll-offset \
     --logdir  ${outdir} \
-    --output  ${outdir}/muscan.json
+    --output  ${outdir}/${wsName}_muscan.json

@@ -61,8 +61,9 @@ troubleshooting.
 ```bash
 # 1. Generation stage (ROOT/quickFit environment)
 source setup_local.sh
-bash workflow.sh            # whole variant matrix, random seed 42
-bash workflow.sh --seed 7   # reproducible toys with a different seed
+bash workflow.sh                 # whole variant matrix, random seed 42
+bash workflow.sh --seed 7        # reproducible toys with a different seed
+bash workflow.sh --steps export  # only re-export HS3 JSON from existing .root files
 
 # 2. Validation stage (pyhs3 environment, via pixi)
 pixi install                                          # one-time env setup
@@ -78,15 +79,17 @@ JSON next to each workspace under `workspaces/`.
 ## Model
 
 Each workspace is a simultaneous fit across `N` channels (`ch0` … `ch{N-1}`,
-default `N=3`, up to 30) with observable `x` in [10, 20].
+default `N=3`, no upper limit — the first 30 use a hardcoded per-channel table,
+beyond that a deterministic per-index formula) with observable `x` in [10, 20].
 
 | Component | Description |
 |-----------|-------------|
-| Signal | Gaussian at mean = 15, per-channel nominal width ~1, ~7 events/channel at `mu_sig = 1` (or a `RooGenericPdf` with `--generic-sig`) |
+| Signal | Gaussian at mean = 15, per-channel nominal width ~1, ~7 events/channel at `mu_sig = 1` (or a `RooGenericPdf` with `--generic-sig`, or a double-sided Crystal Ball with `--sig-form dscb` — `RooCrystalBall` with fixed tail parameters αL=1.5, nL=5, αR=2, nR=3 around the same Gaussian core) |
 | Background | `RooExponential`, or `RooGenericPdf` of exponential or polynomial form, ~23 events/channel |
 | POI | `mu_sig` — signal strength, floated in [−5, 10] |
 | Unconstrained NPs | `tau_ch*` (bkg shape; held constant with `--fix-bkg-shape`), `nbkg_ch*` (bkg yield) |
 | Width NP | Shared signal-width nuisance — `alpha_sigma` (additive, ±10%/σ) or `gamma_sigma` (multiplicative), depending on the constraint form |
+| Yield-syst NPs | Optional (`--num-systs M`): shared Gaussian-constrained NPs `alpha_syst<j>` scaling every channel's signal yield via per-channel response factors `resp_syst<j>_<ch>` (3–7% per σ) |
 
 ### Signal-width nuisance parameter (`--constraint`)
 
@@ -97,6 +100,19 @@ default `N=3`, up to 30) with observable `x` in [10, 20].
 | `none` | `alpha_sigma` | none (free NP, no aux term) | additive, as in `gauss` |
 
 `--no-np` drops the width NP entirely and fixes the signal width at nominal.
+
+### Yield systematics (`--num-systs M`)
+
+`--num-systs M` adds `M` shared nuisance parameters `alpha_syst<j>` (j = 0…M−1),
+each unit-Gaussian constrained (`constr_alpha_syst<j>`, global observable
+`nom_alpha_syst<j>`) and entering every channel's signal yield as
+`nsig_tot_<ch> = mu_sig * nsig_<ch> * Π_j (1 + δ(j,ch) * alpha_syst<j>)` with
+`δ` varying between 3% and 7% by systematic and channel (so no systematic is
+degenerate with `mu_sig`). This approximates the many correlated constrained
+systematics of real workspaces for pyhs3 performance studies. It is independent
+of the width-NP flags (`--no-np`, `--constraint`), and the toy datasets are
+identical to the systs-less workspace for a given seed since all alphas sit at 0
+during generation.
 
 The constraint PDF is supplied to quickFit via `--externalConstraint` (not
 wrapped in a `RooProdPdf`, which breaks extended-likelihood evaluation for
@@ -112,6 +128,8 @@ silently break detection elsewhere:
   `x`, category `index`, POI `mu_sig`.
 - Per-channel objects `tau_<ch>`, `bkg_<ch>`, `sig_<ch>`, `nbkg_<ch>`,
   `model_<ch>`.
+- Yield systematics (`--num-systs`): `alpha_syst<j>`, `constr_alpha_syst<j>`,
+  `nom_alpha_syst<j>`, `resp_syst<j>_<ch>`.
 - Constraint PDFs are named `constr_*`; the fit/scan scripts pass all of them via
   `--externalConstraint`, and `export_hs3.py` detects them structurally.
 
@@ -122,8 +140,10 @@ each `make_workspace.py` option is spelled out in a fixed order, so comparing tw
 names shows exactly which aspects differ:
 
 ```
-<N>ch_bkg{RooExp|GenExp|GenPoly}_sig{Gauss|Generic}_shape{Float|Fixed}_np{On|Off}_constr{Gauss|Poisson|None}_yield<F>x
+<N>ch_bkg{RooExp|GenExp|GenPoly}_sig{Gauss|Generic|DSCB}_shape{Float|Fixed}_np{On|Off}_constr{Gauss|Poisson|None}_yield<F>x[_systs<M>]
 ```
+
+(the `_systs<M>` suffix appears only when `--num-systs` is nonzero.)
 
 For example `3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x` is the
 base variant. `pyhs3_eval/` and `workspace_comparison.sh` parse this stem.
@@ -145,10 +165,12 @@ python3 make_workspace.py --no-np                         # no width NP
 python3 make_workspace.py --generic-bkg                   # RooGenericPdf exponential bkg
 python3 make_workspace.py --generic-bkg --bkg-form poly   # RooGenericPdf polynomial bkg
 python3 make_workspace.py --generic-sig                   # signal as RooGenericPdf
+python3 make_workspace.py --sig-form dscb                 # double-sided crystal ball signal
 python3 make_workspace.py --constraint poisson            # Poisson-constrained width NP (gamma_sigma)
 python3 make_workspace.py --constraint none               # free width NP, no constraint
 python3 make_workspace.py --fix-bkg-shape                 # hold tau_ch constant
-python3 make_workspace.py --num-channels 30               # up to 30 channels
+python3 make_workspace.py --num-channels 100              # any number of channels
+python3 make_workspace.py --num-systs 20                  # 20 shared constrained yield NPs
 python3 make_workspace.py --yield-sf 10                   # scale all yields ×10
 python3 make_workspace.py --seed 123 --output my_ws.root
 ```
@@ -159,9 +181,11 @@ python3 make_workspace.py --seed 123 --output my_ws.root
 | `--generic-bkg` | Use `RooGenericPdf` instead of `RooExponential` for the background |
 | `--bkg-form {exp,poly}` | Generic background form (only with `--generic-bkg`); default `exp` |
 | `--generic-sig` | Express the signal Gaussian as a `RooGenericPdf` |
+| `--sig-form {gauss,dscb}` | Signal shape: Gaussian (default) or double-sided Crystal Ball (`RooCrystalBall`, fixed tails; `dscb` overrides `--generic-sig`) |
 | `--fix-bkg-shape` | Hold `tau_ch` constant so the bkg shape is frozen during the scan |
 | `--constraint {gauss,poisson,none}` | Constraint form for the width NP (default `gauss`) |
-| `--num-channels N` | Number of channels, 1–30 (default 3) |
+| `--num-channels N` | Number of channels (default 3, no upper limit; first 30 from the hardcoded table, beyond that a deterministic formula) |
+| `--num-systs M` | Add `M` shared Gaussian-constrained yield-systematic NPs (default 0) |
 | `--yield-sf F` | Scale all signal and background yields by `F` (default 1.0) |
 | `--seed N` | Random seed for toy generation (default 42) |
 | `--output NAME.root` | Output file (default: auto-derived from options) |
@@ -230,10 +254,13 @@ python3 logs_to_muscan.py --log-dir output__workspace_FINAL_ISOBUGFIX \
 
 Exports a workspace to HS3 JSON via `RooJSONFactoryWSTool`, then applies an
 ordered chain of in-place fixes so pyhs3 can consume it (collapse ROOT's
-exponential sign-inversion intermediates, repair axes, split the combined
-likelihood per channel, add `init: default_values`, drop observables from
-parameter sets, and wire standalone constraints into the first channel's
-likelihood). Each fix is toggleable with `--no-fix-*`, or all off with
+exponential sign-inversion intermediates, repair axes, add
+`init: default_values`, drop observables from parameter sets, and wire
+standalone constraints into the combined likelihood). The single combined
+likelihood over all channels (the `RooSimultaneous` joint fit, analysis
+`sim_pdf_combData`) is preserved by default; pass `--split-likelihoods` to
+instead split it into independent per-channel `L_ch<i>` analyses (debugging
+only). Each fix is toggleable with `--no-fix-*`, or all off with
 `--no-cleanup`.
 
 ```bash
@@ -274,11 +301,16 @@ python3 plot_muscan.py scans/*.json --overlay   # all curves on one figure
 
 Orchestrates the full sequence over the whole variant matrix (defined in the
 `VARIANTS` array): generate → fit → plot → mu scan → HS3 export, naming every
-output with the canonical stem.
+output with the canonical stem. `--steps` runs a subset of the stages
+(`ws,fit,plot,scan,export`) against the existing artifacts — e.g.
+`--steps export` re-exports HS3 JSON from the already-built `workspaces/*.root`
+without regenerating workspaces or re-running fits/scans.
 
 ```bash
 bash workflow.sh
 bash workflow.sh --seed 99
+bash workflow.sh --steps export        # re-export HS3 JSON only
+bash workflow.sh --steps scan,export   # re-scan and re-export
 ```
 
 ### `pyhs3_eval/` — pyhs3 validation

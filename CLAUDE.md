@@ -19,8 +19,9 @@ source setup_local.sh   # run once per shell; sources ATLAS local setup + LCG_10
 ## Commands
 
 ```bash
-bash workflow.sh                 # full pipeline over all ~20 variants (seed 42)
+bash workflow.sh                 # full pipeline over all variants (seed 42)
 bash workflow.sh --seed 7        # reproducible toys with a different seed
+bash workflow.sh --steps export  # rerun a stage subset (ws,fit,plot,scan,export) on existing artifacts
 
 python3 make_workspace.py [flags]            # generate one workspace .root
 bash run_simple_fit.sh [workspace.root]      # one unconditional quickFit fit
@@ -48,9 +49,10 @@ The downstream scripts (`muscan.py`, `run_simple_fit.sh`, `export_hs3.py`) inspe
 - Workspace `combWS`, ModelConfig `ModelConfig`, dataset `combData`, observable `x`, category `index`, POI `mu_sig`.
 - Per-channel objects: `tau_<ch>`, `bkg_<ch>`, `sig_<ch>`, `nbkg_<ch>`, `model_<ch>` for channels `ch0`…`ch{N-1}`.
 - Constraint PDFs are named `constr_*` (e.g. `constr_alpha_sigma`, `constr_gamma_sigma`). `muscan.py` and `run_simple_fit.sh` find all `constr_*` PDFs and pass them via `--externalConstraint`. `export_hs3.py` detects constraints structurally (a distribution whose `x` is a const global observable, not referenced in any likelihood).
+- Yield systematics (`--num-systs M`): shared NPs `alpha_syst<j>` with constraints `constr_alpha_syst<j>`, global observables `nom_alpha_syst<j>`, and per-channel response factors `resp_syst<j>_<ch>` folded into `nsig_tot_<ch>`.
 - Background type detection probes `bkg_ch0`'s class (`RooExponential` vs `RooGenericPdf`).
 
-The `CHANNELS` dict in `make_workspace.py` caps the channel count at 30.
+`--num-channels` has no upper limit: the first 30 channels come from the hardcoded `CHANNELS` dict in `make_workspace.py`; beyond that, `get_channels()` extends it with a deterministic per-index formula (seed-independent).
 
 ### Critical RooFit constraint: do NOT wrap RooSimultaneous in RooProdPdf
 
@@ -62,10 +64,11 @@ ROOT's `RooJSONFactoryWSTool.exportJSON` produces HS3 that pyhs3 cannot consume 
 
 1. `fix_exponential_functions` — collapse ROOT's `-tau` sign-inversion intermediates (HS3 uses `exp(-c*x)`, RooExponential uses `exp(tau*x)`), flipping signs in domains/parameter_points.
 2. `fix_null_axes` / `fix_dataset_axes` — repair empty/malformed axis entries.
-3. `fix_split_likelihoods` — split the single combined likelihood into one per channel and rewrite analyses.
-4. `fix_analysis_init` — add `init: default_values`.
-5. `fix_remove_obs_from_params` — drop non-const observables from parameter sets so they don't overwrite data at eval time.
-6. `fix_constraint_pdfs` — wire standalone constraints into the first channel's likelihood under `aux_distributions`/`aux_data` (default; `--no-aux-constraints` uses `distributions`/`data` and writes a `_noaux.json` file).
+3. `fix_analysis_init` — add `init: default_values`.
+4. `fix_remove_obs_from_params` — drop non-const observables from parameter sets so they don't overwrite data at eval time.
+5. `fix_constraint_pdfs` — wire standalone constraints into the first likelihood under `aux_distributions`/`aux_data` (default; `--no-aux-constraints` uses `distributions`/`data` and writes a `_noaux.json` file).
+
+The single combined likelihood (ROOT's HS3 form of the `RooSimultaneous` joint fit, analysis `sim_pdf_combData`) is kept intact by default so pyhs3 evaluates one joint likelihood over all channels, matching real workspaces. `fix_split_likelihoods` (opt-in via `--split-likelihoods`, debugging only) instead splits it into independent per-channel `L_ch<i>` likelihoods/analyses.
 
 ### Output layout (all git-ignored)
 

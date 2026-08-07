@@ -2,11 +2,14 @@
 """
 Generate a simple multi-channel RooFit workspace for quickFit testing.
 
-The number of channels is configurable via --num-channels (default 3, up to 30);
-the examples below use the default three channels ch0, ch1, ch2.
+The number of channels is configurable via --num-channels (default 3, no upper
+limit; the first 30 use the hardcoded CHANNELS table, beyond that a deterministic
+per-index formula). The examples below use the default three channels ch0, ch1, ch2.
 
 Model (per channel, unbinned, x in [10, 20]):
   Signal   : Gaussian(x, mean=15, sigma_ch), normalization = mu_sig * nsig_ch
+           or double-sided Crystal Ball (--sig-form dscb; RooCrystalBall with
+              fixed tail parameters, same mean/sigma_ch core)
   Background: RooExponential(x, tau_ch)  [default]
            or RooGenericPdf ~ exp(tau_ch*x)  [--generic-bkg; same shape, generic_dist in HS3]
               normalization = nbkg_ch (free)
@@ -16,9 +19,18 @@ Systematic uncertainty (with --np, the default):
                  sigma_ch = sigma_nom_ch * (1 + SIGMA_DELTA * alpha_sigma)
                  Shared across all channels (correlated).
 
+Yield systematics (--num-systs M, default 0):
+  alpha_syst<j> (j = 0..M-1): shared unit-Gaussian-constrained NPs, each scaling
+  every channel's signal yield through a per-channel response factor
+  resp_syst<j>_<ch> = 1 + delta(j, ch) * alpha_syst<j>, delta in 3-7%.
+  Constraints are named constr_alpha_syst<j> (auto-detected downstream).
+  Independent of the width NP flags; alphas sit at 0 during toy generation, so
+  datasets are identical to the systs-less workspace for a given seed.
+
 POI  : mu_sig       (signal strength, floated in fit)
 NPs  : tau_ch{0,1,2}, nbkg_ch{0,1,2}  (unconstrained)
        alpha_sigma                     (Gaussian constrained, --np only)
+       alpha_syst{0..M-1}              (Gaussian constrained, --num-systs M)
 Fixed: mean_ch*, sigma_nom_ch*, nsig_ch*
 
 Expected yield per channel at mu_sig=1: ~30 events (7 signal + 23 background)
@@ -82,12 +94,50 @@ CHANNELS = {
     "ch29": {"tau": -0.31, "nsig": 7.0, "nbkg": 23.0, "sigma": 1.02},
 }
 
+
+def _channel_cfg(i: int) -> dict:
+    """Deterministic config for channel index i >= 30 (ch0-ch29 stay hardcoded).
+
+    Cycles tau through [-0.36, -0.24] and sigma through [0.85, 1.15] using
+    coprime strides so consecutive channels differ, mirroring the spread of
+    the hardcoded table. Independent of --seed by construction.
+    """
+    tau = -0.24 - 0.01 * ((7 * i) % 13)
+    sigma = 0.85 + 0.01 * ((11 * i) % 31)
+    return {"tau": round(tau, 2), "nsig": 7.0, "nbkg": 23.0, "sigma": round(sigma, 2)}
+
+
+def get_channels(n: int) -> dict:
+    """First n channel configs: hardcoded CHANNELS for i < 30, formula beyond."""
+    if n < 1:
+        raise SystemExit(f"--num-channels must be >= 1 (got {n})")
+    out = dict(islice(CHANNELS.items(), min(n, len(CHANNELS))))
+    for i in range(len(out), n):
+        out[f"ch{i}"] = _channel_cfg(i)
+    return out
+
 # Relative uncertainty on signal width applied by alpha_sigma (±1σ → ±10%)
 SIGMA_DELTA = 0.10
+
+# Base relative yield effect of the shared systematics (--num-systs)
+SYST_DELTA_BASE = 0.03
+
+
+def _syst_delta(j: int, i: int) -> float:
+    """Relative yield effect of alpha_syst<j> on channel i: 3-7%, varying with
+    both indices so no syst is degenerate with mu_sig."""
+    return SYST_DELTA_BASE + 0.01 * ((j + 2 * i) % 5)
 
 POLY_SLOPE_INIT = -0.02
 POLY_SLOPE_LO = -0.049
 POLY_SLOPE_HI = 0.049
+
+# Double-sided crystal ball tail parameters (fixed; --sig-form dscb).
+# Mildly asymmetric so a left/right swap in an export round-trip is detectable.
+DSCB_ALPHA_L = 1.5
+DSCB_N_L = 5.0
+DSCB_ALPHA_R = 2.0
+DSCB_N_R = 3.0
 
 
 def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
@@ -118,10 +168,26 @@ def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
     return tau, bkg
 
 
-def build_signal(ch, x, mean, sigma, *, generic_sig, keep):
-    """Return the signal pdf (RooGaussian, or RooGenericPdf with
-    --generic-sig)."""
-    if generic_sig:
+def build_signal(ch, x, mean, sigma, *, generic_sig, sig_form, keep):
+    """Return the signal pdf.
+
+    RooGaussian by default, RooGenericPdf with --generic-sig, or a
+    double-sided RooCrystalBall with --sig-form dscb (fixed tail
+    parameters, shared symmetric width so the sigma NP still applies).
+    The pdf is named sig_<ch> in every case (downstream contract).
+    """
+    if sig_form == "dscb":
+        alpha_l = ROOT.RooRealVar(f"alphaL_{ch}", f"DSCB left tail alpha ({ch})", DSCB_ALPHA_L)
+        n_l = ROOT.RooRealVar(f"nL_{ch}", f"DSCB left tail n ({ch})", DSCB_N_L)
+        alpha_r = ROOT.RooRealVar(f"alphaR_{ch}", f"DSCB right tail alpha ({ch})", DSCB_ALPHA_R)
+        n_r = ROOT.RooRealVar(f"nR_{ch}", f"DSCB right tail n ({ch})", DSCB_N_R)
+        for v in (alpha_l, n_l, alpha_r, n_r):
+            v.setConstant(True)
+            keep[v.GetName()] = v
+        sig = ROOT.RooCrystalBall(
+            f"sig_{ch}", f"signal pdf ({ch})", x, mean, sigma, alpha_l, n_l, alpha_r, n_r
+        )
+    elif generic_sig:
         sig = ROOT.RooGenericPdf(
             f"sig_{ch}",
             f"signal pdf ({ch})",
@@ -185,24 +251,54 @@ def build_width_np(constraint, keep):
     return {"np": alpha, "constr": None, "global_ob": None, "kind": "add"}
 
 
+def build_syst_nps(num_systs, keep):
+    """Build the shared yield-systematic NPs (--num-systs), unit-Gaussian constrained.
+
+    Returns a list of dicts {"np", "constr", "global_ob"}, one per systematic.
+    Constraints are named constr_alpha_syst<j> so muscan.py / run_simple_fit.sh
+    auto-detect them; they are imported standalone (never in a RooProdPdf with
+    the RooSimultaneous — ROOT 6.30+ contract).
+    """
+    infos = []
+    if num_systs <= 0:
+        return infos
+    unit = ROOT.RooRealVar("sigma_constr_syst", "syst constraint width", 1.0)
+    unit.setConstant(True)
+    keep["sigma_constr_syst"] = unit
+    for j in range(num_systs):
+        alpha = ROOT.RooRealVar(f"alpha_syst{j}", f"yield syst NP {j}", 0.0, -5.0, 5.0)
+        glob = ROOT.RooRealVar(f"nom_alpha_syst{j}", f"global obs: yield syst {j}", 0.0)
+        glob.setConstant(True)
+        constr = ROOT.RooGaussian(
+            f"constr_alpha_syst{j}", f"Gaussian constraint on alpha_syst{j}", glob, alpha, unit
+        )
+        keep.update({alpha.GetName(): alpha, glob.GetName(): glob, constr.GetName(): constr})
+        infos.append({"np": alpha, "constr": constr, "global_ob": glob})
+    return infos
+
+
 def build_workspace(
     seed: int = 42,
     with_np: bool = True,
     generic_bkg: bool = False,
     generic_sig: bool = False,
+    sig_form: str = "gauss",
     bkg_form: str = "exp",
     fix_shape: bool = False,
     constraint: str = "gauss",
     yield_sf: float = 1.0,
     num_channels: int = 3,
+    num_systs: int = 0,
 ) -> ROOT.RooWorkspace:
     """Build the workspace."""
     ROOT.gRandom.SetSeed(seed)
 
+    channels = get_channels(num_channels)
+
     # ── Shared observable + channel index ───────────────────────────────────
     x = ROOT.RooRealVar("x", "observable [a.u.]", 10.0, 20.0)
     cat = ROOT.RooCategory("index", "channel index")
-    for ch in islice(CHANNELS, num_channels):
+    for ch in channels:
         cat.defineType(ch)
 
     # ── POI ─────────────────────────────────────────────────────────────────
@@ -210,6 +306,7 @@ def build_workspace(
 
     _keep = {}
     np_info = build_width_np(constraint, _keep) if with_np else None
+    syst_infos = build_syst_nps(num_systs, _keep)
 
     # ── Signal-width systematic (only when with_np=True) ────────────────────
     # Convention follows HS3: constraint PDF is Gaussian(x=nom, mean=alpha, sigma).
@@ -223,7 +320,7 @@ def build_workspace(
     channel_data: dict[str, ROOT.RooDataSet] = {}
     np_vars: list[ROOT.RooRealVar] = []
 
-    for ch, cfg in islice(CHANNELS.items(), num_channels):
+    for ch, cfg in channels.items():
         # Background: exp(tau*x)
         tau, bkg = build_background(
             ch, cfg, x, generic_bkg=generic_bkg, bkg_form=bkg_form, fix_shape=fix_shape, keep=_keep
@@ -253,7 +350,9 @@ def build_workspace(
         else:
             sigma = sigma_nom  # fixed at nominal width
 
-        sig = build_signal(ch, x, mean, sigma, generic_sig=generic_sig, keep=_keep)
+        sig = build_signal(
+            ch, x, mean, sigma, generic_sig=generic_sig, sig_form=sig_form, keep=_keep
+        )
 
         # Nominal signal yield (constant — only mu_sig floats the signal norm)
         nsig_nom = ROOT.RooRealVar(
@@ -261,10 +360,19 @@ def build_workspace(
         )
         nsig_nom.setConstant(True)
 
-        # Scaled signal yield: mu_sig * nsig_nom
-        nsig_tot = ROOT.RooProduct(
-            f"nsig_tot_{ch}", f"scaled signal yield ({ch})", ROOT.RooArgList(mu_sig, nsig_nom)
-        )
+        # Scaled signal yield: mu_sig * nsig_nom * (per-syst response factors)
+        factors = ROOT.RooArgList(mu_sig, nsig_nom)
+        for j, sinfo in enumerate(syst_infos):
+            delta = _syst_delta(j, int(ch[2:]))
+            resp = ROOT.RooFormulaVar(
+                f"resp_syst{j}_{ch}",
+                f"syst {j} response ({ch})",
+                f"1.0 + {delta} * @0",
+                ROOT.RooArgList(sinfo["np"]),
+            )
+            _keep[f"resp_syst{j}_{ch}"] = resp
+            factors.add(resp)
+        nsig_tot = ROOT.RooProduct(f"nsig_tot_{ch}", f"scaled signal yield ({ch})", factors)
 
         # Floating background yield
         nbkg = ROOT.RooRealVar(
@@ -336,6 +444,8 @@ def build_workspace(
     wsImport(sim_pdf, ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
     if with_np and np_info["constr"] is not None:
         wsImport(np_info["constr"], ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
+    for sinfo in syst_infos:
+        wsImport(sinfo["constr"], ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
     wsImport(combined_data, ROOT.RooFit.Silence())
 
     # ── ModelConfig ──────────────────────────────────────────────────────────
@@ -351,9 +461,16 @@ def build_workspace(
             np_argset.add(ws_var)
     if with_np:
         np_argset.add(ws.var(np_info["np"].GetName()))
+    for sinfo in syst_infos:
+        np_argset.add(ws.var(sinfo["np"].GetName()))
     mc.SetNuisanceParameters(np_argset)
+    glob_argset = ROOT.RooArgSet()
     if with_np and np_info["global_ob"] is not None:
-        mc.SetGlobalObservables(ROOT.RooArgSet(ws.var(np_info["global_ob"].GetName())))
+        glob_argset.add(ws.var(np_info["global_ob"].GetName()))
+    for sinfo in syst_infos:
+        glob_argset.add(ws.var(sinfo["global_ob"].GetName()))
+    if glob_argset.getSize() > 0:
+        mc.SetGlobalObservables(glob_argset)
 
     wsImport(mc)
 
@@ -364,7 +481,10 @@ def build_workspace(
         snap_vars.add(ws.var(np_info["np"].GetName()))
         if np_info["global_ob"] is not None:
             snap_vars.add(ws.var(np_info["global_ob"].GetName()))
-    for ch in islice(CHANNELS, num_channels):
+    for sinfo in syst_infos:
+        snap_vars.add(ws.var(sinfo["np"].GetName()))
+        snap_vars.add(ws.var(sinfo["global_ob"].GetName()))
+    for ch in channels:
         for name in [f"tau_{ch}", f"nbkg_{ch}"]:
             v = ws.var(name)
             if v:
@@ -381,11 +501,13 @@ def _output_stem(
     with_np: bool,
     generic_bkg: bool,
     generic_sig: bool,
+    sig_form: str,
     bkg_form: str,
     fix_shape: bool,
     constraint: str,
     yield_sf: float = 1.0,
     num_channels: int = 3,
+    num_systs: int = 0,
 ) -> str:
     """Derive a default workspace file stem from the build options.
 
@@ -401,7 +523,9 @@ def _output_stem(
         stem += "_generic"
         if bkg_form == "poly":
             stem += "_poly"
-    if generic_sig:
+    if sig_form == "dscb":
+        stem += "_dscb"
+    elif generic_sig:
         stem += "_gensig"
     if with_np and constraint == "poisson":
         stem += "_poisson"
@@ -413,6 +537,8 @@ def _output_stem(
         stem += "_nonp"
     if yield_sf != 1.0:
         stem += f"_yield{yield_sf:g}x".replace(".", "p")
+    if num_systs:
+        stem += f"_systs{num_systs}"
     return stem
 
 
@@ -442,6 +568,13 @@ def main() -> None:
         "--generic-sig", action="store_true", help="express the signal gaussian as a RooGenericPdf"
     )
     parser.add_argument(
+        "--sig-form",
+        choices=["gauss", "dscb"],
+        default="gauss",
+        help="Signal shape: Gaussian (default) or double-sided crystal ball "
+        "(RooCrystalBall with fixed tail parameters)",
+    )
+    parser.add_argument(
         "--fix-bkg-shape",
         action="store_true",
         help="Hold tau_ch/slope_ch constant so the bkg normalization is frozen against the mu scan",
@@ -464,13 +597,26 @@ def main() -> None:
         "--yield-sf", type=float, default=1.0, help="scale all yields by a constant factor"
     )
     parser.add_argument(
-        "--num-channels", type=int, default=3, help="specify the number of channels used"
+        "--num-channels",
+        type=int,
+        default=3,
+        help="specify the number of channels used (no upper limit; the first 30 "
+        "use the hardcoded CHANNELS table, beyond that a deterministic formula)",
+    )
+    parser.add_argument(
+        "--num-systs",
+        type=int,
+        default=0,
+        help="add M shared Gaussian-constrained yield-systematic NPs (alpha_syst<j>), "
+        "each scaling every channel's signal yield by a per-channel response factor",
     )
     args = parser.parse_args()
 
     with_np = not args.no_np
     if args.bkg_form == "poly" and not args.generic_bkg:
         print("Note: --bkg-form poly only applies with --generic-bkg; ignoring.")
+    if args.sig_form == "dscb" and args.generic_sig:
+        print("Note: --generic-sig only applies to the gaussian signal; ignoring.")
 
     if args.output is None:
         args.output = (
@@ -478,11 +624,13 @@ def main() -> None:
                 with_np=with_np,
                 generic_bkg=args.generic_bkg,
                 generic_sig=args.generic_sig,
+                sig_form=args.sig_form,
                 bkg_form=args.bkg_form,
                 fix_shape=args.fix_bkg_shape,
                 constraint=args.constraint,
                 yield_sf=args.yield_sf,
                 num_channels=args.num_channels,
+                num_systs=args.num_systs,
             )
             + ".root"
         )
@@ -490,7 +638,12 @@ def main() -> None:
     bkg_label = "exponential_dist"
     if args.generic_bkg:
         bkg_label = f"generic_dist({args.bkg_form})"
-    sig_label = "generic_dist" if args.generic_sig else "gaussian_dist"
+    if args.sig_form == "dscb":
+        sig_label = "crystalball_doublesided_dist"
+    elif args.generic_sig:
+        sig_label = "generic_dist"
+    else:
+        sig_label = "gaussian_dist"
     np_label = "no NP" if not with_np else f"NP(constraint={args.constraint})"
     shape_label = "fixed-shape" if args.fix_bkg_shape else "floating-shape"
     print(
@@ -501,11 +654,13 @@ def main() -> None:
         with_np=with_np,
         generic_bkg=args.generic_bkg,
         generic_sig=args.generic_sig,
+        sig_form=args.sig_form,
         bkg_form=args.bkg_form,
         fix_shape=args.fix_bkg_shape,
         constraint=args.constraint,
         yield_sf=args.yield_sf,
         num_channels=args.num_channels,
+        num_systs=args.num_systs,
     )
 
     ws.Print("v")
@@ -514,8 +669,16 @@ def main() -> None:
     print(f"\nWorkspace written to: {args.output}")
     print("\nQuick-start fit commands:")
     print(f"  quickFit -f {args.output} -w combWS -m ModelConfig -d combData \\")
-    if with_np:
-        print(f"           -p mu_sig=1_-5_10 --minos 1 --externalConstraint constr_alpha_sigma \\")
+    constr_names = []
+    if with_np and args.constraint != "none":
+        constr_names.append(
+            "constr_gamma_sigma" if args.constraint == "poisson" else "constr_alpha_sigma"
+        )
+    constr_names += [f"constr_alpha_syst{j}" for j in range(args.num_systs)]
+    if constr_names:
+        print(
+            f"           -p mu_sig=1_-5_10 --minos 1 --externalConstraint {','.join(constr_names)} \\"
+        )
     else:
         print(f"           -p mu_sig=1_-5_10 --minos 1 \\")
     print(f"           -o result_fit.root")

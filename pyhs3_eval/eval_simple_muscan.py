@@ -11,9 +11,11 @@ comparison table against the quickFit NLL values recorded in the scan JSON
 The POI name is read from the scan's ``metadata.poi``, so the same script works
 for toy workspaces (``mu_sig``) and real ones (e.g. ``mu_HH``). Which analyses
 to evaluate is controlled by ``--analysis``, a regex fully matched against
-analysis names: the default ``L_ch\\d+`` picks up the split per-channel toy
-likelihoods; for a real workspace pass its combined analysis name, e.g.
-``--analysis CombinedPdf_combData``.
+analysis names: the default matches the toy combined analysis
+``sim_pdf_combData`` (one joint likelihood over all channels, the export_hs3.py
+default) and falls back to ``L_ch\\d+`` for legacy exports made with
+``--split-likelihoods``; for a real workspace pass its combined analysis name,
+e.g. ``--analysis CombinedPdf_combData``.
 
 The ``diff = pyhs3_nll - qf_nll + N*ln(C)`` column is expected to be a constant
 offset across the scan (``N*ln(C)`` corrects the known RooSimultaneous
@@ -77,6 +79,11 @@ _DEFAULT_SCAN = _WS_SCRIPTS / "scans" / f"{_DEFAULT_STEM}_muscan.json"
 # Sentinel for a bare ``--plot-*`` flag: the output path is then the default
 # derived below rather than a user-supplied one.
 _PLOT_DEFAULT = object()
+
+# Default --analysis regex: the toy combined analysis (export_hs3.py keeps
+# ROOT's single joint likelihood, named <pdf>_<data>), with the legacy split
+# per-channel analyses as a fallback for JSONs exported via --split-likelihoods.
+_DEFAULT_ANALYSIS = r"sim_pdf_combData|L_ch\d+"
 
 # Bumped whenever the baking recipe in ``compile_channel`` changes, so cached
 # compiled channels from an older (incompatible) recipe are not reused. v2:
@@ -324,7 +331,7 @@ def compile_channel(
 
 def build_channel_models(
     ws_path: Path,
-    analysis_pattern: str = r"L_ch\d+",
+    analysis_pattern: str = _DEFAULT_ANALYSIS,
     cache_dir: Path | None = None,
     mode: str | None = None,
     extra_free: set[str] | None = None,
@@ -450,7 +457,7 @@ def run_scan(
     ws_path: Path,
     scan_path: Path,
     *,
-    analysis_pattern: str = r"L_ch\d+",
+    analysis_pattern: str = _DEFAULT_ANALYSIS,
     cache_dir: Path | None = None,
     mode: str | None = None,
     verbose: bool = True,
@@ -560,12 +567,13 @@ def main() -> None:
     parser.add_argument("--scan", type=Path, default=_DEFAULT_SCAN)
     parser.add_argument(
         "--analysis",
-        default=r"L_ch\d+",
+        default=_DEFAULT_ANALYSIS,
         metavar="REGEX",
         help="Regex fully matched against analysis names to select which "
-        "likelihoods to evaluate (default: the split per-channel toy "
-        "analyses 'L_ch\\d+'; for a real workspace pass its combined "
-        "analysis name, e.g. 'CombinedPdf_combData')",
+        "likelihoods to evaluate (default: the toy combined analysis "
+        "'sim_pdf_combData', falling back to the legacy split per-channel "
+        "'L_ch\\d+'; for a real workspace pass its combined analysis name, "
+        "e.g. 'CombinedPdf_combData')",
     )
     parser.add_argument(
         "--cache-dir",

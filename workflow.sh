@@ -4,17 +4,35 @@
 #
 # Requires the ROOT/quickFit environment; source setup_local.sh first.
 #
-# Usage:  bash workflow.sh [--seed N]   (default seed: 42)
+# Usage:  bash workflow.sh [--seed N] [--steps LIST]   (default seed: 42)
+#
+#   --steps LIST   comma-separated subset of stages to run, in the fixed
+#                  pipeline order: ws,fit,plot,scan,export (default: all).
+#                  e.g. `bash workflow.sh --steps export` re-exports HS3 JSON
+#                  from the existing workspaces/*.root without rebuilding
+#                  workspaces or re-running fits/scans.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 SEED=42
+STEPS="ws,fit,plot,scan,export"
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --seed) SEED=$2; shift 2 ;;
+        --seed)  SEED=$2; shift 2 ;;
+        --steps) STEPS=$2; shift 2 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
+
+# Validate step names up front so a typo doesn't silently skip everything.
+IFS=',' read -r -a _steps_arr <<< "$STEPS"
+for s in "${_steps_arr[@]}"; do
+    case $s in
+        ws|fit|plot|scan|export) ;;
+        *) echo "Unknown step: '$s' (valid: ws,fit,plot,scan,export)"; exit 1 ;;
+    esac
+done
+run_step() { case ",$STEPS," in *",$1,"*) return 0 ;; *) return 1 ;; esac; }
 
 step() { printf '\n\033[1;34m=== %s ===\033[0m\n' "$*"; }
 ok()   { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
@@ -22,31 +40,39 @@ ok()   { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
 # Build a fully-specified workspace name from a set of make_workspace.py flags.
 # Every option is spelled out in a fixed order, so comparing two names shows
 # exactly which aspects differ. Segments (with make_workspace.py defaults):
-#   <N>ch            number of channels                (--num-channels, default 3)
+#   <N>ch            number of channels                (--num-channels, default 3; no cap)
 #   bkg<Pdf><Form>   background pdf + form             (RooExp | GenExp | GenPoly)
-#   sig<Pdf>         signal pdf                        (Gauss | Generic; --generic-sig)
+#   sig<Pdf>         signal pdf                        (Gauss | Generic | DSCB; --generic-sig / --sig-form dscb)
 #   shape<State>     background shape                  (Float | Fixed; --fix-bkg-shape)
 #   np<State>        width nuisance parameter          (On | Off; --no-np)
 #   constr<Type>     constraint form                   (Gauss | Poisson | None; --constraint)
 #   yield<SF>x       yield scale factor                (--yield-sf, default 1)
+#   systs<M>         yield-systematic NPs, only if M>0 (--num-systs, default 0)
 canonical_stem() {
-    local channels=3 bkg_pdf="RooExp" bkg_form="exp" sig_pdf="Gauss"
-    local bkg_shape="Float" np="On" constr="gauss" yield_sf="1"
+    local channels=3 bkg_pdf="RooExp" bkg_form="exp" sig_pdf="Gauss" sig_form="gauss"
+    local bkg_shape="Float" np="On" constr="gauss" yield_sf="1" systs=0
 
     set -- $1
     while [[ $# -gt 0 ]]; do
         case $1 in
             --no-np)         np="Off";            shift ;;
             --generic-bkg)   bkg_pdf="Gen";       shift ;;
-            --bkg-form)      bkg_form="$2";       shift 2 ;;
+            --bkg-form)      bkg_form="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
             --generic-sig)   sig_pdf="Generic";   shift ;;
+            --sig-form)      sig_form="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
             --fix-bkg-shape) bkg_shape="Fixed";   shift ;;
-            --constraint)    constr="$2";         shift 2 ;;
-            --yield-sf)      yield_sf="$2";       shift 2 ;;
-            --num-channels)  channels="$2";       shift 2 ;;
+            --constraint)    constr="${2:?$1 requires a value (check VARIANTS quoting)}";    shift 2 ;;
+            --yield-sf)      yield_sf="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
+            --num-channels)  channels="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
+            --num-systs)     systs="${2:?$1 requires a value (check VARIANTS quoting)}";     shift 2 ;;
             *)               shift ;;
         esac
     done
+
+    # --sig-form dscb wins over --generic-sig (make_workspace.py ignores the latter)
+    if [[ $sig_form == dscb ]]; then
+        sig_pdf="DSCB"
+    fi
 
     local bkg
     if [[ $bkg_pdf == RooExp ]]; then
@@ -66,9 +92,14 @@ canonical_stem() {
         *)       constr_label="$constr" ;;
     esac
 
-    printf '%sch_%s_sig%s_shape%s_np%s_constr%s_yield%sx' \
+    local stem
+    stem=$(printf '%sch_%s_sig%s_shape%s_np%s_constr%s_yield%sx' \
         "$channels" "$bkg" "$sig_pdf" "$bkg_shape" "$np" \
-        "$constr_label" "${yield_sf/./p}"
+        "$constr_label" "${yield_sf/./p}")
+    if [[ $systs != 0 ]]; then
+        stem+="_systs${systs}"
+    fi
+    printf '%s' "$stem"
 }
 
 # Each entry is the set of make_workspace.py flags; the descriptive name is
@@ -83,6 +114,10 @@ VARIANTS=(
     "--generic-sig"
     "--generic-sig --num-channels 10"
     "--generic-sig --num-channels 30"
+    "--sig-form dscb"
+    "--sig-form dscb --num-channels 10"
+    "--sig-form dscb --no-np"
+    "--sig-form dscb --generic-bkg"
     "--constraint poisson"
     
     # number of channels:
@@ -95,6 +130,22 @@ VARIANTS=(
     "--num-channels 20"
     "--num-channels 25"
     "--num-channels 30"
+
+    # channel counts beyond the old 30-channel table:
+    "--num-channels 50"
+    "--num-channels 100"
+    "--num-channels 200"
+
+    # yield-systematic NPs (shared across channels):
+    "--num-systs 5"
+    "--num-systs 20"
+    "--num-systs 50"
+
+    # size products approximating real (bbyy-like) workspaces:
+    "--num-channels 10 --num-systs 20"
+    "--num-channels 50 --num-systs 20"
+    "--num-channels 100 --num-systs 50"
+    "--num-channels 30 --num-systs 100"
 
     # number of events:
     "--yield-sf 0.1"
@@ -172,13 +223,16 @@ VARIANTS=(
 )
 
 # ── 1. Generate workspaces ──────────────────────────────────────────────────
+if run_step ws; then
 step "Generating workspaces (seed=$SEED)"
 for flags in "${VARIANTS[@]}"; do
     stem=$(canonical_stem "$flags")
     python3 make_workspace.py $flags --seed "$SEED" --output "workspaces/${stem}.root"
 done
+fi
 
 # ── 2. Run fits ─────────────────────────────────────────────────────────────
+if run_step fit; then
 step "Running fits"
 for flags in "${VARIANTS[@]}"; do
     stem=$(canonical_stem "$flags")
@@ -189,10 +243,12 @@ for flags in "${VARIANTS[@]}"; do
         printf '\033[1;31m  ✗ fit failed: %s\033[0m\n' "${stem}"
     fi
 done
+fi
 
 # ── 3. Plot workspaces (best-fit / minimum-NLL parameters) ───────────────────
 # run_simple_fit.sh floats mu_sig and writes the unconditional best fit to
 # output_simple/<stem>_result.root; overlay those post-fit parameters.
+if run_step plot; then
 step "Plotting workspaces (best-fit parameters)"
 for flags in "${VARIANTS[@]}"; do
     stem=$(canonical_stem "$flags")
@@ -200,8 +256,10 @@ for flags in "${VARIANTS[@]}"; do
         --fit-result "output_simple/${stem}_result.root"
     ok "plots/${stem}_channels.png"
 done
+fi
 
 # ── 4. mu scans ─────────────────────────────────────────────────────────────
+if run_step scan; then
 step "mu scans"
 for flags in "${VARIANTS[@]}"; do
     stem=$(canonical_stem "$flags")
@@ -209,14 +267,17 @@ for flags in "${VARIANTS[@]}"; do
     python3 muscan.py --input "workspaces/${stem}.root" --output "$scan"
     ok "$scan"
 done
+fi
 
 # ── 5. Export HS3 JSON ───────────────────────────────────────────────────────────
+if run_step export; then
 step "Exporting HS3 JSON"
   for flags in "${VARIANTS[@]}"; do
       stem=$(canonical_stem "$flags")
       python3 export_hs3.py --input "workspaces/${stem}.root" --verify
       ok "workspaces/${stem}.json"
   done
+fi
 
 # aux-stripped exports (json-only; reuse the .root files above, paired with the
 # standard scans in eval_simple_muscan.py)

@@ -1,12 +1,18 @@
 {
   "metadata": {
     "workspace": "workspaces/4ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.root",
+    "workspace_name": "combWS",
+    "modelconfig_name": "ModelConfig",
+    "dataset_name": "combData",
     "poi": "mu_sig",
     "bkg_type": "exponential",
     "constraint": "constr_alpha_sigma",
+    "nll_convention": "-log L (RooFit single negative log-likelihood)",
+    "quickfit_command": "quickFit -f workspaces/4ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x.root -w combWS -m ModelConfig -d combData -p mu_sig=<mu> -o <result.root> --externalConstraint constr_alpha_sigma",
+    "source": "muscan.py",
     "n_points": 13,
     "nll_min": 125.01823810630505,
-    "created": "2026-07-01T00:18:56.611927+00:00"
+    "created": "2026-08-07T18:32:14.570459+00:00"
   },
   "scan_points": [
     {

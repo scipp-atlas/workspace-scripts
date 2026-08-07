@@ -1,0 +1,3087 @@
+{
+  "metadata": {
+    "workspace": "workspaces/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_systs50.root",
+    "workspace_name": "combWS",
+    "modelconfig_name": "ModelConfig",
+    "dataset_name": "combData",
+    "poi": "mu_sig",
+    "bkg_type": "exponential",
+    "constraint": "constr_alpha_sigma,constr_alpha_syst0,constr_alpha_syst1,constr_alpha_syst2,constr_alpha_syst3,constr_alpha_syst4,constr_alpha_syst5,constr_alpha_syst6,constr_alpha_syst7,constr_alpha_syst8,constr_alpha_syst9,constr_alpha_syst10,constr_alpha_syst11,constr_alpha_syst12,constr_alpha_syst13,constr_alpha_syst14,constr_alpha_syst15,constr_alpha_syst16,constr_alpha_syst17,constr_alpha_syst18,constr_alpha_syst19,constr_alpha_syst20,constr_alpha_syst21,constr_alpha_syst22,constr_alpha_syst23,constr_alpha_syst24,constr_alpha_syst25,constr_alpha_syst26,constr_alpha_syst27,constr_alpha_syst28,constr_alpha_syst29,constr_alpha_syst30,constr_alpha_syst31,constr_alpha_syst32,constr_alpha_syst33,constr_alpha_syst34,constr_alpha_syst35,constr_alpha_syst36,constr_alpha_syst37,constr_alpha_syst38,constr_alpha_syst39,constr_alpha_syst40,constr_alpha_syst41,constr_alpha_syst42,constr_alpha_syst43,constr_alpha_syst44,constr_alpha_syst45,constr_alpha_syst46,constr_alpha_syst47,constr_alpha_syst48,constr_alpha_syst49",
+    "nll_convention": "-log L (RooFit single negative log-likelihood)",
+    "quickfit_command": "quickFit -f workspaces/3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x_systs50.root -w combWS -m ModelConfig -d combData -p mu_sig=<mu> -o <result.root> --externalConstraint constr_alpha_sigma,constr_alpha_syst0,constr_alpha_syst1,constr_alpha_syst2,constr_alpha_syst3,constr_alpha_syst4,constr_alpha_syst5,constr_alpha_syst6,constr_alpha_syst7,constr_alpha_syst8,constr_alpha_syst9,constr_alpha_syst10,constr_alpha_syst11,constr_alpha_syst12,constr_alpha_syst13,constr_alpha_syst14,constr_alpha_syst15,constr_alpha_syst16,constr_alpha_syst17,constr_alpha_syst18,constr_alpha_syst19,constr_alpha_syst20,constr_alpha_syst21,constr_alpha_syst22,constr_alpha_syst23,constr_alpha_syst24,constr_alpha_syst25,constr_alpha_syst26,constr_alpha_syst27,constr_alpha_syst28,constr_alpha_syst29,constr_alpha_syst30,constr_alpha_syst31,constr_alpha_syst32,constr_alpha_syst33,constr_alpha_syst34,constr_alpha_syst35,constr_alpha_syst36,constr_alpha_syst37,constr_alpha_syst38,constr_alpha_syst39,constr_alpha_syst40,constr_alpha_syst41,constr_alpha_syst42,constr_alpha_syst43,constr_alpha_syst44,constr_alpha_syst45,constr_alpha_syst46,constr_alpha_syst47,constr_alpha_syst48,constr_alpha_syst49",
+    "source": "muscan.py",
+    "n_points": 13,
+    "nll_min": 116.37530443147571,
+    "created": "2026-08-07T18:36:21.846777+00:00"
+  },
+  "scan_points": [
+    {
+      "nll": 121.59153779311544,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst0": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst1": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst10": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst11": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst12": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst13": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst14": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst15": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst16": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst17": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst18": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst19": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst2": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst20": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst21": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst22": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst23": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst24": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst25": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst26": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst27": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst28": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst29": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst3": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst30": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst31": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst32": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst33": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst34": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst35": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst36": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst37": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst38": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst39": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst4": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst40": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst41": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst42": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst43": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst44": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst45": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst46": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst47": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst48": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst49": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst5": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst6": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst7": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst8": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "alpha_syst9": {
+          "value": 0.0,
+          "error": 0.993346787288192
+        },
+        "nbkg_ch0": {
+          "value": 28.991754893537117,
+          "error": 5.382088106101277
+        },
+        "nbkg_ch1": {
+          "value": 24.006508529440715,
+          "error": 4.898276686450661
+        },
+        "nbkg_ch2": {
+          "value": 26.003939967243653,
+          "error": 5.09781639924881
+        },
+        "tau_ch0": {
+          "value": -0.11833479770510111,
+          "error": 0.06633885281465704
+        },
+        "tau_ch1": {
+          "value": -0.2415563154618634,
+          "error": 0.08068172951342706
+        },
+        "tau_ch2": {
+          "value": -0.29125661841068473,
+          "error": 0.0818736739868655
+        }
+      },
+      "mu_sig": 0.0,
+      "delta_nll": 10.432466723279447
+    },
+    {
+      "nll": 119.4887188333255,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.006272224964216705,
+          "error": 0.9607692679998721
+        },
+        "alpha_syst0": {
+          "value": 0.10899726511294161,
+          "error": 0.9926357082969883
+        },
+        "alpha_syst1": {
+          "value": 0.06605584374679258,
+          "error": 0.9924091995461398
+        },
+        "alpha_syst10": {
+          "value": 0.10899726511294161,
+          "error": 0.9926357079657416
+        },
+        "alpha_syst11": {
+          "value": 0.06605584374471019,
+          "error": 0.9924091999371507
+        },
+        "alpha_syst12": {
+          "value": 0.08470947547027763,
+          "error": 0.992033720060969
+        },
+        "alpha_syst13": {
+          "value": 0.09502671809371255,
+          "error": 0.9927691337767837
+        },
+        "alpha_syst14": {
+          "value": 0.11351671543046256,
+          "error": 0.992473089851112
+        },
+        "alpha_syst15": {
+          "value": 0.10899726511422475,
+          "error": 0.992635708196154
+        },
+        "alpha_syst16": {
+          "value": 0.06605584374970325,
+          "error": 0.9924091999059307
+        },
+        "alpha_syst17": {
+          "value": 0.08470947547027764,
+          "error": 0.9920337197342669
+        },
+        "alpha_syst18": {
+          "value": 0.09502671809277846,
+          "error": 0.9927691352654682
+        },
+        "alpha_syst19": {
+          "value": 0.11351671543806849,
+          "error": 0.9924730889185376
+        },
+        "alpha_syst2": {
+          "value": 0.08470947547121223,
+          "error": 0.9920337200594849
+        },
+        "alpha_syst20": {
+          "value": 0.10899726511142059,
+          "error": 0.9926357080433172
+        },
+        "alpha_syst21": {
+          "value": 0.06605584374523843,
+          "error": 0.9924091998344021
+        },
+        "alpha_syst22": {
+          "value": 0.08470947547027763,
+          "error": 0.9920337197547894
+        },
+        "alpha_syst23": {
+          "value": 0.09502671809074356,
+          "error": 0.9927691337907721
+        },
+        "alpha_syst24": {
+          "value": 0.11351671543139562,
+          "error": 0.9924730894787805
+        },
+        "alpha_syst25": {
+          "value": 0.10899726511422475,
+          "error": 0.9926357079578368
+        },
+        "alpha_syst26": {
+          "value": 0.06605584374209764,
+          "error": 0.9924091998585566
+        },
+        "alpha_syst27": {
+          "value": 0.08470947547121223,
+          "error": 0.9920337200385068
+        },
+        "alpha_syst28": {
+          "value": 0.09502671809244485,
+          "error": 0.9927691349526715
+        },
+        "alpha_syst29": {
+          "value": 0.11351671543139562,
+          "error": 0.9924730895388044
+        },
+        "alpha_syst3": {
+          "value": 0.09502671809371256,
+          "error": 0.9927691337844875
+        },
+        "alpha_syst30": {
+          "value": 0.10899726511294161,
+          "error": 0.9926357082502193
+        },
+        "alpha_syst31": {
+          "value": 0.0660558437449036,
+          "error": 0.9924091998454133
+        },
+        "alpha_syst32": {
+          "value": 0.08470947547121223,
+          "error": 0.9920337200863576
+        },
+        "alpha_syst33": {
+          "value": 0.09502671809972478,
+          "error": 0.9927691347615639
+        },
+        "alpha_syst34": {
+          "value": 0.11351671543218742,
+          "error": 0.9924730885823103
+        },
+        "alpha_syst35": {
+          "value": 0.10899726511294161,
+          "error": 0.9926357082742661
+        },
+        "alpha_syst36": {
+          "value": 0.06605584374202729,
+          "error": 0.992409199929885
+        },
+        "alpha_syst37": {
+          "value": 0.08470947547027763,
+          "error": 0.9920337200800473
+        },
+        "alpha_syst38": {
+          "value": 0.09502671809785662,
+          "error": 0.992769134329551
+        },
+        "alpha_syst39": {
+          "value": 0.11351671543372031,
+          "error": 0.9924730886173052
+        },
+        "alpha_syst4": {
+          "value": 0.11351671543046254,
+          "error": 0.9924730893070401
+        },
+        "alpha_syst40": {
+          "value": 0.10899726511294162,
+          "error": 0.9926357082924299
+        },
+        "alpha_syst41": {
+          "value": 0.0660558437467926,
+          "error": 0.9924091995722948
+        },
+        "alpha_syst42": {
+          "value": 0.08470947547027763,
+          "error": 0.9920337197785509
+        },
+        "alpha_syst43": {
+          "value": 0.09502671809785662,
+          "error": 0.9927691343473284
+        },
+        "alpha_syst44": {
+          "value": 0.11351671543372033,
+          "error": 0.9924730886366183
+        },
+        "alpha_syst45": {
+          "value": 0.10899726511294162,
+          "error": 0.9926357082881234
+        },
+        "alpha_syst46": {
+          "value": 0.06605584374471017,
+          "error": 0.9924091996366203
+        },
+        "alpha_syst47": {
+          "value": 0.08470947547121223,
+          "error": 0.9920337200861544
+        },
+        "alpha_syst48": {
+          "value": 0.0950267180968144,
+          "error": 0.9927691343288353
+        },
+        "alpha_syst49": {
+          "value": 0.11351671543355366,
+          "error": 0.9924730886045191
+        },
+        "alpha_syst5": {
+          "value": 0.1089972651134577,
+          "error": 0.9926357088300082
+        },
+        "alpha_syst6": {
+          "value": 0.06605584374471017,
+          "error": 0.9924092002205196
+        },
+        "alpha_syst7": {
+          "value": 0.08470947547197946,
+          "error": 0.9920337203722888
+        },
+        "alpha_syst8": {
+          "value": 0.09502671809371256,
+          "error": 0.9927691337770532
+        },
+        "alpha_syst9": {
+          "value": 0.11351671543046254,
+          "error": 0.9924730893046432
+        },
+        "nbkg_ch0": {
+          "value": 26.270522182929323,
+          "error": 5.450703482472672
+        },
+        "nbkg_ch1": {
+          "value": 21.67691603310297,
+          "error": 4.9102379986424385
+        },
+        "nbkg_ch2": {
+          "value": 22.524388134222864,
+          "error": 5.23491646447091
+        },
+        "tau_ch0": {
+          "value": -0.13310100622633422,
+          "error": 0.07155917631601647
+        },
+        "tau_ch1": {
+          "value": -0.2726420194513479,
+          "error": 0.0912250307266263
+        },
+        "tau_ch2": {
+          "value": -0.3629099886603057,
+          "error": 0.11305073360380921
+        }
+      },
+      "mu_sig": 0.25,
+      "delta_nll": 6.22682880369959
+    },
+    {
+      "nll": 117.96555702612063,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.16433798534801597,
+          "error": 0.9286924036248563
+        },
+        "alpha_syst0": {
+          "value": 0.15305389110780035,
+          "error": 0.9924655243274582
+        },
+        "alpha_syst1": {
+          "value": 0.05923094305760184,
+          "error": 0.9906448638142928
+        },
+        "alpha_syst10": {
+          "value": 0.153053891104605,
+          "error": 0.9924655243582987
+        },
+        "alpha_syst11": {
+          "value": 0.05923094305914969,
+          "error": 0.9906448637283459
+        },
+        "alpha_syst12": {
+          "value": 0.08304276315629183,
+          "error": 0.989539649208743
+        },
+        "alpha_syst13": {
+          "value": 0.13768017524654508,
+          "error": 0.9917473520827353
+        },
+        "alpha_syst14": {
+          "value": 0.16087556045465953,
+          "error": 0.9909458002723326
+        },
+        "alpha_syst15": {
+          "value": 0.15305389110602938,
+          "error": 0.9924655246303007
+        },
+        "alpha_syst16": {
+          "value": 0.05923094305347738,
+          "error": 0.9906448626700615
+        },
+        "alpha_syst17": {
+          "value": 0.08304276316398951,
+          "error": 0.9895396483311538
+        },
+        "alpha_syst18": {
+          "value": 0.13768017525345014,
+          "error": 0.9917473529287351
+        },
+        "alpha_syst19": {
+          "value": 0.16087556045585094,
+          "error": 0.990945800983813
+        },
+        "alpha_syst2": {
+          "value": 0.08304276315560886,
+          "error": 0.9895396492036639
+        },
+        "alpha_syst20": {
+          "value": 0.15305389110563097,
+          "error": 0.9924655245290797
+        },
+        "alpha_syst21": {
+          "value": 0.05923094305463423,
+          "error": 0.9906448631274074
+        },
+        "alpha_syst22": {
+          "value": 0.08304276315766715,
+          "error": 0.9895396486437619
+        },
+        "alpha_syst23": {
+          "value": 0.13768017525435555,
+          "error": 0.9917473527690521
+        },
+        "alpha_syst24": {
+          "value": 0.16087556045739243,
+          "error": 0.9909458010134704
+        },
+        "alpha_syst25": {
+          "value": 0.15305389110395312,
+          "error": 0.9924655246276318
+        },
+        "alpha_syst26": {
+          "value": 0.05923094305463423,
+          "error": 0.9906448630400455
+        },
+        "alpha_syst27": {
+          "value": 0.08304276316575525,
+          "error": 0.9895396487030438
+        },
+        "alpha_syst28": {
+          "value": 0.13768017525589213,
+          "error": 0.9917473529585643
+        },
+        "alpha_syst29": {
+          "value": 0.16087556045276805,
+          "error": 0.9909458002368392
+        },
+        "alpha_syst3": {
+          "value": 0.13768017525667745,
+          "error": 0.9917473530067376
+        },
+        "alpha_syst30": {
+          "value": 0.1530538911090557,
+          "error": 0.9924655240159849
+        },
+        "alpha_syst31": {
+          "value": 0.05923094305463423,
+          "error": 0.9906448633939522
+        },
+        "alpha_syst32": {
+          "value": 0.08304276315564821,
+          "error": 0.9895396484108441
+        },
+        "alpha_syst33": {
+          "value": 0.13768017525589998,
+          "error": 0.9917473530900274
+        },
+        "alpha_syst34": {
+          "value": 0.1608755604543095,
+          "error": 0.9909458006425322
+        },
+        "alpha_syst35": {
+          "value": 0.15305389110773857,
+          "error": 0.9924655244253765
+        },
+        "alpha_syst36": {
+          "value": 0.059230943055322276,
+          "error": 0.9906448629550213
+        },
+        "alpha_syst37": {
+          "value": 0.0830427631653344,
+          "error": 0.989539648013453
+        },
+        "alpha_syst38": {
+          "value": 0.13768017525366136,
+          "error": 0.9917473525709555
+        },
+        "alpha_syst39": {
+          "value": 0.16087556045208237,
+          "error": 0.990945800839999
+        },
+        "alpha_syst4": {
+          "value": 0.16087556045380375,
+          "error": 0.9909458010011406
+        },
+        "alpha_syst40": {
+          "value": 0.15305389111028028,
+          "error": 0.9924655246797821
+        },
+        "alpha_syst41": {
+          "value": 0.05923094305627299,
+          "error": 0.9906448633338795
+        },
+        "alpha_syst42": {
+          "value": 0.08304276315902938,
+          "error": 0.9895396487219876
+        },
+        "alpha_syst43": {
+          "value": 0.13768017525460097,
+          "error": 0.991747352839031
+        },
+        "alpha_syst44": {
+          "value": 0.1608755604543095,
+          "error": 0.9909458005831779
+        },
+        "alpha_syst45": {
+          "value": 0.15305389111170473,
+          "error": 0.9924655241040448
+        },
+        "alpha_syst46": {
+          "value": 0.05923094305545364,
+          "error": 0.9906448629748197
+        },
+        "alpha_syst47": {
+          "value": 0.08304276315564824,
+          "error": 0.9895396483846721
+        },
+        "alpha_syst48": {
+          "value": 0.13768017525568027,
+          "error": 0.9917473533753166
+        },
+        "alpha_syst49": {
+          "value": 0.16087556045779097,
+          "error": 0.990945800036887
+        },
+        "alpha_syst5": {
+          "value": 0.15305389110193876,
+          "error": 0.9924655239017426
+        },
+        "alpha_syst6": {
+          "value": 0.059230943056182137,
+          "error": 0.9906448626925036
+        },
+        "alpha_syst7": {
+          "value": 0.08304276315662575,
+          "error": 0.9895396488116837
+        },
+        "alpha_syst8": {
+          "value": 0.13768017525358858,
+          "error": 0.9917473532708938
+        },
+        "alpha_syst9": {
+          "value": 0.16087556045192744,
+          "error": 0.9909457999245492
+        },
+        "nbkg_ch0": {
+          "value": 23.65371941619998,
+          "error": 5.544628593390238
+        },
+        "nbkg_ch1": {
+          "value": 19.990283315394656,
+          "error": 4.866795131377252
+        },
+        "nbkg_ch2": {
+          "value": 18.879854677771075,
+          "error": 5.865095399857927
+        },
+        "tau_ch0": {
+          "value": -0.14723174967126795,
+          "error": 0.07831904758289289
+        },
+        "tau_ch1": {
+          "value": -0.29926843904698236,
+          "error": 0.10083588851943553
+        },
+        "tau_ch2": {
+          "value": -0.5044699576517843,
+          "error": 0.2515907933976039
+        }
+      },
+      "mu_sig": 0.5,
+      "delta_nll": 3.180505189289846
+    },
+    {
+      "nll": 116.94212256262836,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.3777312714114462,
+          "error": 0.895426502986213
+        },
+        "alpha_syst0": {
+          "value": 0.17259613508720442,
+          "error": 0.9818556956023496
+        },
+        "alpha_syst1": {
+          "value": 0.02391682459184547,
+          "error": 0.9895419806166865
+        },
+        "alpha_syst10": {
+          "value": 0.17259613508206847,
+          "error": 0.9818556947789685
+        },
+        "alpha_syst11": {
+          "value": 0.023916824587517937,
+          "error": 0.9895419801429857
+        },
+        "alpha_syst12": {
+          "value": 0.046245623858715175,
+          "error": 0.9873032332325264
+        },
+        "alpha_syst13": {
+          "value": 0.14400635458096736,
+          "error": 0.9858203840667672
+        },
+        "alpha_syst14": {
+          "value": 0.16569314826437703,
+          "error": 0.9827869529934463
+        },
+        "alpha_syst15": {
+          "value": 0.17259613508702523,
+          "error": 0.9818556949713519
+        },
+        "alpha_syst16": {
+          "value": 0.023916824591476354,
+          "error": 0.9895419787605768
+        },
+        "alpha_syst17": {
+          "value": 0.046245623862556276,
+          "error": 0.9873032345871202
+        },
+        "alpha_syst18": {
+          "value": 0.14400635456889516,
+          "error": 0.9858203844030724
+        },
+        "alpha_syst19": {
+          "value": 0.16569314826341724,
+          "error": 0.9827869529526262
+        },
+        "alpha_syst2": {
+          "value": 0.04624562386043817,
+          "error": 0.9873032344982993
+        },
+        "alpha_syst20": {
+          "value": 0.1725961350862629,
+          "error": 0.9818556946216328
+        },
+        "alpha_syst21": {
+          "value": 0.02391682458743512,
+          "error": 0.9895419794386215
+        },
+        "alpha_syst22": {
+          "value": 0.04624562386322777,
+          "error": 0.9873032333785261
+        },
+        "alpha_syst23": {
+          "value": 0.14400635457177924,
+          "error": 0.9858203839912453
+        },
+        "alpha_syst24": {
+          "value": 0.16569314826545267,
+          "error": 0.9827869539764619
+        },
+        "alpha_syst25": {
+          "value": 0.1725961350825625,
+          "error": 0.9818556941374125
+        },
+        "alpha_syst26": {
+          "value": 0.023916824591431237,
+          "error": 0.9895419800483816
+        },
+        "alpha_syst27": {
+          "value": 0.04624562386547198,
+          "error": 0.9873032337425658
+        },
+        "alpha_syst28": {
+          "value": 0.14400635456768118,
+          "error": 0.9858203841057629
+        },
+        "alpha_syst29": {
+          "value": 0.16569314827045617,
+          "error": 0.982786953288713
+        },
+        "alpha_syst3": {
+          "value": 0.14400635457407157,
+          "error": 0.9858203835520459
+        },
+        "alpha_syst30": {
+          "value": 0.1725961350834032,
+          "error": 0.9818556947147181
+        },
+        "alpha_syst31": {
+          "value": 0.02391682458829673,
+          "error": 0.9895419799774783
+        },
+        "alpha_syst32": {
+          "value": 0.04624562386200024,
+          "error": 0.9873032337436244
+        },
+        "alpha_syst33": {
+          "value": 0.1440063545766419,
+          "error": 0.985820383964308
+        },
+        "alpha_syst34": {
+          "value": 0.16569314826790324,
+          "error": 0.9827869534416105
+        },
+        "alpha_syst35": {
+          "value": 0.17259613508447885,
+          "error": 0.981855694983867
+        },
+        "alpha_syst36": {
+          "value": 0.02391682459102413,
+          "error": 0.9895419796880889
+        },
+        "alpha_syst37": {
+          "value": 0.04624562386222139,
+          "error": 0.9873032339490154
+        },
+        "alpha_syst38": {
+          "value": 0.1440063545813743,
+          "error": 0.9858203848115041
+        },
+        "alpha_syst39": {
+          "value": 0.1656931482660528,
+          "error": 0.982786952965605
+        },
+        "alpha_syst4": {
+          "value": 0.1656931482626698,
+          "error": 0.982786953411044
+        },
+        "alpha_syst40": {
+          "value": 0.17259613508757699,
+          "error": 0.981855694901201
+        },
+        "alpha_syst41": {
+          "value": 0.02391682459312871,
+          "error": 0.9895419790319173
+        },
+        "alpha_syst42": {
+          "value": 0.04624562386351708,
+          "error": 0.9873032336828
+        },
+        "alpha_syst43": {
+          "value": 0.14400635457694644,
+          "error": 0.9858203828810417
+        },
+        "alpha_syst44": {
+          "value": 0.16569314826395068,
+          "error": 0.9827869526754334
+        },
+        "alpha_syst45": {
+          "value": 0.1725961350885749,
+          "error": 0.981855695052955
+        },
+        "alpha_syst46": {
+          "value": 0.02391682459223518,
+          "error": 0.9895419793109774
+        },
+        "alpha_syst47": {
+          "value": 0.0462456238623133,
+          "error": 0.9873032326141857
+        },
+        "alpha_syst48": {
+          "value": 0.14400635458073177,
+          "error": 0.9858203838795586
+        },
+        "alpha_syst49": {
+          "value": 0.16569314826522222,
+          "error": 0.9827869533814946
+        },
+        "alpha_syst5": {
+          "value": 0.1725961350847368,
+          "error": 0.9818556953346369
+        },
+        "alpha_syst6": {
+          "value": 0.023916824589737845,
+          "error": 0.9895419791083022
+        },
+        "alpha_syst7": {
+          "value": 0.04624562386271147,
+          "error": 0.987303233494849
+        },
+        "alpha_syst8": {
+          "value": 0.14400635457819752,
+          "error": 0.9858203835923969
+        },
+        "alpha_syst9": {
+          "value": 0.165693148264851,
+          "error": 0.9827869525479521
+        },
+        "nbkg_ch0": {
+          "value": 21.694800979606377,
+          "error": 5.438656750178744
+        },
+        "nbkg_ch1": {
+          "value": 18.84205718289327,
+          "error": 4.732503245919987
+        },
+        "nbkg_ch2": {
+          "value": 15.298072795281819,
+          "error": 4.782556737348003
+        },
+        "tau_ch0": {
+          "value": -0.16428669799332488,
+          "error": 0.08428925639764946
+        },
+        "tau_ch1": {
+          "value": -0.32005746967012666,
+          "error": 0.10700844172645191
+        },
+        "tau_ch2": {
+          "value": -0.835819652469824,
+          "error": 0.46778796937046063
+        }
+      },
+      "mu_sig": 0.75,
+      "delta_nll": 1.1336362623052878
+    },
+    {
+      "nll": 116.47516590842024,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.4592778341520805,
+          "error": 0.8895167754440019
+        },
+        "alpha_syst0": {
+          "value": 0.1029142193866625,
+          "error": 0.9808767634766327
+        },
+        "alpha_syst1": {
+          "value": -0.03391108222366928,
+          "error": 0.9901787816721814
+        },
+        "alpha_syst10": {
+          "value": 0.10291421938780261,
+          "error": 0.980876762011219
+        },
+        "alpha_syst11": {
+          "value": -0.03391108221998012,
+          "error": 0.990178782249215
+        },
+        "alpha_syst12": {
+          "value": -0.02424297948628399,
+          "error": 0.9881677513042697
+        },
+        "alpha_syst13": {
+          "value": 0.09233641080232015,
+          "error": 0.9854527040238827
+        },
+        "alpha_syst14": {
+          "value": 0.10163311164359125,
+          "error": 0.9823718878510506
+        },
+        "alpha_syst15": {
+          "value": 0.10291421938746467,
+          "error": 0.980876763060776
+        },
+        "alpha_syst16": {
+          "value": -0.03391108221968405,
+          "error": 0.9901787831754482
+        },
+        "alpha_syst17": {
+          "value": -0.02424297948744887,
+          "error": 0.9881677514947896
+        },
+        "alpha_syst18": {
+          "value": 0.09233641080657048,
+          "error": 0.9854527046660817
+        },
+        "alpha_syst19": {
+          "value": 0.10163311164317691,
+          "error": 0.9823718889106361
+        },
+        "alpha_syst2": {
+          "value": -0.024242979481954103,
+          "error": 0.9881677526052342
+        },
+        "alpha_syst20": {
+          "value": 0.10291421938964904,
+          "error": 0.9808767642345959
+        },
+        "alpha_syst21": {
+          "value": -0.03391108221988344,
+          "error": 0.9901787822452881
+        },
+        "alpha_syst22": {
+          "value": -0.024242979486757275,
+          "error": 0.9881677523652149
+        },
+        "alpha_syst23": {
+          "value": 0.09233641080673541,
+          "error": 0.9854527044417771
+        },
+        "alpha_syst24": {
+          "value": 0.1016331116436791,
+          "error": 0.9823718889063182
+        },
+        "alpha_syst25": {
+          "value": 0.10291421938437255,
+          "error": 0.9808767646287229
+        },
+        "alpha_syst26": {
+          "value": -0.03391108222100886,
+          "error": 0.9901787815286057
+        },
+        "alpha_syst27": {
+          "value": -0.024242979484437144,
+          "error": 0.9881677518536569
+        },
+        "alpha_syst28": {
+          "value": 0.09233641080355211,
+          "error": 0.9854527052029026
+        },
+        "alpha_syst29": {
+          "value": 0.10163311164521302,
+          "error": 0.9823718906354411
+        },
+        "alpha_syst3": {
+          "value": 0.09233641080392276,
+          "error": 0.9854527045436235
+        },
+        "alpha_syst30": {
+          "value": 0.10291421938734868,
+          "error": 0.9808767648052774
+        },
+        "alpha_syst31": {
+          "value": -0.03391108222139741,
+          "error": 0.9901787817287815
+        },
+        "alpha_syst32": {
+          "value": -0.024242979484422493,
+          "error": 0.9881677533841415
+        },
+        "alpha_syst33": {
+          "value": 0.0923364108023921,
+          "error": 0.9854527042832297
+        },
+        "alpha_syst34": {
+          "value": 0.10163311164793074,
+          "error": 0.9823718893287865
+        },
+        "alpha_syst35": {
+          "value": 0.10291421939985766,
+          "error": 0.9808767634533455
+        },
+        "alpha_syst36": {
+          "value": -0.03391108222349701,
+          "error": 0.9901787819326684
+        },
+        "alpha_syst37": {
+          "value": -0.024242979481830632,
+          "error": 0.9881677531871935
+        },
+        "alpha_syst38": {
+          "value": 0.09233641080406366,
+          "error": 0.9854527042593486
+        },
+        "alpha_syst39": {
+          "value": 0.10163311164282546,
+          "error": 0.9823718887260331
+        },
+        "alpha_syst4": {
+          "value": 0.1016331116432988,
+          "error": 0.9823718889280788
+        },
+        "alpha_syst40": {
+          "value": 0.1029142194014201,
+          "error": 0.9808767623134913
+        },
+        "alpha_syst41": {
+          "value": -0.03391108222004268,
+          "error": 0.9901787819569995
+        },
+        "alpha_syst42": {
+          "value": -0.024242979481063333,
+          "error": 0.9881677530320581
+        },
+        "alpha_syst43": {
+          "value": 0.09233641080358919,
+          "error": 0.9854527043538437
+        },
+        "alpha_syst44": {
+          "value": 0.10163311164567838,
+          "error": 0.9823718892979603
+        },
+        "alpha_syst45": {
+          "value": 0.10291421940028274,
+          "error": 0.9808767622522091
+        },
+        "alpha_syst46": {
+          "value": -0.033911082219913194,
+          "error": 0.9901787815302205
+        },
+        "alpha_syst47": {
+          "value": -0.02424297948103178,
+          "error": 0.9881677520448178
+        },
+        "alpha_syst48": {
+          "value": 0.09233641080485555,
+          "error": 0.9854527038384883
+        },
+        "alpha_syst49": {
+          "value": 0.10163311164552127,
+          "error": 0.9823718903411591
+        },
+        "alpha_syst5": {
+          "value": 0.10291421938802219,
+          "error": 0.9808767641788079
+        },
+        "alpha_syst6": {
+          "value": -0.03391108221882254,
+          "error": 0.9901787821821494
+        },
+        "alpha_syst7": {
+          "value": -0.024242979483693965,
+          "error": 0.9881677527359092
+        },
+        "alpha_syst8": {
+          "value": 0.09233641080327847,
+          "error": 0.985452704049599
+        },
+        "alpha_syst9": {
+          "value": 0.10163311164676711,
+          "error": 0.9823718891079317
+        },
+        "nbkg_ch0": {
+          "value": 20.92416732732261,
+          "error": 5.3858803450158295
+        },
+        "nbkg_ch1": {
+          "value": 18.49691963658346,
+          "error": 4.691023305289057
+        },
+        "nbkg_ch2": {
+          "value": 14.797992620061319,
+          "error": 4.343743872982411
+        },
+        "tau_ch0": {
+          "value": -0.17186510998970667,
+          "error": 0.08714541605953359
+        },
+        "tau_ch1": {
+          "value": -0.32654876197975524,
+          "error": 0.10921270085365167
+        },
+        "tau_ch2": {
+          "value": -0.9241559375059912,
+          "error": 0.4292464414682973
+        }
+      },
+      "mu_sig": 1.0,
+      "delta_nll": 0.1997229538890508
+    },
+    {
+      "nll": 116.37530443147571,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.5140695802923676,
+          "error": 0.887867893383371
+        },
+        "alpha_syst0": {
+          "value": 0.049036798215751194,
+          "error": 0.9816045037146119
+        },
+        "alpha_syst1": {
+          "value": -0.08139736894869837,
+          "error": 0.9909283754202297
+        },
+        "alpha_syst10": {
+          "value": 0.04903679821838558,
+          "error": 0.9816045042373067
+        },
+        "alpha_syst11": {
+          "value": -0.08139736894952465,
+          "error": 0.9909283755271373
+        },
+        "alpha_syst12": {
+          "value": -0.08233857270603,
+          "error": 0.9892886344607885
+        },
+        "alpha_syst13": {
+          "value": 0.04642608079508607,
+          "error": 0.9859529530976758
+        },
+        "alpha_syst14": {
+          "value": 0.04530859748197261,
+          "error": 0.9831521758462398
+        },
+        "alpha_syst15": {
+          "value": 0.04903679821546871,
+          "error": 0.9816045054414806
+        },
+        "alpha_syst16": {
+          "value": -0.08139736894844717,
+          "error": 0.9909283756493318
+        },
+        "alpha_syst17": {
+          "value": -0.08233857270835139,
+          "error": 0.9892886352262613
+        },
+        "alpha_syst18": {
+          "value": 0.0464260808001766,
+          "error": 0.9859529531697535
+        },
+        "alpha_syst19": {
+          "value": 0.045308597481440456,
+          "error": 0.9831521758419604
+        },
+        "alpha_syst2": {
+          "value": -0.0823385727084937,
+          "error": 0.9892886345463119
+        },
+        "alpha_syst20": {
+          "value": 0.049036798216686266,
+          "error": 0.9816045050509018
+        },
+        "alpha_syst21": {
+          "value": -0.08139736895001153,
+          "error": 0.9909283752486482
+        },
+        "alpha_syst22": {
+          "value": -0.08233857270811466,
+          "error": 0.9892886359585158
+        },
+        "alpha_syst23": {
+          "value": 0.04642608079806799,
+          "error": 0.985952953472139
+        },
+        "alpha_syst24": {
+          "value": 0.045308597482402194,
+          "error": 0.9831521765507559
+        },
+        "alpha_syst25": {
+          "value": 0.04903679821571654,
+          "error": 0.9816045052131436
+        },
+        "alpha_syst26": {
+          "value": -0.08139736894975641,
+          "error": 0.9909283750927458
+        },
+        "alpha_syst27": {
+          "value": -0.0823385727090625,
+          "error": 0.9892886344054241
+        },
+        "alpha_syst28": {
+          "value": 0.0464260807992704,
+          "error": 0.985952953507889
+        },
+        "alpha_syst29": {
+          "value": 0.045308597483357776,
+          "error": 0.9831521759249696
+        },
+        "alpha_syst3": {
+          "value": 0.046426080799302154,
+          "error": 0.9859529530605613
+        },
+        "alpha_syst30": {
+          "value": 0.04903679821630976,
+          "error": 0.9816045052721323
+        },
+        "alpha_syst31": {
+          "value": -0.08139736894950438,
+          "error": 0.9909283751895775
+        },
+        "alpha_syst32": {
+          "value": -0.08233857270568286,
+          "error": 0.9892886365428819
+        },
+        "alpha_syst33": {
+          "value": 0.04642608080037775,
+          "error": 0.9859529532835265
+        },
+        "alpha_syst34": {
+          "value": 0.045308597480758765,
+          "error": 0.9831521745878394
+        },
+        "alpha_syst35": {
+          "value": 0.049036798213572534,
+          "error": 0.9816045045309336
+        },
+        "alpha_syst36": {
+          "value": -0.08139736894910268,
+          "error": 0.9909283758342624
+        },
+        "alpha_syst37": {
+          "value": -0.08233857270516204,
+          "error": 0.9892886342599685
+        },
+        "alpha_syst38": {
+          "value": 0.046426080797423025,
+          "error": 0.985952954629062
+        },
+        "alpha_syst39": {
+          "value": 0.04530859748000362,
+          "error": 0.9831521754821206
+        },
+        "alpha_syst4": {
+          "value": 0.04530859748506703,
+          "error": 0.9831521757127066
+        },
+        "alpha_syst40": {
+          "value": 0.04903679821729182,
+          "error": 0.9816045054884956
+        },
+        "alpha_syst41": {
+          "value": -0.08139736895157142,
+          "error": 0.9909283746420823
+        },
+        "alpha_syst42": {
+          "value": -0.0823385727087676,
+          "error": 0.9892886355446939
+        },
+        "alpha_syst43": {
+          "value": 0.04642608079732508,
+          "error": 0.9859529528766656
+        },
+        "alpha_syst44": {
+          "value": 0.04530859747800467,
+          "error": 0.9831521746601177
+        },
+        "alpha_syst45": {
+          "value": 0.04903679822123691,
+          "error": 0.9816045048716682
+        },
+        "alpha_syst46": {
+          "value": -0.08139736895139406,
+          "error": 0.9909283748687946
+        },
+        "alpha_syst47": {
+          "value": -0.0823385727094153,
+          "error": 0.9892886356123038
+        },
+        "alpha_syst48": {
+          "value": 0.046426080798274746,
+          "error": 0.9859529531132218
+        },
+        "alpha_syst49": {
+          "value": 0.04530859748218918,
+          "error": 0.9831521757715254
+        },
+        "alpha_syst5": {
+          "value": 0.04903679821549472,
+          "error": 0.9816045040768194
+        },
+        "alpha_syst6": {
+          "value": -0.0813973689486104,
+          "error": 0.9909283754361288
+        },
+        "alpha_syst7": {
+          "value": -0.08233857270589019,
+          "error": 0.98928863409941
+        },
+        "alpha_syst8": {
+          "value": 0.04642608079682578,
+          "error": 0.9859529531937515
+        },
+        "alpha_syst9": {
+          "value": 0.04530859747938811,
+          "error": 0.9831521754521586
+        },
+        "nbkg_ch0": {
+          "value": 20.349483437141675,
+          "error": 5.351999193107681
+        },
+        "nbkg_ch1": {
+          "value": 18.216561800349364,
+          "error": 4.657722195609925
+        },
+        "nbkg_ch2": {
+          "value": 14.486505078932014,
+          "error": 4.18692488383232
+        },
+        "tau_ch0": {
+          "value": -0.1772927080007176,
+          "error": 0.08950205033016528
+        },
+        "tau_ch1": {
+          "value": -0.332000375054946,
+          "error": 0.11102222786353695
+        },
+        "tau_ch2": {
+          "value": -0.975525974647156,
+          "error": 0.4179563499129206
+        }
+      },
+      "mu_sig": 1.25,
+      "delta_nll": 0.0
+    },
+    {
+      "nll": 116.47823772931704,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.5721220390220868,
+          "error": 0.8885253282586344
+        },
+        "alpha_syst0": {
+          "value": -0.004820863891394125,
+          "error": 0.9823993078037621
+        },
+        "alpha_syst1": {
+          "value": -0.12051848642318694,
+          "error": 0.9915700377972477
+        },
+        "alpha_syst10": {
+          "value": -0.004820863890412353,
+          "error": 0.9823993088350673
+        },
+        "alpha_syst11": {
+          "value": -0.12051848642559497,
+          "error": 0.9915700384872805
+        },
+        "alpha_syst12": {
+          "value": -0.13129592619329875,
+          "error": 0.9902608266884383
+        },
+        "alpha_syst13": {
+          "value": 0.0033344967180709236,
+          "error": 0.9864862748419561
+        },
+        "alpha_syst14": {
+          "value": -0.0069130742781118495,
+          "error": 0.9839617466506299
+        },
+        "alpha_syst15": {
+          "value": -0.004820863889386174,
+          "error": 0.9823993070316005
+        },
+        "alpha_syst16": {
+          "value": -0.12051848642432393,
+          "error": 0.9915700361396818
+        },
+        "alpha_syst17": {
+          "value": -0.1312959261922574,
+          "error": 0.9902608276512916
+        },
+        "alpha_syst18": {
+          "value": 0.0033344967171428223,
+          "error": 0.9864862750613754
+        },
+        "alpha_syst19": {
+          "value": -0.006913074279354238,
+          "error": 0.9839617481473742
+        },
+        "alpha_syst2": {
+          "value": -0.1312959261938816,
+          "error": 0.9902608270001936
+        },
+        "alpha_syst20": {
+          "value": -0.004820863888788945,
+          "error": 0.9823993072215791
+        },
+        "alpha_syst21": {
+          "value": -0.12051848642315169,
+          "error": 0.9915700375917134
+        },
+        "alpha_syst22": {
+          "value": -0.13129592619789088,
+          "error": 0.9902608253174614
+        },
+        "alpha_syst23": {
+          "value": 0.00333449671934193,
+          "error": 0.9864862760314371
+        },
+        "alpha_syst24": {
+          "value": -0.006913074281837074,
+          "error": 0.9839617464707482
+        },
+        "alpha_syst25": {
+          "value": -0.0048208638879208374,
+          "error": 0.9823993078478037
+        },
+        "alpha_syst26": {
+          "value": -0.12051848642480105,
+          "error": 0.9915700383869711
+        },
+        "alpha_syst27": {
+          "value": -0.13129592619714647,
+          "error": 0.9902608277951559
+        },
+        "alpha_syst28": {
+          "value": 0.0033344967181045976,
+          "error": 0.9864862747066026
+        },
+        "alpha_syst29": {
+          "value": -0.006913074284018443,
+          "error": 0.9839617461450729
+        },
+        "alpha_syst3": {
+          "value": 0.003334496718844941,
+          "error": 0.9864862752954295
+        },
+        "alpha_syst30": {
+          "value": -0.004820863885861098,
+          "error": 0.9823993087601848
+        },
+        "alpha_syst31": {
+          "value": -0.12051848642385338,
+          "error": 0.9915700380593733
+        },
+        "alpha_syst32": {
+          "value": -0.1312959261985299,
+          "error": 0.9902608268401831
+        },
+        "alpha_syst33": {
+          "value": 0.0033344967205005864,
+          "error": 0.9864862749075061
+        },
+        "alpha_syst34": {
+          "value": -0.006913074279601385,
+          "error": 0.98396174672289
+        },
+        "alpha_syst35": {
+          "value": -0.00482086388510621,
+          "error": 0.9823993070193903
+        },
+        "alpha_syst36": {
+          "value": -0.12051848642374492,
+          "error": 0.9915700381536913
+        },
+        "alpha_syst37": {
+          "value": -0.13129592619399344,
+          "error": 0.9902608259191461
+        },
+        "alpha_syst38": {
+          "value": 0.0033344967155862246,
+          "error": 0.9864862739633928
+        },
+        "alpha_syst39": {
+          "value": -0.0069130742778822215,
+          "error": 0.9839617477821887
+        },
+        "alpha_syst4": {
+          "value": -0.00691307428184303,
+          "error": 0.9839617458659875
+        },
+        "alpha_syst40": {
+          "value": -0.004820863887743419,
+          "error": 0.9823993070353411
+        },
+        "alpha_syst41": {
+          "value": -0.12051848642267293,
+          "error": 0.9915700379156485
+        },
+        "alpha_syst42": {
+          "value": -0.13129592619632197,
+          "error": 0.9902608268929086
+        },
+        "alpha_syst43": {
+          "value": 0.0033344967176038966,
+          "error": 0.9864862739646114
+        },
+        "alpha_syst44": {
+          "value": -0.0069130742768553285,
+          "error": 0.9839617487473782
+        },
+        "alpha_syst45": {
+          "value": -0.004820863888136956,
+          "error": 0.9823993072631582
+        },
+        "alpha_syst46": {
+          "value": -0.12051848642246032,
+          "error": 0.991570037294306
+        },
+        "alpha_syst47": {
+          "value": -0.13129592619752822,
+          "error": 0.9902608259095983
+        },
+        "alpha_syst48": {
+          "value": 0.0033344967174995105,
+          "error": 0.9864862737813105
+        },
+        "alpha_syst49": {
+          "value": -0.006913074277092276,
+          "error": 0.983961747265179
+        },
+        "alpha_syst5": {
+          "value": -0.0048208638855114574,
+          "error": 0.9823993079131481
+        },
+        "alpha_syst6": {
+          "value": -0.12051848642467441,
+          "error": 0.9915700379511849
+        },
+        "alpha_syst7": {
+          "value": -0.13129592619352617,
+          "error": 0.9902608275578155
+        },
+        "alpha_syst8": {
+          "value": 0.003334496719551874,
+          "error": 0.9864862758824706
+        },
+        "alpha_syst9": {
+          "value": -0.006913074280746608,
+          "error": 0.9839617474263538
+        },
+        "nbkg_ch0": {
+          "value": 19.954843815517247,
+          "error": 5.33128220910824
+        },
+        "nbkg_ch1": {
+          "value": 18.003908390243357,
+          "error": 4.633152571626511
+        },
+        "nbkg_ch2": {
+          "value": 14.359766747227855,
+          "error": 4.1260531914990715
+        },
+        "tau_ch0": {
+          "value": -0.1806365350736837,
+          "error": 0.09132542436608274
+        },
+        "tau_ch1": {
+          "value": -0.3366665094521245,
+          "error": 0.1125259878010531
+        },
+        "tau_ch2": {
+          "value": -1.0124135170762614,
+          "error": 0.41758553245999686
+        }
+      },
+      "mu_sig": 1.5,
+      "delta_nll": 0.2058665956826644
+    },
+    {
+      "nll": 116.70085778905937,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.6138509236169457,
+          "error": 0.8891731021826286
+        },
+        "alpha_syst0": {
+          "value": -0.05029806798076815,
+          "error": 0.9832733958714617
+        },
+        "alpha_syst1": {
+          "value": -0.15586855568642322,
+          "error": 0.9921816850871819
+        },
+        "alpha_syst10": {
+          "value": -0.05029806798007872,
+          "error": 0.9832733963625593
+        },
+        "alpha_syst11": {
+          "value": -0.1558685556878916,
+          "error": 0.9921816861798629
+        },
+        "alpha_syst12": {
+          "value": -0.17514533783089545,
+          "error": 0.9911941292054927
+        },
+        "alpha_syst13": {
+          "value": -0.032558545414020174,
+          "error": 0.9870536949719009
+        },
+        "alpha_syst14": {
+          "value": -0.050960704859512485,
+          "error": 0.9848155554604876
+        },
+        "alpha_syst15": {
+          "value": -0.05029806797932245,
+          "error": 0.9832733946900725
+        },
+        "alpha_syst16": {
+          "value": -0.1558685556879404,
+          "error": 0.9921816846278046
+        },
+        "alpha_syst17": {
+          "value": -0.17514533783521105,
+          "error": 0.9911941281104213
+        },
+        "alpha_syst18": {
+          "value": -0.032558545413911275,
+          "error": 0.9870536938318631
+        },
+        "alpha_syst19": {
+          "value": -0.05096070486447986,
+          "error": 0.9848155557953338
+        },
+        "alpha_syst2": {
+          "value": -0.17514533783648575,
+          "error": 0.9911941270244292
+        },
+        "alpha_syst20": {
+          "value": -0.05029806797865731,
+          "error": 0.9832733965161755
+        },
+        "alpha_syst21": {
+          "value": -0.15586855568742994,
+          "error": 0.9921816852781442
+        },
+        "alpha_syst22": {
+          "value": -0.17514533783427577,
+          "error": 0.9911941283350276
+        },
+        "alpha_syst23": {
+          "value": -0.03255854541287422,
+          "error": 0.9870536948483475
+        },
+        "alpha_syst24": {
+          "value": -0.05096070486426271,
+          "error": 0.9848155542547575
+        },
+        "alpha_syst25": {
+          "value": -0.05029806798168444,
+          "error": 0.9832733963823417
+        },
+        "alpha_syst26": {
+          "value": -0.1558685556849699,
+          "error": 0.9921816844331803
+        },
+        "alpha_syst27": {
+          "value": -0.17514533783702085,
+          "error": 0.9911941295334443
+        },
+        "alpha_syst28": {
+          "value": -0.03255854541530245,
+          "error": 0.9870536954338941
+        },
+        "alpha_syst29": {
+          "value": -0.05096070486497212,
+          "error": 0.9848155562482823
+        },
+        "alpha_syst3": {
+          "value": -0.03255854540648888,
+          "error": 0.9870536959783842
+        },
+        "alpha_syst30": {
+          "value": -0.050298067978147024,
+          "error": 0.9832733967562
+        },
+        "alpha_syst31": {
+          "value": -0.15586855568586766,
+          "error": 0.9921816840933646
+        },
+        "alpha_syst32": {
+          "value": -0.175145337834365,
+          "error": 0.991194128659084
+        },
+        "alpha_syst33": {
+          "value": -0.03255854540951286,
+          "error": 0.9870536940723387
+        },
+        "alpha_syst34": {
+          "value": -0.050960704866764406,
+          "error": 0.9848155573463475
+        },
+        "alpha_syst35": {
+          "value": -0.050298067976420044,
+          "error": 0.9832733969062255
+        },
+        "alpha_syst36": {
+          "value": -0.15586855568599225,
+          "error": 0.992181684727661
+        },
+        "alpha_syst37": {
+          "value": -0.17514533783518627,
+          "error": 0.9911941287979924
+        },
+        "alpha_syst38": {
+          "value": -0.03255854540618806,
+          "error": 0.9870536932686116
+        },
+        "alpha_syst39": {
+          "value": -0.050960704863062985,
+          "error": 0.9848155553306481
+        },
+        "alpha_syst4": {
+          "value": -0.05096070486646791,
+          "error": 0.984815556233078
+        },
+        "alpha_syst40": {
+          "value": -0.05029806797843592,
+          "error": 0.9832733959529381
+        },
+        "alpha_syst41": {
+          "value": -0.15586855568764166,
+          "error": 0.9921816844501521
+        },
+        "alpha_syst42": {
+          "value": -0.17514533783639666,
+          "error": 0.9911941271759993
+        },
+        "alpha_syst43": {
+          "value": -0.03255854540876986,
+          "error": 0.9870536941206287
+        },
+        "alpha_syst44": {
+          "value": -0.0509607048655346,
+          "error": 0.9848155570611161
+        },
+        "alpha_syst45": {
+          "value": -0.05029806798047678,
+          "error": 0.9832733964510976
+        },
+        "alpha_syst46": {
+          "value": -0.15586855568834382,
+          "error": 0.992181685933599
+        },
+        "alpha_syst47": {
+          "value": -0.17514533783158623,
+          "error": 0.9911941273453992
+        },
+        "alpha_syst48": {
+          "value": -0.032558545410110135,
+          "error": 0.9870536952682599
+        },
+        "alpha_syst49": {
+          "value": -0.050960704864056176,
+          "error": 0.9848155558936524
+        },
+        "alpha_syst5": {
+          "value": -0.05029806797642451,
+          "error": 0.9832733972958689
+        },
+        "alpha_syst6": {
+          "value": -0.15586855568875627,
+          "error": 0.9921816841859332
+        },
+        "alpha_syst7": {
+          "value": -0.1751453378341996,
+          "error": 0.9911941263260661
+        },
+        "alpha_syst8": {
+          "value": -0.03255854540625897,
+          "error": 0.98705369521676
+        },
+        "alpha_syst9": {
+          "value": -0.0509607048670948,
+          "error": 0.9848155549319756
+        },
+        "nbkg_ch0": {
+          "value": 19.611068378587717,
+          "error": 5.312114423940132
+        },
+        "nbkg_ch1": {
+          "value": 17.84192753534905,
+          "error": 4.61443847732533
+        },
+        "nbkg_ch2": {
+          "value": 14.250618654589712,
+          "error": 4.084781485169201
+        },
+        "tau_ch0": {
+          "value": -0.18426314353062037,
+          "error": 0.09298523264117811
+        },
+        "tau_ch1": {
+          "value": -0.3400984092668998,
+          "error": 0.11371272746773137
+        },
+        "tau_ch2": {
+          "value": -1.0356689020079137,
+          "error": 0.41660964299731984
+        }
+      },
+      "mu_sig": 1.75,
+      "delta_nll": 0.651106715167316
+    },
+    {
+      "nll": 116.99627710782062,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.6475909170954339,
+          "error": 0.8899138977737929
+        },
+        "alpha_syst0": {
+          "value": -0.09105615874074498,
+          "error": 0.9840792285745996
+        },
+        "alpha_syst1": {
+          "value": -0.1875354587980157,
+          "error": 0.992733589824644
+        },
+        "alpha_syst10": {
+          "value": -0.09105615874184653,
+          "error": 0.9840792286774969
+        },
+        "alpha_syst11": {
+          "value": -0.18753545879935646,
+          "error": 0.9927335910662679
+        },
+        "alpha_syst12": {
+          "value": -0.21446220243159855,
+          "error": 0.9920386619355267
+        },
+        "alpha_syst13": {
+          "value": -0.06472728483055426,
+          "error": 0.9875788960653314
+        },
+        "alpha_syst14": {
+          "value": -0.09051927435274716,
+          "error": 0.9856048663749494
+        },
+        "alpha_syst15": {
+          "value": -0.09105615874240115,
+          "error": 0.9840792271412131
+        },
+        "alpha_syst16": {
+          "value": -0.18753545878944441,
+          "error": 0.9927335916701452
+        },
+        "alpha_syst17": {
+          "value": -0.21446220242655226,
+          "error": 0.9920386619095489
+        },
+        "alpha_syst18": {
+          "value": -0.06472728482601324,
+          "error": 0.9875788952878706
+        },
+        "alpha_syst19": {
+          "value": -0.0905192743526895,
+          "error": 0.985604865793066
+        },
+        "alpha_syst2": {
+          "value": -0.21446220242746575,
+          "error": 0.9920386637986623
+        },
+        "alpha_syst20": {
+          "value": -0.09105615874217415,
+          "error": 0.9840792263042003
+        },
+        "alpha_syst21": {
+          "value": -0.18753545879844724,
+          "error": 0.9927335902554886
+        },
+        "alpha_syst22": {
+          "value": -0.2144622024287032,
+          "error": 0.9920386635473092
+        },
+        "alpha_syst23": {
+          "value": -0.06472728482812572,
+          "error": 0.9875788958770235
+        },
+        "alpha_syst24": {
+          "value": -0.09051927435113721,
+          "error": 0.9856048666296775
+        },
+        "alpha_syst25": {
+          "value": -0.09105615874263066,
+          "error": 0.984079227315179
+        },
+        "alpha_syst26": {
+          "value": -0.18753545880171288,
+          "error": 0.9927335922764298
+        },
+        "alpha_syst27": {
+          "value": -0.2144622024276032,
+          "error": 0.9920386631358286
+        },
+        "alpha_syst28": {
+          "value": -0.06472728482739665,
+          "error": 0.9875788973267774
+        },
+        "alpha_syst29": {
+          "value": -0.09051927434939487,
+          "error": 0.9856048669032194
+        },
+        "alpha_syst3": {
+          "value": -0.06472728482822589,
+          "error": 0.987578895998636
+        },
+        "alpha_syst30": {
+          "value": -0.09105615874304965,
+          "error": 0.9840792272441305
+        },
+        "alpha_syst31": {
+          "value": -0.1875354587980106,
+          "error": 0.992733589778627
+        },
+        "alpha_syst32": {
+          "value": -0.21446220242507621,
+          "error": 0.99203866187381
+        },
+        "alpha_syst33": {
+          "value": -0.06472728482477669,
+          "error": 0.9875788969822744
+        },
+        "alpha_syst34": {
+          "value": -0.09051927434958484,
+          "error": 0.9856048648193021
+        },
+        "alpha_syst35": {
+          "value": -0.09105615874224122,
+          "error": 0.9840792290367004
+        },
+        "alpha_syst36": {
+          "value": -0.18753545879389147,
+          "error": 0.9927335916895026
+        },
+        "alpha_syst37": {
+          "value": -0.21446220242547914,
+          "error": 0.9920386610830282
+        },
+        "alpha_syst38": {
+          "value": -0.06472728482830098,
+          "error": 0.9875788956905655
+        },
+        "alpha_syst39": {
+          "value": -0.09051927435158577,
+          "error": 0.985604865802109
+        },
+        "alpha_syst4": {
+          "value": -0.09051927435026773,
+          "error": 0.9856048648002211
+        },
+        "alpha_syst40": {
+          "value": -0.09105615874266035,
+          "error": 0.9840792296215152
+        },
+        "alpha_syst41": {
+          "value": -0.18753545879473307,
+          "error": 0.9927335901771588
+        },
+        "alpha_syst42": {
+          "value": -0.21446220242811564,
+          "error": 0.9920386620600639
+        },
+        "alpha_syst43": {
+          "value": -0.0647272848265696,
+          "error": 0.9875788946313933
+        },
+        "alpha_syst44": {
+          "value": -0.09051927435288967,
+          "error": 0.9856048674819929
+        },
+        "alpha_syst45": {
+          "value": -0.09105615874059964,
+          "error": 0.9840792268274996
+        },
+        "alpha_syst46": {
+          "value": -0.1875354587940613,
+          "error": 0.9927335910642668
+        },
+        "alpha_syst47": {
+          "value": -0.2144622024266101,
+          "error": 0.9920386641364737
+        },
+        "alpha_syst48": {
+          "value": -0.06472728482712334,
+          "error": 0.9875788958870635
+        },
+        "alpha_syst49": {
+          "value": -0.0905192743542293,
+          "error": 0.9856048674883913
+        },
+        "alpha_syst5": {
+          "value": -0.09105615874250272,
+          "error": 0.9840792295386267
+        },
+        "alpha_syst6": {
+          "value": -0.18753545879825256,
+          "error": 0.9927335910560893
+        },
+        "alpha_syst7": {
+          "value": -0.2144622024285195,
+          "error": 0.9920386615070915
+        },
+        "alpha_syst8": {
+          "value": -0.06472728482920392,
+          "error": 0.9875788966590823
+        },
+        "alpha_syst9": {
+          "value": -0.09051927435475247,
+          "error": 0.9856048653765775
+        },
+        "nbkg_ch0": {
+          "value": 19.32704353796482,
+          "error": 5.295458681591105
+        },
+        "nbkg_ch1": {
+          "value": 17.712630996826,
+          "error": 4.59959402297038
+        },
+        "nbkg_ch2": {
+          "value": 14.170118123283329,
+          "error": 4.0568460050249175
+        },
+        "tau_ch0": {
+          "value": -0.18724263236668792,
+          "error": 0.09441841489505814
+        },
+        "tau_ch1": {
+          "value": -0.34295370355836835,
+          "error": 0.11471181781697873
+        },
+        "tau_ch2": {
+          "value": -1.053788696322543,
+          "error": 0.4166838221712428
+        }
+      },
+      "mu_sig": 2.0,
+      "delta_nll": 1.241945352689811
+    },
+    {
+      "nll": 117.3373362502958,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.6803200860608847,
+          "error": 0.8909377102277372
+        },
+        "alpha_syst0": {
+          "value": -0.12756480904339057,
+          "error": 0.9848441396860255
+        },
+        "alpha_syst1": {
+          "value": -0.21555042752062079,
+          "error": 0.9932467510662963
+        },
+        "alpha_syst10": {
+          "value": -0.12756480904368472,
+          "error": 0.984844139371652
+        },
+        "alpha_syst11": {
+          "value": -0.21555042753134207,
+          "error": 0.99324675339542
+        },
+        "alpha_syst12": {
+          "value": -0.2493857644945398,
+          "error": 0.9928271844396452
+        },
+        "alpha_syst13": {
+          "value": -0.09356293752897621,
+          "error": 0.9880816980426445
+        },
+        "alpha_syst14": {
+          "value": -0.12593230852708134,
+          "error": 0.9863599952911777
+        },
+        "alpha_syst15": {
+          "value": -0.12756480903863654,
+          "error": 0.9848441398930452
+        },
+        "alpha_syst16": {
+          "value": -0.21555042752393813,
+          "error": 0.9932467531559138
+        },
+        "alpha_syst17": {
+          "value": -0.24938576449503722,
+          "error": 0.9928271843291732
+        },
+        "alpha_syst18": {
+          "value": -0.09356293752934226,
+          "error": 0.9880816970448344
+        },
+        "alpha_syst19": {
+          "value": -0.1259323085280932,
+          "error": 0.9863599977016346
+        },
+        "alpha_syst2": {
+          "value": -0.24938576449620567,
+          "error": 0.9928271850714516
+        },
+        "alpha_syst20": {
+          "value": -0.1275648090388435,
+          "error": 0.9848441395825227
+        },
+        "alpha_syst21": {
+          "value": -0.21555042752614734,
+          "error": 0.9932467523123428
+        },
+        "alpha_syst22": {
+          "value": -0.2493857644942313,
+          "error": 0.9928271852054402
+        },
+        "alpha_syst23": {
+          "value": -0.09356293752822362,
+          "error": 0.9880816967958213
+        },
+        "alpha_syst24": {
+          "value": -0.1259323085274543,
+          "error": 0.9863599963706497
+        },
+        "alpha_syst25": {
+          "value": -0.12756480904028672,
+          "error": 0.9848441376320207
+        },
+        "alpha_syst26": {
+          "value": -0.2155504275250401,
+          "error": 0.9932467519919813
+        },
+        "alpha_syst27": {
+          "value": -0.24938576449646357,
+          "error": 0.992827184580648
+        },
+        "alpha_syst28": {
+          "value": -0.09356293753258361,
+          "error": 0.9880816967154984
+        },
+        "alpha_syst29": {
+          "value": -0.1259323085315033,
+          "error": 0.9863599975218857
+        },
+        "alpha_syst3": {
+          "value": -0.09356293752941391,
+          "error": 0.9880816968735673
+        },
+        "alpha_syst30": {
+          "value": -0.12756480904352993,
+          "error": 0.98484413802346
+        },
+        "alpha_syst31": {
+          "value": -0.21555042752416206,
+          "error": 0.9932467536360051
+        },
+        "alpha_syst32": {
+          "value": -0.2493857644953294,
+          "error": 0.9928271827994163
+        },
+        "alpha_syst33": {
+          "value": -0.09356293752989792,
+          "error": 0.988081697786149
+        },
+        "alpha_syst34": {
+          "value": -0.12593230852787896,
+          "error": 0.986359998498271
+        },
+        "alpha_syst35": {
+          "value": -0.12756480903881648,
+          "error": 0.9848441399429388
+        },
+        "alpha_syst36": {
+          "value": -0.21555042752724063,
+          "error": 0.9932467513085729
+        },
+        "alpha_syst37": {
+          "value": -0.2493857644970193,
+          "error": 0.9928271860244521
+        },
+        "alpha_syst38": {
+          "value": -0.0935629375293392,
+          "error": 0.9880816967347636
+        },
+        "alpha_syst39": {
+          "value": -0.12593230853125972,
+          "error": 0.9863599959675747
+        },
+        "alpha_syst4": {
+          "value": -0.1259323085252372,
+          "error": 0.9863599948319917
+        },
+        "alpha_syst40": {
+          "value": -0.12756480903760756,
+          "error": 0.9848441394830173
+        },
+        "alpha_syst41": {
+          "value": -0.2155504275272485,
+          "error": 0.9932467527664102
+        },
+        "alpha_syst42": {
+          "value": -0.24938576449771074,
+          "error": 0.9928271864160036
+        },
+        "alpha_syst43": {
+          "value": -0.09356293753162405,
+          "error": 0.9880816978495228
+        },
+        "alpha_syst44": {
+          "value": -0.12593230852799814,
+          "error": 0.9863599981205725
+        },
+        "alpha_syst45": {
+          "value": -0.12756480904646933,
+          "error": 0.9848441415446272
+        },
+        "alpha_syst46": {
+          "value": -0.2155504275234454,
+          "error": 0.9932467519638241
+        },
+        "alpha_syst47": {
+          "value": -0.2493857644949092,
+          "error": 0.9928271854849929
+        },
+        "alpha_syst48": {
+          "value": -0.09356293752626826,
+          "error": 0.9880816969909534
+        },
+        "alpha_syst49": {
+          "value": -0.125932308526404,
+          "error": 0.9863599954833202
+        },
+        "alpha_syst5": {
+          "value": -0.1275648090403818,
+          "error": 0.9848441395031986
+        },
+        "alpha_syst6": {
+          "value": -0.2155504275254333,
+          "error": 0.9932467516248142
+        },
+        "alpha_syst7": {
+          "value": -0.24938576449246416,
+          "error": 0.992827186224214
+        },
+        "alpha_syst8": {
+          "value": -0.09356293753199543,
+          "error": 0.9880816970192858
+        },
+        "alpha_syst9": {
+          "value": -0.12593230852858728,
+          "error": 0.9863599942007264
+        },
+        "nbkg_ch0": {
+          "value": 19.096721991703163,
+          "error": 5.283853127376541
+        },
+        "nbkg_ch1": {
+          "value": 17.600724143920523,
+          "error": 4.587033689656004
+        },
+        "nbkg_ch2": {
+          "value": 14.109169945019007,
+          "error": 4.036825558714578
+        },
+        "tau_ch0": {
+          "value": -0.19005733578482897,
+          "error": 0.09572865101190811
+        },
+        "tau_ch1": {
+          "value": -0.3455438013357034,
+          "error": 0.11562997316296726
+        },
+        "tau_ch2": {
+          "value": -1.0684447044272782,
+          "error": 0.4171069115461375
+        }
+      },
+      "mu_sig": 2.25,
+      "delta_nll": 1.924063637640188
+    },
+    {
+      "nll": 117.70702427491908,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.7069076274067229,
+          "error": 0.8918106426496466
+        },
+        "alpha_syst0": {
+          "value": -0.15971884546177997,
+          "error": 0.9855664341762678
+        },
+        "alpha_syst1": {
+          "value": -0.2414802931329147,
+          "error": 0.9937250808222637
+        },
+        "alpha_syst10": {
+          "value": -0.15971884545783552,
+          "error": 0.9855664364296632
+        },
+        "alpha_syst11": {
+          "value": -0.24148029314251632,
+          "error": 0.9937250811440768
+        },
+        "alpha_syst12": {
+          "value": -0.28156010021835065,
+          "error": 0.9935634919808354
+        },
+        "alpha_syst13": {
+          "value": -0.11942203318796057,
+          "error": 0.988554743093354
+        },
+        "alpha_syst14": {
+          "value": -0.15783934955785145,
+          "error": 0.9870714705808968
+        },
+        "alpha_syst15": {
+          "value": -0.1597188454543407,
+          "error": 0.9855664358308882
+        },
+        "alpha_syst16": {
+          "value": -0.24148029313881714,
+          "error": 0.9937250807995444
+        },
+        "alpha_syst17": {
+          "value": -0.28156010021533007,
+          "error": 0.9935634934349783
+        },
+        "alpha_syst18": {
+          "value": -0.11942203318913175,
+          "error": 0.9885547426152271
+        },
+        "alpha_syst19": {
+          "value": -0.1578393495557207,
+          "error": 0.9870714729245947
+        },
+        "alpha_syst2": {
+          "value": -0.2815601002205141,
+          "error": 0.9935634930656397
+        },
+        "alpha_syst20": {
+          "value": -0.1597188454534919,
+          "error": 0.9855664353645659
+        },
+        "alpha_syst21": {
+          "value": -0.24148029314025196,
+          "error": 0.9937250813698595
+        },
+        "alpha_syst22": {
+          "value": -0.2815601002113478,
+          "error": 0.9935634914823852
+        },
+        "alpha_syst23": {
+          "value": -0.11942203319626854,
+          "error": 0.9885547437911494
+        },
+        "alpha_syst24": {
+          "value": -0.15783934956162954,
+          "error": 0.9870714735002624
+        },
+        "alpha_syst25": {
+          "value": -0.1597188454574529,
+          "error": 0.9855664362910628
+        },
+        "alpha_syst26": {
+          "value": -0.24148029313968083,
+          "error": 0.9937250804531548
+        },
+        "alpha_syst27": {
+          "value": -0.28156010021835287,
+          "error": 0.993563492336335
+        },
+        "alpha_syst28": {
+          "value": -0.11942203319351989,
+          "error": 0.988554744951649
+        },
+        "alpha_syst29": {
+          "value": -0.15783934955257653,
+          "error": 0.9870714718756394
+        },
+        "alpha_syst3": {
+          "value": -0.11942203319353327,
+          "error": 0.9885547454389734
+        },
+        "alpha_syst30": {
+          "value": -0.1597188454549246,
+          "error": 0.9855664369214278
+        },
+        "alpha_syst31": {
+          "value": -0.2414802931390555,
+          "error": 0.99372508136895
+        },
+        "alpha_syst32": {
+          "value": -0.281560100215839,
+          "error": 0.993563489804159
+        },
+        "alpha_syst33": {
+          "value": -0.11942203319364204,
+          "error": 0.9885547445232266
+        },
+        "alpha_syst34": {
+          "value": -0.15783934955919757,
+          "error": 0.9870714718883102
+        },
+        "alpha_syst35": {
+          "value": -0.15971884545348508,
+          "error": 0.9855664364596907
+        },
+        "alpha_syst36": {
+          "value": -0.2414802931347477,
+          "error": 0.9937250820124052
+        },
+        "alpha_syst37": {
+          "value": -0.28156010022345374,
+          "error": 0.993563491233277
+        },
+        "alpha_syst38": {
+          "value": -0.11942203318985664,
+          "error": 0.9885547435022165
+        },
+        "alpha_syst39": {
+          "value": -0.15783934955952297,
+          "error": 0.9870714716208737
+        },
+        "alpha_syst4": {
+          "value": -0.15783934955401474,
+          "error": 0.9870714735166719
+        },
+        "alpha_syst40": {
+          "value": -0.15971884545567597,
+          "error": 0.9855664365589527
+        },
+        "alpha_syst41": {
+          "value": -0.2414802931379601,
+          "error": 0.9937250833350635
+        },
+        "alpha_syst42": {
+          "value": -0.28156010021951977,
+          "error": 0.9935634921992328
+        },
+        "alpha_syst43": {
+          "value": -0.11942203319392856,
+          "error": 0.9885547441260158
+        },
+        "alpha_syst44": {
+          "value": -0.157839349555665,
+          "error": 0.9870714724874943
+        },
+        "alpha_syst45": {
+          "value": -0.1597188454605623,
+          "error": 0.9855664358638524
+        },
+        "alpha_syst46": {
+          "value": -0.24148029313483263,
+          "error": 0.9937250810050398
+        },
+        "alpha_syst47": {
+          "value": -0.2815601002194348,
+          "error": 0.993563491195689
+        },
+        "alpha_syst48": {
+          "value": -0.1194220331878383,
+          "error": 0.9885547425569783
+        },
+        "alpha_syst49": {
+          "value": -0.15783934955857912,
+          "error": 0.9870714704418111
+        },
+        "alpha_syst5": {
+          "value": -0.1597188454558676,
+          "error": 0.985566436703061
+        },
+        "alpha_syst6": {
+          "value": -0.24148029313995306,
+          "error": 0.9937250821183615
+        },
+        "alpha_syst7": {
+          "value": -0.2815601002126033,
+          "error": 0.9935634950099862
+        },
+        "alpha_syst8": {
+          "value": -0.11942203319128458,
+          "error": 0.9885547451008377
+        },
+        "alpha_syst9": {
+          "value": -0.15783934955065126,
+          "error": 0.9870714729726175
+        },
+        "nbkg_ch0": {
+          "value": 18.873950098120545,
+          "error": 5.269543733079896
+        },
+        "nbkg_ch1": {
+          "value": 17.498558039186726,
+          "error": 4.575102382695153
+        },
+        "nbkg_ch2": {
+          "value": 14.046659108392364,
+          "error": 4.0184086856753005
+        },
+        "tau_ch0": {
+          "value": -0.19232134129099893,
+          "error": 0.09692605924203188
+        },
+        "tau_ch1": {
+          "value": -0.3477554888738249,
+          "error": 0.11643848480039361
+        },
+        "tau_ch2": {
+          "value": -1.0803004388265567,
+          "error": 0.4173402312320282
+        }
+      },
+      "mu_sig": 2.5,
+      "delta_nll": 2.6634396868867327
+    },
+    {
+      "nll": 118.09463134648804,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.7326632942823676,
+          "error": 0.8928425336282793
+        },
+        "alpha_syst0": {
+          "value": -0.18974164554344486,
+          "error": 0.9862354187343848
+        },
+        "alpha_syst1": {
+          "value": -0.2649217596250932,
+          "error": 0.9941670394475554
+        },
+        "alpha_syst10": {
+          "value": -0.18974164554111791,
+          "error": 0.9862354201640013
+        },
+        "alpha_syst11": {
+          "value": -0.26492175962667497,
+          "error": 0.9941670349694998
+        },
+        "alpha_syst12": {
+          "value": -0.31078591563816726,
+          "error": 0.9942456504466137
+        },
+        "alpha_syst13": {
+          "value": -0.14323749354531992,
+          "error": 0.9889955627567223
+        },
+        "alpha_syst14": {
+          "value": -0.1871906421435612,
+          "error": 0.9877349575446283
+        },
+        "alpha_syst15": {
+          "value": -0.1897416455393588,
+          "error": 0.986235420083278
+        },
+        "alpha_syst16": {
+          "value": -0.26492175962240655,
+          "error": 0.9941670368905255
+        },
+        "alpha_syst17": {
+          "value": -0.31078591562641605,
+          "error": 0.9942456506505205
+        },
+        "alpha_syst18": {
+          "value": -0.1432374935442538,
+          "error": 0.9889955618248351
+        },
+        "alpha_syst19": {
+          "value": -0.18719064214034442,
+          "error": 0.9877349581138875
+        },
+        "alpha_syst2": {
+          "value": -0.3107859156327463,
+          "error": 0.9942456489479892
+        },
+        "alpha_syst20": {
+          "value": -0.18974164553935954,
+          "error": 0.9862354180311248
+        },
+        "alpha_syst21": {
+          "value": -0.26492175961968767,
+          "error": 0.9941670366645621
+        },
+        "alpha_syst22": {
+          "value": -0.31078591562679,
+          "error": 0.994245651462547
+        },
+        "alpha_syst23": {
+          "value": -0.1432374935495612,
+          "error": 0.988995564278051
+        },
+        "alpha_syst24": {
+          "value": -0.18719064214310577,
+          "error": 0.9877349569807161
+        },
+        "alpha_syst25": {
+          "value": -0.18974164553896547,
+          "error": 0.9862354188944155
+        },
+        "alpha_syst26": {
+          "value": -0.26492175963216363,
+          "error": 0.9941670364613434
+        },
+        "alpha_syst27": {
+          "value": -0.3107859156258992,
+          "error": 0.9942456526305943
+        },
+        "alpha_syst28": {
+          "value": -0.14323749354885312,
+          "error": 0.9889955622130027
+        },
+        "alpha_syst29": {
+          "value": -0.1871906421448706,
+          "error": 0.9877349568702632
+        },
+        "alpha_syst3": {
+          "value": -0.14323749354778145,
+          "error": 0.9889955617608304
+        },
+        "alpha_syst30": {
+          "value": -0.18974164554046982,
+          "error": 0.9862354194015934
+        },
+        "alpha_syst31": {
+          "value": -0.26492175962225983,
+          "error": 0.9941670363770276
+        },
+        "alpha_syst32": {
+          "value": -0.3107859156235248,
+          "error": 0.9942456517928413
+        },
+        "alpha_syst33": {
+          "value": -0.14323749354666768,
+          "error": 0.9889955633685387
+        },
+        "alpha_syst34": {
+          "value": -0.18719064214326797,
+          "error": 0.9877349562852207
+        },
+        "alpha_syst35": {
+          "value": -0.1897416455409462,
+          "error": 0.986235419483293
+        },
+        "alpha_syst36": {
+          "value": -0.26492175962514675,
+          "error": 0.9941670373684977
+        },
+        "alpha_syst37": {
+          "value": -0.31078591562740043,
+          "error": 0.9942456497464625
+        },
+        "alpha_syst38": {
+          "value": -0.14323749354516851,
+          "error": 0.9889955643561084
+        },
+        "alpha_syst39": {
+          "value": -0.18719064214205697,
+          "error": 0.9877349594446923
+        },
+        "alpha_syst4": {
+          "value": -0.1871906421432135,
+          "error": 0.9877349596964349
+        },
+        "alpha_syst40": {
+          "value": -0.18974164553914,
+          "error": 0.9862354186328786
+        },
+        "alpha_syst41": {
+          "value": -0.2649217596255619,
+          "error": 0.9941670384087102
+        },
+        "alpha_syst42": {
+          "value": -0.3107859156306325,
+          "error": 0.9942456541357082
+        },
+        "alpha_syst43": {
+          "value": -0.14323749354830098,
+          "error": 0.9889955625119211
+        },
+        "alpha_syst44": {
+          "value": -0.18719064214237982,
+          "error": 0.9877349575121628
+        },
+        "alpha_syst45": {
+          "value": -0.18974164553705708,
+          "error": 0.9862354200467889
+        },
+        "alpha_syst46": {
+          "value": -0.2649217596261563,
+          "error": 0.9941670369188242
+        },
+        "alpha_syst47": {
+          "value": -0.31078591564104047,
+          "error": 0.9942456530472505
+        },
+        "alpha_syst48": {
+          "value": -0.14323749354446483,
+          "error": 0.9889955644519703
+        },
+        "alpha_syst49": {
+          "value": -0.18719064214520217,
+          "error": 0.9877349588377493
+        },
+        "alpha_syst5": {
+          "value": -0.18974164553940287,
+          "error": 0.9862354190768692
+        },
+        "alpha_syst6": {
+          "value": -0.26492175962166215,
+          "error": 0.994167036854987
+        },
+        "alpha_syst7": {
+          "value": -0.31078591563451113,
+          "error": 0.9942456516037261
+        },
+        "alpha_syst8": {
+          "value": -0.1432374935432385,
+          "error": 0.988995563271118
+        },
+        "alpha_syst9": {
+          "value": -0.1871906421447179,
+          "error": 0.9877349571406608
+        },
+        "nbkg_ch0": {
+          "value": 18.68886708154842,
+          "error": 5.259215020611838
+        },
+        "nbkg_ch1": {
+          "value": 17.4132273356275,
+          "error": 4.5656830282079355
+        },
+        "nbkg_ch2": {
+          "value": 14.003787339710748,
+          "error": 4.005734316283203
+        },
+        "tau_ch0": {
+          "value": -0.19458132359627034,
+          "error": 0.09803647943679374
+        },
+        "tau_ch1": {
+          "value": -0.3498307743669782,
+          "error": 0.1171941561093775
+        },
+        "tau_ch2": {
+          "value": -1.0903616701422463,
+          "error": 0.41783430021326595
+        }
+      },
+      "mu_sig": 2.75,
+      "delta_nll": 3.4386538300246627
+    },
+    {
+      "nll": 118.49287011234372,
+      "fit_status": 0,
+      "parameters": {
+        "alpha_sigma": {
+          "value": 0.756231714273464,
+          "error": 0.8938905932980739
+        },
+        "alpha_syst0": {
+          "value": -0.217284148905726,
+          "error": 0.98686199098325
+        },
+        "alpha_syst1": {
+          "value": -0.28653477446040193,
+          "error": 0.9945804939451542
+        },
+        "alpha_syst10": {
+          "value": -0.2172841489055608,
+          "error": 0.986861990899343
+        },
+        "alpha_syst11": {
+          "value": -0.2865347744494406,
+          "error": 0.9945804932931694
+        },
+        "alpha_syst12": {
+          "value": -0.3377582612504805,
+          "error": 0.9948851966368111
+        },
+        "alpha_syst13": {
+          "value": -0.1651925914501435,
+          "error": 0.9894109685903687
+        },
+        "alpha_syst14": {
+          "value": -0.21426354272170117,
+          "error": 0.9883607367552324
+        },
+        "alpha_syst15": {
+          "value": -0.21728414889959863,
+          "error": 0.9868619904005701
+        },
+        "alpha_syst16": {
+          "value": -0.28653477445002673,
+          "error": 0.9945804931623579
+        },
+        "alpha_syst17": {
+          "value": -0.3377582612497962,
+          "error": 0.9948851979250027
+        },
+        "alpha_syst18": {
+          "value": -0.1651925914509245,
+          "error": 0.9894109699554055
+        },
+        "alpha_syst19": {
+          "value": -0.21426354271761724,
+          "error": 0.9883607352458984
+        },
+        "alpha_syst2": {
+          "value": -0.33775826125009983,
+          "error": 0.9948851951864672
+        },
+        "alpha_syst20": {
+          "value": -0.21728414890554082,
+          "error": 0.986861992748866
+        },
+        "alpha_syst21": {
+          "value": -0.2865347744432951,
+          "error": 0.9945804925829952
+        },
+        "alpha_syst22": {
+          "value": -0.33775826124908553,
+          "error": 0.9948851937219415
+        },
+        "alpha_syst23": {
+          "value": -0.16519259144537496,
+          "error": 0.9894109685797804
+        },
+        "alpha_syst24": {
+          "value": -0.2142635427236727,
+          "error": 0.98836073440153
+        },
+        "alpha_syst25": {
+          "value": -0.2172841489033568,
+          "error": 0.9868619929441733
+        },
+        "alpha_syst26": {
+          "value": -0.286534774449358,
+          "error": 0.994580495010931
+        },
+        "alpha_syst27": {
+          "value": -0.3377582612554936,
+          "error": 0.9948851953160336
+        },
+        "alpha_syst28": {
+          "value": -0.16519259145011086,
+          "error": 0.9894109689339305
+        },
+        "alpha_syst29": {
+          "value": -0.21426354272690262,
+          "error": 0.9883607371904891
+        },
+        "alpha_syst3": {
+          "value": -0.1651925914499125,
+          "error": 0.9894109696766976
+        },
+        "alpha_syst30": {
+          "value": -0.2172841489010065,
+          "error": 0.9868619926375135
+        },
+        "alpha_syst31": {
+          "value": -0.28653477444892467,
+          "error": 0.9945804931774885
+        },
+        "alpha_syst32": {
+          "value": -0.33775826125183717,
+          "error": 0.994885195240748
+        },
+        "alpha_syst33": {
+          "value": -0.1651925914487811,
+          "error": 0.9894109691655946
+        },
+        "alpha_syst34": {
+          "value": -0.21426354271748288,
+          "error": 0.9883607374146196
+        },
+        "alpha_syst35": {
+          "value": -0.21728414889948844,
+          "error": 0.9868619913295322
+        },
+        "alpha_syst36": {
+          "value": -0.2865347744576853,
+          "error": 0.9945804940668476
+        },
+        "alpha_syst37": {
+          "value": -0.337758261252894,
+          "error": 0.9948851952752341
+        },
+        "alpha_syst38": {
+          "value": -0.1651925914525456,
+          "error": 0.989410968911079
+        },
+        "alpha_syst39": {
+          "value": -0.21426354272134646,
+          "error": 0.988360736167619
+        },
+        "alpha_syst4": {
+          "value": -0.21426354272041565,
+          "error": 0.9883607370157697
+        },
+        "alpha_syst40": {
+          "value": -0.21728414890419306,
+          "error": 0.9868619921985781
+        },
+        "alpha_syst41": {
+          "value": -0.2865347744522987,
+          "error": 0.9945804921954406
+        },
+        "alpha_syst42": {
+          "value": -0.3377582612496729,
+          "error": 0.9948851956741716
+        },
+        "alpha_syst43": {
+          "value": -0.16519259145414492,
+          "error": 0.989410969310174
+        },
+        "alpha_syst44": {
+          "value": -0.21426354272075757,
+          "error": 0.9883607373801404
+        },
+        "alpha_syst45": {
+          "value": -0.21728414890029668,
+          "error": 0.9868619913227005
+        },
+        "alpha_syst46": {
+          "value": -0.2865347744552826,
+          "error": 0.9945804942090829
+        },
+        "alpha_syst47": {
+          "value": -0.3377582612509269,
+          "error": 0.9948851944915782
+        },
+        "alpha_syst48": {
+          "value": -0.16519259145072246,
+          "error": 0.9894109689305812
+        },
+        "alpha_syst49": {
+          "value": -0.21426354271958437,
+          "error": 0.9883607345264809
+        },
+        "alpha_syst5": {
+          "value": -0.2172841489025377,
+          "error": 0.9868619936543604
+        },
+        "alpha_syst6": {
+          "value": -0.28653477445681924,
+          "error": 0.9945804933369926
+        },
+        "alpha_syst7": {
+          "value": -0.33775826125089875,
+          "error": 0.9948851939321318
+        },
+        "alpha_syst8": {
+          "value": -0.1651925914467412,
+          "error": 0.9894109682649663
+        },
+        "alpha_syst9": {
+          "value": -0.2142635427192471,
+          "error": 0.9883607342156882
+        },
+        "nbkg_ch0": {
+          "value": 18.52795341378568,
+          "error": 5.2508495838548805
+        },
+        "nbkg_ch1": {
+          "value": 17.33803825565698,
+          "error": 4.557599599921706
+        },
+        "nbkg_ch2": {
+          "value": 13.965462775051972,
+          "error": 3.9949128136526832
+        },
+        "tau_ch0": {
+          "value": -0.19672661816423728,
+          "error": 0.09907175223069671
+        },
+        "tau_ch1": {
+          "value": -0.35179612035691443,
+          "error": 0.11790601830483695
+        },
+        "tau_ch2": {
+          "value": -1.0991641667069056,
+          "error": 0.41838091476538875
+        }
+      },
+      "mu_sig": 3.0,
+      "delta_nll": 4.235131361736023
+    }
+  ]
+}

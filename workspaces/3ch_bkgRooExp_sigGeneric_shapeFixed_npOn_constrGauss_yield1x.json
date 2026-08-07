@@ -6,37 +6,11 @@
         "sim_pdf_combData_global_observables",
         "sim_pdf_combData_parameters_of_interest"
       ],
-      "name": "L_ch0",
+      "likelihood": "sim_pdf_combData",
+      "name": "sim_pdf_combData",
       "parameters_of_interest": [
         "mu_sig"
       ],
-      "likelihood": "L_ch0",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_global_observables",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch1",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch1",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_global_observables",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch2",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch2",
       "init": "default_values"
     }
   ],
@@ -44,7 +18,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch0",
           "min": 10.0,
           "max": 20.0
         }
@@ -135,7 +109,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch1",
           "min": 10.0,
           "max": 20.0
         }
@@ -226,7 +200,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch2",
           "min": 10.0,
           "max": 20.0
         }
@@ -385,10 +359,10 @@
       "c": "tau_ch0",
       "name": "bkg_ch0",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch0"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch0)/sigma_ch0)**2)",
+      "expression": "exp(-0.5*((x_ch0-mean_ch0)/sigma_ch0)**2)",
       "name": "sig_ch0",
       "type": "generic_dist"
     },
@@ -409,10 +383,10 @@
       "c": "tau_ch1",
       "name": "bkg_ch1",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch1"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch1)/sigma_ch1)**2)",
+      "expression": "exp(-0.5*((x_ch1-mean_ch1)/sigma_ch1)**2)",
       "name": "sig_ch1",
       "type": "generic_dist"
     },
@@ -433,10 +407,10 @@
       "c": "tau_ch2",
       "name": "bkg_ch2",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch2"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch2)/sigma_ch2)**2)",
+      "expression": "exp(-0.5*((x_ch2-mean_ch2)/sigma_ch2)**2)",
       "name": "sig_ch2",
       "type": "generic_dist"
     }
@@ -535,7 +509,17 @@
         {
           "max": 20.0,
           "min": 10.0,
-          "name": "x"
+          "name": "x_ch0"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch1"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch2"
         }
       ],
       "name": "default_domain",
@@ -585,36 +569,22 @@
   ],
   "likelihoods": [
     {
-      "name": "L_ch0",
-      "distributions": [
-        "model_ch0"
-      ],
       "data": [
-        "combData_ch0"
+        "combData_ch0",
+        "combData_ch1",
+        "combData_ch2"
       ],
+      "distributions": [
+        "model_ch0",
+        "model_ch1",
+        "model_ch2"
+      ],
+      "name": "sim_pdf_combData",
       "aux_distributions": [
         "constr_alpha_sigma"
       ],
       "aux_data": [
         "global_obs_data"
-      ]
-    },
-    {
-      "name": "L_ch1",
-      "distributions": [
-        "model_ch1"
-      ],
-      "data": [
-        "combData_ch1"
-      ]
-    },
-    {
-      "name": "L_ch2",
-      "distributions": [
-        "model_ch2"
-      ],
-      "data": [
-        "combData_ch2"
       ]
     }
   ],

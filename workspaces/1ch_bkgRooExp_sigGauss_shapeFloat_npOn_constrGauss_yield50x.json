@@ -6,11 +6,11 @@
         "sim_pdf_combData_global_observables",
         "sim_pdf_combData_parameters_of_interest"
       ],
-      "name": "L_ch0",
+      "likelihood": "sim_pdf_combData",
+      "name": "sim_pdf_combData",
       "parameters_of_interest": [
         "mu_sig"
       ],
-      "likelihood": "L_ch0",
       "init": "default_values"
     }
   ],
@@ -4654,13 +4654,13 @@
   ],
   "likelihoods": [
     {
-      "name": "L_ch0",
-      "distributions": [
-        "model_ch0"
-      ],
       "data": [
         "combData_ch0"
       ],
+      "distributions": [
+        "model_ch0"
+      ],
+      "name": "sim_pdf_combData",
       "aux_distributions": [
         "constr_alpha_sigma"
       ],

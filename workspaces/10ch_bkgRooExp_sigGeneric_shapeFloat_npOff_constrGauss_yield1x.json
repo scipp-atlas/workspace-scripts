@@ -5,119 +5,11 @@
         "sim_pdf_combData_nuisance_parameters",
         "sim_pdf_combData_parameters_of_interest"
       ],
-      "name": "L_ch0",
+      "likelihood": "sim_pdf_combData",
+      "name": "sim_pdf_combData",
       "parameters_of_interest": [
         "mu_sig"
       ],
-      "likelihood": "L_ch0",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch1",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch1",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch2",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch2",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch3",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch3",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch4",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch4",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch5",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch5",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch6",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch6",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch7",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch7",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch8",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch8",
-      "init": "default_values"
-    },
-    {
-      "domains": [
-        "sim_pdf_combData_nuisance_parameters",
-        "sim_pdf_combData_parameters_of_interest"
-      ],
-      "name": "L_ch9",
-      "parameters_of_interest": [
-        "mu_sig"
-      ],
-      "likelihood": "L_ch9",
       "init": "default_values"
     }
   ],
@@ -125,7 +17,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch0",
           "min": 10.0,
           "max": 20.0
         }
@@ -216,7 +108,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch1",
           "min": 10.0,
           "max": 20.0
         }
@@ -307,7 +199,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch2",
           "min": 10.0,
           "max": 20.0
         }
@@ -443,7 +335,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch3",
           "min": 10.0,
           "max": 20.0
         }
@@ -552,7 +444,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch4",
           "min": 10.0,
           "max": 20.0
         }
@@ -670,7 +562,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch5",
           "min": 10.0,
           "max": 20.0
         }
@@ -773,7 +665,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch6",
           "min": 10.0,
           "max": 20.0
         }
@@ -885,7 +777,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch7",
           "min": 10.0,
           "max": 20.0
         }
@@ -1003,7 +895,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch8",
           "min": 10.0,
           "max": 20.0
         }
@@ -1118,7 +1010,7 @@
     {
       "axes": [
         {
-          "name": "x",
+          "name": "x_ch9",
           "min": 10.0,
           "max": 20.0
         }
@@ -1261,10 +1153,10 @@
       "c": "tau_ch0",
       "name": "bkg_ch0",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch0"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch0)/sigma_nom_ch0)**2)",
+      "expression": "exp(-0.5*((x_ch0-mean_ch0)/sigma_nom_ch0)**2)",
       "name": "sig_ch0",
       "type": "generic_dist"
     },
@@ -1285,10 +1177,10 @@
       "c": "tau_ch1",
       "name": "bkg_ch1",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch1"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch1)/sigma_nom_ch1)**2)",
+      "expression": "exp(-0.5*((x_ch1-mean_ch1)/sigma_nom_ch1)**2)",
       "name": "sig_ch1",
       "type": "generic_dist"
     },
@@ -1309,10 +1201,10 @@
       "c": "tau_ch2",
       "name": "bkg_ch2",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch2"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch2)/sigma_nom_ch2)**2)",
+      "expression": "exp(-0.5*((x_ch2-mean_ch2)/sigma_nom_ch2)**2)",
       "name": "sig_ch2",
       "type": "generic_dist"
     },
@@ -1333,10 +1225,10 @@
       "c": "tau_ch3",
       "name": "bkg_ch3",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch3"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch3)/sigma_nom_ch3)**2)",
+      "expression": "exp(-0.5*((x_ch3-mean_ch3)/sigma_nom_ch3)**2)",
       "name": "sig_ch3",
       "type": "generic_dist"
     },
@@ -1357,10 +1249,10 @@
       "c": "tau_ch4",
       "name": "bkg_ch4",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch4"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch4)/sigma_nom_ch4)**2)",
+      "expression": "exp(-0.5*((x_ch4-mean_ch4)/sigma_nom_ch4)**2)",
       "name": "sig_ch4",
       "type": "generic_dist"
     },
@@ -1381,10 +1273,10 @@
       "c": "tau_ch5",
       "name": "bkg_ch5",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch5"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch5)/sigma_nom_ch5)**2)",
+      "expression": "exp(-0.5*((x_ch5-mean_ch5)/sigma_nom_ch5)**2)",
       "name": "sig_ch5",
       "type": "generic_dist"
     },
@@ -1405,10 +1297,10 @@
       "c": "tau_ch6",
       "name": "bkg_ch6",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch6"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch6)/sigma_nom_ch6)**2)",
+      "expression": "exp(-0.5*((x_ch6-mean_ch6)/sigma_nom_ch6)**2)",
       "name": "sig_ch6",
       "type": "generic_dist"
     },
@@ -1429,10 +1321,10 @@
       "c": "tau_ch7",
       "name": "bkg_ch7",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch7"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch7)/sigma_nom_ch7)**2)",
+      "expression": "exp(-0.5*((x_ch7-mean_ch7)/sigma_nom_ch7)**2)",
       "name": "sig_ch7",
       "type": "generic_dist"
     },
@@ -1453,10 +1345,10 @@
       "c": "tau_ch8",
       "name": "bkg_ch8",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch8"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch8)/sigma_nom_ch8)**2)",
+      "expression": "exp(-0.5*((x_ch8-mean_ch8)/sigma_nom_ch8)**2)",
       "name": "sig_ch8",
       "type": "generic_dist"
     },
@@ -1477,10 +1369,10 @@
       "c": "tau_ch9",
       "name": "bkg_ch9",
       "type": "exponential_dist",
-      "x": "x"
+      "x": "x_ch9"
     },
     {
-      "expression": "exp(-0.5*((x-mean_ch9)/sigma_nom_ch9)**2)",
+      "expression": "exp(-0.5*((x_ch9-mean_ch9)/sigma_nom_ch9)**2)",
       "name": "sig_ch9",
       "type": "generic_dist"
     }
@@ -1713,7 +1605,52 @@
         {
           "max": 20.0,
           "min": 10.0,
-          "name": "x"
+          "name": "x_ch0"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch1"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch2"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch3"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch4"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch5"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch6"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch7"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch8"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch9"
         }
       ],
       "name": "default_domain",
@@ -1804,94 +1741,31 @@
   ],
   "likelihoods": [
     {
-      "name": "L_ch0",
-      "distributions": [
-        "model_ch0"
-      ],
       "data": [
-        "combData_ch0"
-      ]
-    },
-    {
-      "name": "L_ch1",
-      "distributions": [
-        "model_ch1"
+        "combData_ch0",
+        "combData_ch1",
+        "combData_ch2",
+        "combData_ch3",
+        "combData_ch4",
+        "combData_ch5",
+        "combData_ch6",
+        "combData_ch7",
+        "combData_ch8",
+        "combData_ch9"
       ],
-      "data": [
-        "combData_ch1"
-      ]
-    },
-    {
-      "name": "L_ch2",
       "distributions": [
-        "model_ch2"
-      ],
-      "data": [
-        "combData_ch2"
-      ]
-    },
-    {
-      "name": "L_ch3",
-      "distributions": [
-        "model_ch3"
-      ],
-      "data": [
-        "combData_ch3"
-      ]
-    },
-    {
-      "name": "L_ch4",
-      "distributions": [
-        "model_ch4"
-      ],
-      "data": [
-        "combData_ch4"
-      ]
-    },
-    {
-      "name": "L_ch5",
-      "distributions": [
-        "model_ch5"
-      ],
-      "data": [
-        "combData_ch5"
-      ]
-    },
-    {
-      "name": "L_ch6",
-      "distributions": [
-        "model_ch6"
-      ],
-      "data": [
-        "combData_ch6"
-      ]
-    },
-    {
-      "name": "L_ch7",
-      "distributions": [
-        "model_ch7"
-      ],
-      "data": [
-        "combData_ch7"
-      ]
-    },
-    {
-      "name": "L_ch8",
-      "distributions": [
-        "model_ch8"
-      ],
-      "data": [
-        "combData_ch8"
-      ]
-    },
-    {
-      "name": "L_ch9",
-      "distributions": [
+        "model_ch0",
+        "model_ch1",
+        "model_ch2",
+        "model_ch3",
+        "model_ch4",
+        "model_ch5",
+        "model_ch6",
+        "model_ch7",
+        "model_ch8",
         "model_ch9"
       ],
-      "data": [
-        "combData_ch9"
-      ]
+      "name": "sim_pdf_combData"
     }
   ],
   "metadata": {

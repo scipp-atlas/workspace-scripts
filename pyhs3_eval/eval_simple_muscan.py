@@ -73,6 +73,7 @@ _WS_SCRIPTS = _HERE.parent
 _DEFAULT_STEM = "3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x"
 _DEFAULT_WS = _WS_SCRIPTS / "workspaces" / f"{_DEFAULT_STEM}.json"
 _DEFAULT_SCAN = _WS_SCRIPTS / "scans" / f"{_DEFAULT_STEM}_muscan.json"
+_NLL_OUTPUT_DEFAULT = _WS_SCRIPTS / f"nll_output.json"
 
 # Sentinel for a bare ``--plot-*`` flag: the output path is then the default
 # derived below rather than a user-supplied one.
@@ -608,6 +609,14 @@ def main() -> None:
         "(all_nll_comparisons.pdf next to this script).",
     )
     parser.add_argument(
+        "--output-nll-json",
+        nargs="?",
+        const=_NLL_OUTPUT_DEFAULT,
+        default=None,
+        metavar="PATH",
+        help="enable outputting resulting nll plot to a .json file at specified location, default: nll-output.json",
+    )   
+    parser.add_argument(
         "--plot-resid",
         nargs="?",
         const=_PLOT_DEFAULT,
@@ -663,7 +672,11 @@ def main() -> None:
                 verbose=True,
             )
         )
-
+      
+    if args.output_nll_json:
+        with open(args.output_nll_json, "w") as f:
+            json.dump(results, f, indent=2)
+        
     if args.plot_nll is not None:
         from plot_muscan_nll import plot_nll_curves  # noqa: PLC0415
 

@@ -19,6 +19,7 @@ Examples:
 
 import argparse
 import os
+import re
 import sys
 
 import ROOT
@@ -105,7 +106,7 @@ def fix_exponential_functions(doc: dict) -> dict:
 
 
 def fix_null_axes(doc: dict) -> dict:
-    """Fix 1: Replace null axes in empty domains (e.g. global-observables) with []."""
+    """Fix: Replace null axes in empty domains (e.g. global-observables) with []."""
     for domain in doc.get("domains", []):
         if domain.get("axes") is None:
             domain["axes"] = []
@@ -113,7 +114,7 @@ def fix_null_axes(doc: dict) -> dict:
 
 
 def fix_dataset_axes(doc: dict) -> dict:
-    """Fix 2: Add min/max to dataset axis entries and drop the ROOT-internal value field."""
+    """Fix: Add min/max to dataset axis entries and drop the ROOT-internal value field."""
     obs_ranges: dict[str, dict] = {}
     for domain in doc.get("domains", []):
         if domain.get("name") == "default_domain":
@@ -130,9 +131,173 @@ def fix_dataset_axes(doc: dict) -> dict:
     return doc
 
 
+def fix_unique_observables(doc: dict) -> dict:
+    """Fix: give each channel of the combined likelihood its own observable name.
+
+    The toy channels all share one observable ('x'), so every per-channel
+    dataset in the combined likelihood carries an axis named 'x'. pyhs3 keys
+    observed data by axis name within a likelihood, so duplicate names make
+    the channels' data collide (its Workspace validation rejects them). Real
+    combined workspaces avoid this by construction — each channel has its own
+    observable (e.g. myy_ch1) — so this renames the observable to
+    '<obs>_<channel>' per channel: in the dataset axes, in every
+    distribution/function reachable from the channel's model (both FK
+    references and generic-expression strings), and in the domains. The
+    shared name is then retired from domains and parameter points. This is a
+    pure renaming; NLL values are unchanged."""
+    dists = {d["name"]: d for d in doc.get("distributions", [])}
+    funcs = {f["name"]: f for f in doc.get("functions", [])}
+    nodes = {**funcs, **dists}
+    data_by_name = {d["name"]: d for d in doc.get("data", [])}
+
+    token_pats: dict[str, re.Pattern] = {}
+
+    def token_pat(name: str) -> re.Pattern:
+        if name not in token_pats:
+            token_pats[name] = re.compile(rf"\b{re.escape(name)}\b")
+        return token_pats[name]
+
+    def walk_strings(obj, visit):
+        """Apply visit(container, key, string) to every string value (not dict
+        keys, and not the object's own 'name' field)."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if k == "name":
+                    continue
+                if isinstance(v, str):
+                    visit(obj, k, v)
+                else:
+                    walk_strings(v, visit)
+        elif isinstance(obj, list):
+            for i, v in enumerate(obj):
+                if isinstance(v, str):
+                    visit(obj, i, v)
+                else:
+                    walk_strings(v, visit)
+
+    def node_mentions(node: dict, obs: str) -> bool:
+        pat = token_pat(obs)
+        found = []
+        walk_strings(node, lambda c, k, s: found.append(True) if pat.search(s) else None)
+        return bool(found)
+
+    def rewrite_node(node: dict, obs: str, new: str) -> None:
+        pat = token_pat(obs)
+        walk_strings(node, lambda c, k, s: c.__setitem__(k, pat.sub(new, s)))
+
+    ident_pat = re.compile(r"[A-Za-z_]\w*")
+
+    def node_refs(node: dict) -> set:
+        """Names of other distributions/functions this node references, either
+        as a direct FK string or as an identifier inside an expression."""
+        refs: set = set()
+
+        def visit(container, key, s):
+            if s in nodes:
+                refs.add(s)
+            else:
+                refs.update(t for t in ident_pat.findall(s) if t in nodes)
+
+        walk_strings(node, visit)
+        return refs
+
+    renamed: dict[str, set] = {}  # old observable name -> set of new names
+    node_axis_owner: dict[tuple, str] = {}  # (node name, old obs) -> new obs
+
+    for lh in doc.get("likelihoods", []):
+        data_list = lh.get("data") or []
+        dist_list = lh.get("distributions") or []
+        if len(data_list) != len(dist_list) or len(data_list) < 2:
+            continue
+
+        # Axis names appearing in more than one of this likelihood's datasets.
+        counts: dict[str, int] = {}
+        for data_name in data_list:
+            for ax in data_by_name.get(data_name, {}).get("axes") or []:
+                counts[ax["name"]] = counts.get(ax["name"], 0) + 1
+        dup_axes = {n for n, c in counts.items() if c > 1}
+        if not dup_axes:
+            continue
+
+        for i, (dist_name, data_name) in enumerate(zip(dist_list, data_list)):
+            m = re.search(r"_(ch\d+)$", data_name) or re.search(r"_(ch\d+)$", dist_name)
+            suffix = m.group(1) if m else f"c{i}"
+            datum = data_by_name.get(data_name)
+            if datum is None:
+                continue
+            for ax in datum.get("axes") or []:
+                old = ax["name"]
+                if old not in dup_axes:
+                    continue
+                new = f"{old}_{suffix}"
+                ax["name"] = new
+                renamed.setdefault(old, set()).add(new)
+                # Rewrite every distribution/function reachable from the
+                # channel's model that mentions the old observable.
+                seen: set = set()
+                queue = [dist_name]
+                while queue:
+                    name = queue.pop()
+                    if name in seen or name not in nodes:
+                        continue
+                    seen.add(name)
+                    node = nodes[name]
+                    prev = node_axis_owner.get((name, old))
+                    if prev is not None:
+                        if prev != new:
+                            sys.exit(
+                                f"ERROR: fix_unique_observables: {name!r} is shared "
+                                f"between channels but depends on observable {old!r} "
+                                f"(would need both {prev!r} and {new!r}); rerun with "
+                                "--no-fix-unique-observables"
+                            )
+                    elif node_mentions(node, old):
+                        rewrite_node(node, old, new)
+                        node_axis_owner[(name, old)] = new
+                    queue.extend(node_refs(node))
+
+    # Move each renamed observable's domain entries to the new names and
+    # retire the shared name (unless something outside the renamed channel
+    # subtrees still uses it).
+    def natural_key(name: str):
+        m = re.search(r"(\d+)$", name)
+        return (int(m.group(1)) if m else -1, name)
+
+    for old, new_names in renamed.items():
+        still_used = any(node_mentions(node, old) for node in nodes.values())
+        if still_used:
+            print(
+                f"  WARNING: fix_unique_observables: observable {old!r} is still "
+                "referenced outside the combined likelihood; keeping its domain entry"
+            )
+        for domain in doc.get("domains", []):
+            axes = domain.get("axes") or []
+            old_entries = [ax for ax in axes if ax["name"] == old]
+            if not old_entries:
+                continue
+            template = old_entries[0]
+            axes.extend({**template, "name": n} for n in sorted(new_names, key=natural_key))
+            if not still_used:
+                domain["axes"] = [ax for ax in axes if ax["name"] != old]
+        if not still_used:
+            for pp in doc.get("parameter_points", []):
+                pp["parameters"] = [
+                    p for p in pp.get("parameters", []) if p["name"] != old
+                ]
+
+    return doc
+
+
 def fix_split_likelihoods(doc: dict) -> dict:
-    """Fix 3: Split the single combined likelihood into one likelihood per channel,
-    and rewrite analyses to reference the new per-channel likelihoods."""
+    """Optional (--split-likelihoods): split the single combined likelihood into one
+    likelihood per channel, and rewrite analyses to reference the new per-channel
+    likelihoods.
+
+    OFF by default: ROOT already exports one combined likelihood whose
+    distributions/data pairs cover every channel (the HS3 form of the
+    RooSimultaneous joint fit), and that is what pyhs3 should evaluate —
+    splitting it yields N independent single-channel analyses with no joint
+    structure. The split remains available for per-channel debugging only."""
     old_to_new: dict[str, list[str]] = {}
     new_likelihoods = []
     for lh in doc.get("likelihoods", []):
@@ -171,7 +336,7 @@ def fix_split_likelihoods(doc: dict) -> dict:
 
 
 def fix_analysis_init(doc: dict) -> dict:
-    """Fix 4: Add "init": "default_values" to each analysis so pyhs3 knows which
+    """Fix: Add "init": "default_values" to each analysis so pyhs3 knows which
     parameter set carries the const flags."""
     for analysis in doc.get("analyses", []):
         analysis.setdefault("init", "default_values")
@@ -179,7 +344,7 @@ def fix_analysis_init(doc: dict) -> dict:
 
 
 def fix_remove_obs_from_params(doc: dict) -> dict:
-    """Fix 5: Remove non-constant observables (e.g. x) from default_values.
+    """Fix: Remove non-constant observables (e.g. x) from default_values.
     They must not appear in parameter sets or they overwrite the data array at
     eval time. Constant parameters (global observables) are kept even if in a dataset."""
     obs_names: set[str] = set()
@@ -196,7 +361,8 @@ def fix_remove_obs_from_params(doc: dict) -> dict:
 
 
 def fix_constraint_pdfs(doc: dict, use_aux_distributions: bool = True) -> dict:
-    """Fix 6: Wire standalone constraint PDFs into the first per-channel likelihood.
+    """Fix: Wire standalone constraint PDFs into the first likelihood (the
+    combined one by default, or the first per-channel one after --split-likelihoods).
     Constraint PDFs are those not yet referenced in any likelihood whose 'x' field
     names a constant parameter (the global observable). A single-entry dataset is
     created from default_values and added alongside the constraint.
@@ -279,7 +445,8 @@ def export_workspace(
     do_fix_exponential: bool = True,
     do_fix_null_axes: bool = True,
     do_fix_dataset_axes: bool = True,
-    do_fix_split_likelihoods: bool = True,
+    do_fix_unique_observables: bool = True,
+    do_fix_split_likelihoods: bool = False,
     do_fix_analysis_init: bool = True,
     do_fix_remove_obs: bool = True,
     do_fix_constraints: bool = True,
@@ -296,6 +463,8 @@ def export_workspace(
         doc = fix_null_axes(doc)
     if do_fix_dataset_axes:
         doc = fix_dataset_axes(doc)
+    if do_fix_unique_observables:
+        doc = fix_unique_observables(doc)
     if do_fix_split_likelihoods:
         doc = fix_split_likelihoods(doc)
     if do_fix_analysis_init:
@@ -338,15 +507,24 @@ def verify_roundtrip(hs3_file: str, ws_name: str = "combWS") -> bool:
         if not obj:
             ok = False
 
-    # Check event counts per channel
+    # Check event counts per channel (cap the printout for large workspaces)
     data = ws2.data("combData")
     if data:
         cat = ws2.cat("index")
         if cat:
-            for state in ["ch0", "ch1", "ch2"]:
+            # ROOT 6.22+ iterates a RooCategory as (name, index) pairs; the
+            # names are C++ std::string proxies, so convert before slicing.
+            states = sorted(
+                (str(state[0]) if not isinstance(state, str) else str(state) for state in cat),
+                key=lambda s: int(s[2:]) if s[2:].isdigit() else 0,
+            )
+            max_print = 10
+            for state in states[:max_print]:
                 cat.setLabel(state)
                 n = data.sumEntries(f"index=={cat.getIndex()}")
                 print(f"    combData[{state}]: {int(n)} events")
+            if len(states) > max_print:
+                print(f"    ... {len(states) - max_print} more channels")
 
     return ok
 
@@ -435,42 +613,53 @@ def main() -> None:
         dest="do_fix_null_axes",
         action="store_false",
         default=True,
-        help="Skip fix 1: replace null axes in empty domains with []",
+        help="Skip fix: replace null axes in empty domains with []",
     )
     fix_group.add_argument(
         "--no-fix-dataset-axes",
         dest="do_fix_dataset_axes",
         action="store_false",
         default=True,
-        help="Skip fix 2: add min/max to dataset axes, drop value field",
+        help="Skip fix: add min/max to dataset axes, drop value field",
     )
     fix_group.add_argument(
-        "--no-fix-split-likelihoods",
-        dest="do_fix_split_likelihoods",
+        "--no-fix-unique-observables",
+        dest="do_fix_unique_observables",
         action="store_false",
         default=True,
-        help="Skip fix 3: split combined likelihood into per-channel likelihoods",
+        help="Skip fix: rename the shared observable to <obs>_<channel> per "
+        "channel so the combined likelihood has unique observable axis names "
+        "(required by pyhs3)",
+    )
+    fix_group.add_argument(
+        "--split-likelihoods",
+        dest="do_fix_split_likelihoods",
+        action="store_true",
+        default=False,
+        help="Split the combined likelihood into independent per-channel "
+        "likelihoods/analyses (debugging only; the default keeps ROOT's "
+        "single combined likelihood so pyhs3 evaluates the joint fit)",
     )
     fix_group.add_argument(
         "--no-fix-analysis-init",
         dest="do_fix_analysis_init",
         action="store_false",
         default=True,
-        help="Skip fix 4: add init: default_values to each analysis",
+        help="Skip fix: add init: default_values to each analysis",
     )
     fix_group.add_argument(
         "--no-fix-remove-obs",
         dest="do_fix_remove_obs",
         action="store_false",
         default=True,
-        help="Skip fix 5: remove non-const observables from default_values",
+        help="Skip fix: remove non-const observables from default_values",
     )
     fix_group.add_argument(
         "--no-fix-constraints",
         dest="do_fix_constraints",
         action="store_false",
         default=True,
-        help="Skip fix 6: wire standalone constraint PDFs into the first likelihood",
+        help="Skip fix: wire standalone constraint PDFs into the first likelihood",
     )
     args = parser.parse_args()
 
@@ -479,6 +668,7 @@ def main() -> None:
         args.do_fix_exponential = False
         args.do_fix_null_axes = False
         args.do_fix_dataset_axes = False
+        args.do_fix_unique_observables = False
         args.do_fix_split_likelihoods = False
         args.do_fix_analysis_init = False
         args.do_fix_remove_obs = False
@@ -510,6 +700,7 @@ def main() -> None:
         do_fix_exponential=args.do_fix_exponential,
         do_fix_null_axes=args.do_fix_null_axes,
         do_fix_dataset_axes=args.do_fix_dataset_axes,
+        do_fix_unique_observables=args.do_fix_unique_observables,
         do_fix_split_likelihoods=args.do_fix_split_likelihoods,
         do_fix_analysis_init=args.do_fix_analysis_init,
         do_fix_remove_obs=args.do_fix_remove_obs,

@@ -1,0 +1,4290 @@
+{
+  "analyses": [
+    {
+      "domains": [
+        "sim_pdf_combData_nuisance_parameters",
+        "sim_pdf_combData_global_observables",
+        "sim_pdf_combData_parameters_of_interest"
+      ],
+      "likelihood": "sim_pdf_combData",
+      "name": "sim_pdf_combData",
+      "parameters_of_interest": [
+        "mu_sig"
+      ],
+      "init": "default_values"
+    }
+  ],
+  "data": [
+    {
+      "axes": [
+        {
+          "name": "x_ch0",
+          "min": 10.0,
+          "max": 20.0
+        }
+      ],
+      "entries": [
+        [
+          13.770775238024271
+        ],
+        [
+          13.729513639240167
+        ],
+        [
+          18.0743352517311
+        ],
+        [
+          11.622233096895798
+        ],
+        [
+          16.300216992676724
+        ],
+        [
+          15.983793690531268
+        ],
+        [
+          11.032641935671563
+        ],
+        [
+          17.230860678606074
+        ],
+        [
+          10.642581139327376
+        ],
+        [
+          13.92221912741661
+        ],
+        [
+          12.789688525507472
+        ],
+        [
+          11.816994788835018
+        ],
+        [
+          11.193948846776038
+        ],
+        [
+          15.637405859902332
+        ],
+        [
+          15.764836742763979
+        ],
+        [
+          15.464286619244376
+        ],
+        [
+          10.413569046213524
+        ],
+        [
+          13.440783165751782
+        ],
+        [
+          16.496893423318397
+        ],
+        [
+          13.402923937269975
+        ],
+        [
+          15.61933992936617
+        ],
+        [
+          13.991371978975167
+        ],
+        [
+          17.85854773974279
+        ],
+        [
+          13.759525800093309
+        ],
+        [
+          14.88233033567667
+        ],
+        [
+          11.81155682314511
+        ],
+        [
+          13.144842160494932
+        ],
+        [
+          10.27773520021583
+        ],
+        [
+          16.99035508490029
+        ]
+      ],
+      "name": "combData_ch0",
+      "type": "unbinned"
+    },
+    {
+      "axes": [
+        {
+          "name": "x_ch1",
+          "min": 10.0,
+          "max": 20.0
+        }
+      ],
+      "entries": [
+        [
+          15.775077637681854
+        ],
+        [
+          10.170111926081518
+        ],
+        [
+          11.434226343681075
+        ],
+        [
+          14.067695081612328
+        ],
+        [
+          15.622652033925988
+        ],
+        [
+          10.175154657335952
+        ],
+        [
+          13.545639547985047
+        ],
+        [
+          10.094603958723383
+        ],
+        [
+          11.344973078985277
+        ],
+        [
+          10.15311273723455
+        ],
+        [
+          10.183968949386326
+        ],
+        [
+          18.257898278929723
+        ],
+        [
+          13.643704605242238
+        ],
+        [
+          12.144169370594682
+        ],
+        [
+          12.315366930761229
+        ],
+        [
+          15.162968383374391
+        ],
+        [
+          14.428668261675702
+        ],
+        [
+          13.162032335203548
+        ],
+        [
+          18.32633318268904
+        ],
+        [
+          13.988930364339467
+        ],
+        [
+          10.416237489753257
+        ],
+        [
+          16.222263707919048
+        ],
+        [
+          12.596652556458139
+        ],
+        [
+          12.576925430948904
+        ]
+      ],
+      "name": "combData_ch1",
+      "type": "unbinned"
+    },
+    {
+      "axes": [
+        {
+          "name": "x_ch2",
+          "min": 10.0,
+          "max": 20.0
+        }
+      ],
+      "entries": [
+        [
+          16.162126473622497
+        ],
+        [
+          17.112153607440632
+        ],
+        [
+          12.188614065304364
+        ],
+        [
+          10.579317645642732
+        ],
+        [
+          10.224768796324497
+        ],
+        [
+          15.17205582014782
+        ],
+        [
+          10.358072355193144
+        ],
+        [
+          10.545684388234804
+        ],
+        [
+          11.54478401116009
+        ],
+        [
+          10.690209832464461
+        ],
+        [
+          13.947405754817199
+        ],
+        [
+          13.118255463204648
+        ],
+        [
+          10.485067948247888
+        ],
+        [
+          10.072131484484999
+        ],
+        [
+          10.114431666988821
+        ],
+        [
+          10.742199935521057
+        ],
+        [
+          10.211739856677013
+        ],
+        [
+          11.652204033619284
+        ],
+        [
+          14.300074246991425
+        ],
+        [
+          14.068394090361128
+        ],
+        [
+          12.74289947145511
+        ],
+        [
+          15.331947738971351
+        ],
+        [
+          15.627764186775313
+        ],
+        [
+          14.759843858657405
+        ],
+        [
+          15.903588841955717
+        ],
+        [
+          16.664803162548196
+        ]
+      ],
+      "name": "combData_ch2",
+      "type": "unbinned"
+    }
+  ],
+  "distributions": [
+    {
+      "mean": "alpha_sigma",
+      "name": "constr_alpha_sigma",
+      "sigma": "sigma_constr",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_sigma"
+    },
+    {
+      "mean": "alpha_syst0",
+      "name": "constr_alpha_syst0",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst0"
+    },
+    {
+      "mean": "alpha_syst1",
+      "name": "constr_alpha_syst1",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst1"
+    },
+    {
+      "mean": "alpha_syst10",
+      "name": "constr_alpha_syst10",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst10"
+    },
+    {
+      "mean": "alpha_syst11",
+      "name": "constr_alpha_syst11",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst11"
+    },
+    {
+      "mean": "alpha_syst12",
+      "name": "constr_alpha_syst12",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst12"
+    },
+    {
+      "mean": "alpha_syst13",
+      "name": "constr_alpha_syst13",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst13"
+    },
+    {
+      "mean": "alpha_syst14",
+      "name": "constr_alpha_syst14",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst14"
+    },
+    {
+      "mean": "alpha_syst15",
+      "name": "constr_alpha_syst15",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst15"
+    },
+    {
+      "mean": "alpha_syst16",
+      "name": "constr_alpha_syst16",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst16"
+    },
+    {
+      "mean": "alpha_syst17",
+      "name": "constr_alpha_syst17",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst17"
+    },
+    {
+      "mean": "alpha_syst18",
+      "name": "constr_alpha_syst18",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst18"
+    },
+    {
+      "mean": "alpha_syst19",
+      "name": "constr_alpha_syst19",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst19"
+    },
+    {
+      "mean": "alpha_syst2",
+      "name": "constr_alpha_syst2",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst2"
+    },
+    {
+      "mean": "alpha_syst20",
+      "name": "constr_alpha_syst20",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst20"
+    },
+    {
+      "mean": "alpha_syst21",
+      "name": "constr_alpha_syst21",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst21"
+    },
+    {
+      "mean": "alpha_syst22",
+      "name": "constr_alpha_syst22",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst22"
+    },
+    {
+      "mean": "alpha_syst23",
+      "name": "constr_alpha_syst23",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst23"
+    },
+    {
+      "mean": "alpha_syst24",
+      "name": "constr_alpha_syst24",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst24"
+    },
+    {
+      "mean": "alpha_syst25",
+      "name": "constr_alpha_syst25",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst25"
+    },
+    {
+      "mean": "alpha_syst26",
+      "name": "constr_alpha_syst26",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst26"
+    },
+    {
+      "mean": "alpha_syst27",
+      "name": "constr_alpha_syst27",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst27"
+    },
+    {
+      "mean": "alpha_syst28",
+      "name": "constr_alpha_syst28",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst28"
+    },
+    {
+      "mean": "alpha_syst29",
+      "name": "constr_alpha_syst29",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst29"
+    },
+    {
+      "mean": "alpha_syst3",
+      "name": "constr_alpha_syst3",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst3"
+    },
+    {
+      "mean": "alpha_syst30",
+      "name": "constr_alpha_syst30",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst30"
+    },
+    {
+      "mean": "alpha_syst31",
+      "name": "constr_alpha_syst31",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst31"
+    },
+    {
+      "mean": "alpha_syst32",
+      "name": "constr_alpha_syst32",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst32"
+    },
+    {
+      "mean": "alpha_syst33",
+      "name": "constr_alpha_syst33",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst33"
+    },
+    {
+      "mean": "alpha_syst34",
+      "name": "constr_alpha_syst34",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst34"
+    },
+    {
+      "mean": "alpha_syst35",
+      "name": "constr_alpha_syst35",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst35"
+    },
+    {
+      "mean": "alpha_syst36",
+      "name": "constr_alpha_syst36",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst36"
+    },
+    {
+      "mean": "alpha_syst37",
+      "name": "constr_alpha_syst37",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst37"
+    },
+    {
+      "mean": "alpha_syst38",
+      "name": "constr_alpha_syst38",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst38"
+    },
+    {
+      "mean": "alpha_syst39",
+      "name": "constr_alpha_syst39",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst39"
+    },
+    {
+      "mean": "alpha_syst4",
+      "name": "constr_alpha_syst4",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst4"
+    },
+    {
+      "mean": "alpha_syst40",
+      "name": "constr_alpha_syst40",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst40"
+    },
+    {
+      "mean": "alpha_syst41",
+      "name": "constr_alpha_syst41",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst41"
+    },
+    {
+      "mean": "alpha_syst42",
+      "name": "constr_alpha_syst42",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst42"
+    },
+    {
+      "mean": "alpha_syst43",
+      "name": "constr_alpha_syst43",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst43"
+    },
+    {
+      "mean": "alpha_syst44",
+      "name": "constr_alpha_syst44",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst44"
+    },
+    {
+      "mean": "alpha_syst45",
+      "name": "constr_alpha_syst45",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst45"
+    },
+    {
+      "mean": "alpha_syst46",
+      "name": "constr_alpha_syst46",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst46"
+    },
+    {
+      "mean": "alpha_syst47",
+      "name": "constr_alpha_syst47",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst47"
+    },
+    {
+      "mean": "alpha_syst48",
+      "name": "constr_alpha_syst48",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst48"
+    },
+    {
+      "mean": "alpha_syst49",
+      "name": "constr_alpha_syst49",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst49"
+    },
+    {
+      "mean": "alpha_syst5",
+      "name": "constr_alpha_syst5",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst5"
+    },
+    {
+      "mean": "alpha_syst6",
+      "name": "constr_alpha_syst6",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst6"
+    },
+    {
+      "mean": "alpha_syst7",
+      "name": "constr_alpha_syst7",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst7"
+    },
+    {
+      "mean": "alpha_syst8",
+      "name": "constr_alpha_syst8",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst8"
+    },
+    {
+      "mean": "alpha_syst9",
+      "name": "constr_alpha_syst9",
+      "sigma": "sigma_constr_syst",
+      "type": "gaussian_dist",
+      "x": "nom_alpha_syst9"
+    },
+    {
+      "coefficients": [
+        "nsig_tot_ch0",
+        "nbkg_ch0"
+      ],
+      "extended": true,
+      "name": "model_ch0",
+      "summands": [
+        "sig_ch0",
+        "bkg_ch0"
+      ],
+      "type": "mixture_dist"
+    },
+    {
+      "c": "tau_ch0",
+      "name": "bkg_ch0",
+      "type": "exponential_dist",
+      "x": "x_ch0"
+    },
+    {
+      "mean": "mean_ch0",
+      "name": "sig_ch0",
+      "sigma": "sigma_ch0",
+      "type": "gaussian_dist",
+      "x": "x_ch0"
+    },
+    {
+      "coefficients": [
+        "nsig_tot_ch1",
+        "nbkg_ch1"
+      ],
+      "extended": true,
+      "name": "model_ch1",
+      "summands": [
+        "sig_ch1",
+        "bkg_ch1"
+      ],
+      "type": "mixture_dist"
+    },
+    {
+      "c": "tau_ch1",
+      "name": "bkg_ch1",
+      "type": "exponential_dist",
+      "x": "x_ch1"
+    },
+    {
+      "mean": "mean_ch1",
+      "name": "sig_ch1",
+      "sigma": "sigma_ch1",
+      "type": "gaussian_dist",
+      "x": "x_ch1"
+    },
+    {
+      "coefficients": [
+        "nsig_tot_ch2",
+        "nbkg_ch2"
+      ],
+      "extended": true,
+      "name": "model_ch2",
+      "summands": [
+        "sig_ch2",
+        "bkg_ch2"
+      ],
+      "type": "mixture_dist"
+    },
+    {
+      "c": "tau_ch2",
+      "name": "bkg_ch2",
+      "type": "exponential_dist",
+      "x": "x_ch2"
+    },
+    {
+      "mean": "mean_ch2",
+      "name": "sig_ch2",
+      "sigma": "sigma_ch2",
+      "type": "gaussian_dist",
+      "x": "x_ch2"
+    }
+  ],
+  "domains": [
+    {
+      "axes": [
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_sigma"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst0"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst1"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst10"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst11"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst12"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst13"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst14"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst15"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst16"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst17"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst18"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst19"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst2"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst20"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst21"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst22"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst23"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst24"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst25"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst26"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst27"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst28"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst29"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst3"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst30"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst31"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst32"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst33"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst34"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst35"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst36"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst37"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst38"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst39"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst4"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst40"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst41"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst42"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst43"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst44"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst45"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst46"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst47"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst48"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst49"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst5"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst6"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst7"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst8"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst9"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch0"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch1"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch2"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch0"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch1"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch2"
+        }
+      ],
+      "name": "sim_pdf_combData_nuisance_parameters",
+      "type": "product_domain"
+    },
+    {
+      "axes": [
+        {
+          "name": "nom_alpha_sigma",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst0",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst1",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst10",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst11",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst12",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst13",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst14",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst15",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst16",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst17",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst18",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst19",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst2",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst20",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst21",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst22",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst23",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst24",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst25",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst26",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst27",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst28",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst29",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst3",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst30",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst31",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst32",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst33",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst34",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst35",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst36",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst37",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst38",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst39",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst4",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst40",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst41",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst42",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst43",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst44",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst45",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst46",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst47",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst48",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst49",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst5",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst6",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst7",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst8",
+          "min": -5.0,
+          "max": 5.0
+        },
+        {
+          "name": "nom_alpha_syst9",
+          "min": -5.0,
+          "max": 5.0
+        }
+      ],
+      "name": "sim_pdf_combData_global_observables",
+      "type": "product_domain"
+    },
+    {
+      "axes": [
+        {
+          "max": 10.0,
+          "min": -5.0,
+          "name": "mu_sig"
+        }
+      ],
+      "name": "sim_pdf_combData_parameters_of_interest",
+      "type": "product_domain"
+    },
+    {
+      "axes": [
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_sigma"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst0"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst1"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst10"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst11"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst12"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst13"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst14"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst15"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst16"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst17"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst18"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst19"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst2"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst20"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst21"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst22"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst23"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst24"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst25"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst26"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst27"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst28"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst29"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst3"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst30"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst31"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst32"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst33"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst34"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst35"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst36"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst37"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst38"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst39"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst4"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst40"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst41"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst42"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst43"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst44"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst45"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst46"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst47"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst48"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst49"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst5"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst6"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst7"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst8"
+        },
+        {
+          "max": 5.0,
+          "min": -5.0,
+          "name": "alpha_syst9"
+        },
+        {
+          "max": 10.0,
+          "min": -5.0,
+          "name": "mu_sig"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch0"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch1"
+        },
+        {
+          "max": 500.0,
+          "min": 0.0,
+          "name": "nbkg_ch2"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch0"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch1"
+        },
+        {
+          "max": 2.0,
+          "min": 0.001,
+          "name": "tau_ch2"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch0"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch1"
+        },
+        {
+          "max": 20.0,
+          "min": 10.0,
+          "name": "x_ch2"
+        }
+      ],
+      "name": "default_domain",
+      "type": "product_domain"
+    }
+  ],
+  "functions": [
+    {
+      "factors": [
+        "mu_sig",
+        "nsig_ch0",
+        "resp_syst0_ch0",
+        "resp_syst1_ch0",
+        "resp_syst2_ch0",
+        "resp_syst3_ch0",
+        "resp_syst4_ch0",
+        "resp_syst5_ch0",
+        "resp_syst6_ch0",
+        "resp_syst7_ch0",
+        "resp_syst8_ch0",
+        "resp_syst9_ch0",
+        "resp_syst10_ch0",
+        "resp_syst11_ch0",
+        "resp_syst12_ch0",
+        "resp_syst13_ch0",
+        "resp_syst14_ch0",
+        "resp_syst15_ch0",
+        "resp_syst16_ch0",
+        "resp_syst17_ch0",
+        "resp_syst18_ch0",
+        "resp_syst19_ch0",
+        "resp_syst20_ch0",
+        "resp_syst21_ch0",
+        "resp_syst22_ch0",
+        "resp_syst23_ch0",
+        "resp_syst24_ch0",
+        "resp_syst25_ch0",
+        "resp_syst26_ch0",
+        "resp_syst27_ch0",
+        "resp_syst28_ch0",
+        "resp_syst29_ch0",
+        "resp_syst30_ch0",
+        "resp_syst31_ch0",
+        "resp_syst32_ch0",
+        "resp_syst33_ch0",
+        "resp_syst34_ch0",
+        "resp_syst35_ch0",
+        "resp_syst36_ch0",
+        "resp_syst37_ch0",
+        "resp_syst38_ch0",
+        "resp_syst39_ch0",
+        "resp_syst40_ch0",
+        "resp_syst41_ch0",
+        "resp_syst42_ch0",
+        "resp_syst43_ch0",
+        "resp_syst44_ch0",
+        "resp_syst45_ch0",
+        "resp_syst46_ch0",
+        "resp_syst47_ch0",
+        "resp_syst48_ch0",
+        "resp_syst49_ch0"
+      ],
+      "name": "nsig_tot_ch0",
+      "type": "product"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst0",
+      "name": "resp_syst0_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst1",
+      "name": "resp_syst1_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst2",
+      "name": "resp_syst2_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst3",
+      "name": "resp_syst3_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst4",
+      "name": "resp_syst4_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst5",
+      "name": "resp_syst5_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst6",
+      "name": "resp_syst6_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst7",
+      "name": "resp_syst7_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst8",
+      "name": "resp_syst8_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst9",
+      "name": "resp_syst9_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst10",
+      "name": "resp_syst10_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst11",
+      "name": "resp_syst11_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst12",
+      "name": "resp_syst12_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst13",
+      "name": "resp_syst13_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst14",
+      "name": "resp_syst14_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst15",
+      "name": "resp_syst15_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst16",
+      "name": "resp_syst16_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst17",
+      "name": "resp_syst17_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst18",
+      "name": "resp_syst18_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst19",
+      "name": "resp_syst19_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst20",
+      "name": "resp_syst20_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst21",
+      "name": "resp_syst21_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst22",
+      "name": "resp_syst22_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst23",
+      "name": "resp_syst23_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst24",
+      "name": "resp_syst24_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst25",
+      "name": "resp_syst25_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst26",
+      "name": "resp_syst26_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst27",
+      "name": "resp_syst27_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst28",
+      "name": "resp_syst28_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst29",
+      "name": "resp_syst29_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst30",
+      "name": "resp_syst30_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst31",
+      "name": "resp_syst31_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst32",
+      "name": "resp_syst32_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst33",
+      "name": "resp_syst33_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst34",
+      "name": "resp_syst34_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst35",
+      "name": "resp_syst35_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst36",
+      "name": "resp_syst36_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst37",
+      "name": "resp_syst37_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst38",
+      "name": "resp_syst38_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst39",
+      "name": "resp_syst39_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst40",
+      "name": "resp_syst40_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst41",
+      "name": "resp_syst41_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst42",
+      "name": "resp_syst42_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst43",
+      "name": "resp_syst43_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst44",
+      "name": "resp_syst44_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst45",
+      "name": "resp_syst45_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst46",
+      "name": "resp_syst46_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst47",
+      "name": "resp_syst47_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst48",
+      "name": "resp_syst48_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst49",
+      "name": "resp_syst49_ch0",
+      "type": "generic_function"
+    },
+    {
+      "expression": "sigma_nom_ch0 * (1.0 + 0.1 * alpha_sigma)",
+      "name": "sigma_ch0",
+      "type": "generic_function"
+    },
+    {
+      "factors": [
+        "mu_sig",
+        "nsig_ch1",
+        "resp_syst0_ch1",
+        "resp_syst1_ch1",
+        "resp_syst2_ch1",
+        "resp_syst3_ch1",
+        "resp_syst4_ch1",
+        "resp_syst5_ch1",
+        "resp_syst6_ch1",
+        "resp_syst7_ch1",
+        "resp_syst8_ch1",
+        "resp_syst9_ch1",
+        "resp_syst10_ch1",
+        "resp_syst11_ch1",
+        "resp_syst12_ch1",
+        "resp_syst13_ch1",
+        "resp_syst14_ch1",
+        "resp_syst15_ch1",
+        "resp_syst16_ch1",
+        "resp_syst17_ch1",
+        "resp_syst18_ch1",
+        "resp_syst19_ch1",
+        "resp_syst20_ch1",
+        "resp_syst21_ch1",
+        "resp_syst22_ch1",
+        "resp_syst23_ch1",
+        "resp_syst24_ch1",
+        "resp_syst25_ch1",
+        "resp_syst26_ch1",
+        "resp_syst27_ch1",
+        "resp_syst28_ch1",
+        "resp_syst29_ch1",
+        "resp_syst30_ch1",
+        "resp_syst31_ch1",
+        "resp_syst32_ch1",
+        "resp_syst33_ch1",
+        "resp_syst34_ch1",
+        "resp_syst35_ch1",
+        "resp_syst36_ch1",
+        "resp_syst37_ch1",
+        "resp_syst38_ch1",
+        "resp_syst39_ch1",
+        "resp_syst40_ch1",
+        "resp_syst41_ch1",
+        "resp_syst42_ch1",
+        "resp_syst43_ch1",
+        "resp_syst44_ch1",
+        "resp_syst45_ch1",
+        "resp_syst46_ch1",
+        "resp_syst47_ch1",
+        "resp_syst48_ch1",
+        "resp_syst49_ch1"
+      ],
+      "name": "nsig_tot_ch1",
+      "type": "product"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst0",
+      "name": "resp_syst0_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst1",
+      "name": "resp_syst1_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst2",
+      "name": "resp_syst2_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst3",
+      "name": "resp_syst3_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst4",
+      "name": "resp_syst4_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst5",
+      "name": "resp_syst5_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst6",
+      "name": "resp_syst6_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst7",
+      "name": "resp_syst7_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst8",
+      "name": "resp_syst8_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst9",
+      "name": "resp_syst9_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst10",
+      "name": "resp_syst10_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst11",
+      "name": "resp_syst11_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst12",
+      "name": "resp_syst12_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst13",
+      "name": "resp_syst13_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst14",
+      "name": "resp_syst14_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst15",
+      "name": "resp_syst15_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst16",
+      "name": "resp_syst16_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst17",
+      "name": "resp_syst17_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst18",
+      "name": "resp_syst18_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst19",
+      "name": "resp_syst19_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst20",
+      "name": "resp_syst20_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst21",
+      "name": "resp_syst21_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst22",
+      "name": "resp_syst22_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst23",
+      "name": "resp_syst23_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst24",
+      "name": "resp_syst24_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst25",
+      "name": "resp_syst25_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst26",
+      "name": "resp_syst26_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst27",
+      "name": "resp_syst27_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst28",
+      "name": "resp_syst28_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst29",
+      "name": "resp_syst29_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst30",
+      "name": "resp_syst30_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst31",
+      "name": "resp_syst31_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst32",
+      "name": "resp_syst32_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst33",
+      "name": "resp_syst33_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst34",
+      "name": "resp_syst34_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst35",
+      "name": "resp_syst35_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst36",
+      "name": "resp_syst36_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst37",
+      "name": "resp_syst37_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst38",
+      "name": "resp_syst38_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst39",
+      "name": "resp_syst39_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst40",
+      "name": "resp_syst40_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst41",
+      "name": "resp_syst41_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst42",
+      "name": "resp_syst42_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst43",
+      "name": "resp_syst43_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst44",
+      "name": "resp_syst44_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst45",
+      "name": "resp_syst45_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst46",
+      "name": "resp_syst46_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst47",
+      "name": "resp_syst47_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst48",
+      "name": "resp_syst48_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst49",
+      "name": "resp_syst49_ch1",
+      "type": "generic_function"
+    },
+    {
+      "expression": "sigma_nom_ch1 * (1.0 + 0.1 * alpha_sigma)",
+      "name": "sigma_ch1",
+      "type": "generic_function"
+    },
+    {
+      "factors": [
+        "mu_sig",
+        "nsig_ch2",
+        "resp_syst0_ch2",
+        "resp_syst1_ch2",
+        "resp_syst2_ch2",
+        "resp_syst3_ch2",
+        "resp_syst4_ch2",
+        "resp_syst5_ch2",
+        "resp_syst6_ch2",
+        "resp_syst7_ch2",
+        "resp_syst8_ch2",
+        "resp_syst9_ch2",
+        "resp_syst10_ch2",
+        "resp_syst11_ch2",
+        "resp_syst12_ch2",
+        "resp_syst13_ch2",
+        "resp_syst14_ch2",
+        "resp_syst15_ch2",
+        "resp_syst16_ch2",
+        "resp_syst17_ch2",
+        "resp_syst18_ch2",
+        "resp_syst19_ch2",
+        "resp_syst20_ch2",
+        "resp_syst21_ch2",
+        "resp_syst22_ch2",
+        "resp_syst23_ch2",
+        "resp_syst24_ch2",
+        "resp_syst25_ch2",
+        "resp_syst26_ch2",
+        "resp_syst27_ch2",
+        "resp_syst28_ch2",
+        "resp_syst29_ch2",
+        "resp_syst30_ch2",
+        "resp_syst31_ch2",
+        "resp_syst32_ch2",
+        "resp_syst33_ch2",
+        "resp_syst34_ch2",
+        "resp_syst35_ch2",
+        "resp_syst36_ch2",
+        "resp_syst37_ch2",
+        "resp_syst38_ch2",
+        "resp_syst39_ch2",
+        "resp_syst40_ch2",
+        "resp_syst41_ch2",
+        "resp_syst42_ch2",
+        "resp_syst43_ch2",
+        "resp_syst44_ch2",
+        "resp_syst45_ch2",
+        "resp_syst46_ch2",
+        "resp_syst47_ch2",
+        "resp_syst48_ch2",
+        "resp_syst49_ch2"
+      ],
+      "name": "nsig_tot_ch2",
+      "type": "product"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst0",
+      "name": "resp_syst0_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst1",
+      "name": "resp_syst1_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst2",
+      "name": "resp_syst2_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst3",
+      "name": "resp_syst3_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst4",
+      "name": "resp_syst4_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst5",
+      "name": "resp_syst5_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst6",
+      "name": "resp_syst6_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst7",
+      "name": "resp_syst7_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst8",
+      "name": "resp_syst8_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst9",
+      "name": "resp_syst9_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst10",
+      "name": "resp_syst10_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst11",
+      "name": "resp_syst11_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst12",
+      "name": "resp_syst12_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst13",
+      "name": "resp_syst13_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst14",
+      "name": "resp_syst14_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst15",
+      "name": "resp_syst15_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst16",
+      "name": "resp_syst16_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst17",
+      "name": "resp_syst17_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst18",
+      "name": "resp_syst18_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst19",
+      "name": "resp_syst19_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst20",
+      "name": "resp_syst20_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst21",
+      "name": "resp_syst21_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst22",
+      "name": "resp_syst22_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst23",
+      "name": "resp_syst23_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst24",
+      "name": "resp_syst24_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst25",
+      "name": "resp_syst25_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst26",
+      "name": "resp_syst26_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst27",
+      "name": "resp_syst27_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst28",
+      "name": "resp_syst28_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst29",
+      "name": "resp_syst29_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst30",
+      "name": "resp_syst30_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst31",
+      "name": "resp_syst31_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst32",
+      "name": "resp_syst32_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst33",
+      "name": "resp_syst33_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst34",
+      "name": "resp_syst34_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst35",
+      "name": "resp_syst35_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst36",
+      "name": "resp_syst36_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst37",
+      "name": "resp_syst37_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst38",
+      "name": "resp_syst38_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst39",
+      "name": "resp_syst39_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst40",
+      "name": "resp_syst40_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst41",
+      "name": "resp_syst41_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst42",
+      "name": "resp_syst42_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst43",
+      "name": "resp_syst43_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst44",
+      "name": "resp_syst44_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.07 * alpha_syst45",
+      "name": "resp_syst45_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.03 * alpha_syst46",
+      "name": "resp_syst46_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.04 * alpha_syst47",
+      "name": "resp_syst47_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.05 * alpha_syst48",
+      "name": "resp_syst48_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "1.0 + 0.06 * alpha_syst49",
+      "name": "resp_syst49_ch2",
+      "type": "generic_function"
+    },
+    {
+      "expression": "sigma_nom_ch2 * (1.0 + 0.1 * alpha_sigma)",
+      "name": "sigma_ch2",
+      "type": "generic_function"
+    }
+  ],
+  "likelihoods": [
+    {
+      "data": [
+        "combData_ch0",
+        "combData_ch1",
+        "combData_ch2"
+      ],
+      "distributions": [
+        "model_ch0",
+        "model_ch1",
+        "model_ch2"
+      ],
+      "name": "sim_pdf_combData",
+      "aux_distributions": [
+        "constr_alpha_sigma",
+        "constr_alpha_syst0",
+        "constr_alpha_syst1",
+        "constr_alpha_syst10",
+        "constr_alpha_syst11",
+        "constr_alpha_syst12",
+        "constr_alpha_syst13",
+        "constr_alpha_syst14",
+        "constr_alpha_syst15",
+        "constr_alpha_syst16",
+        "constr_alpha_syst17",
+        "constr_alpha_syst18",
+        "constr_alpha_syst19",
+        "constr_alpha_syst2",
+        "constr_alpha_syst20",
+        "constr_alpha_syst21",
+        "constr_alpha_syst22",
+        "constr_alpha_syst23",
+        "constr_alpha_syst24",
+        "constr_alpha_syst25",
+        "constr_alpha_syst26",
+        "constr_alpha_syst27",
+        "constr_alpha_syst28",
+        "constr_alpha_syst29",
+        "constr_alpha_syst3",
+        "constr_alpha_syst30",
+        "constr_alpha_syst31",
+        "constr_alpha_syst32",
+        "constr_alpha_syst33",
+        "constr_alpha_syst34",
+        "constr_alpha_syst35",
+        "constr_alpha_syst36",
+        "constr_alpha_syst37",
+        "constr_alpha_syst38",
+        "constr_alpha_syst39",
+        "constr_alpha_syst4",
+        "constr_alpha_syst40",
+        "constr_alpha_syst41",
+        "constr_alpha_syst42",
+        "constr_alpha_syst43",
+        "constr_alpha_syst44",
+        "constr_alpha_syst45",
+        "constr_alpha_syst46",
+        "constr_alpha_syst47",
+        "constr_alpha_syst48",
+        "constr_alpha_syst49",
+        "constr_alpha_syst5",
+        "constr_alpha_syst6",
+        "constr_alpha_syst7",
+        "constr_alpha_syst8",
+        "constr_alpha_syst9"
+      ],
+      "aux_data": [
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data",
+        "global_obs_data"
+      ]
+    }
+  ],
+  "metadata": {
+    "hs3_version": "0.2",
+    "packages": [
+      {
+        "name": "ROOT",
+        "version": "6.36.02"
+      }
+    ]
+  },
+  "misc": {
+    "ROOT_internal": {
+      "ModelConfigs": {
+        "sim_pdf_combData": {
+          "mcName": "ModelConfig",
+          "pdfName": "sim_pdf"
+        }
+      },
+      "attributes": {
+        "alpha_sigma": {
+          "dict": {
+            "origName": "alpha_sigma"
+          }
+        },
+        "alpha_syst0": {
+          "dict": {
+            "origName": "alpha_syst0"
+          }
+        },
+        "alpha_syst1": {
+          "dict": {
+            "origName": "alpha_syst1"
+          }
+        },
+        "alpha_syst10": {
+          "dict": {
+            "origName": "alpha_syst10"
+          }
+        },
+        "alpha_syst11": {
+          "dict": {
+            "origName": "alpha_syst11"
+          }
+        },
+        "alpha_syst12": {
+          "dict": {
+            "origName": "alpha_syst12"
+          }
+        },
+        "alpha_syst13": {
+          "dict": {
+            "origName": "alpha_syst13"
+          }
+        },
+        "alpha_syst14": {
+          "dict": {
+            "origName": "alpha_syst14"
+          }
+        },
+        "alpha_syst15": {
+          "dict": {
+            "origName": "alpha_syst15"
+          }
+        },
+        "alpha_syst16": {
+          "dict": {
+            "origName": "alpha_syst16"
+          }
+        },
+        "alpha_syst17": {
+          "dict": {
+            "origName": "alpha_syst17"
+          }
+        },
+        "alpha_syst18": {
+          "dict": {
+            "origName": "alpha_syst18"
+          }
+        },
+        "alpha_syst19": {
+          "dict": {
+            "origName": "alpha_syst19"
+          }
+        },
+        "alpha_syst2": {
+          "dict": {
+            "origName": "alpha_syst2"
+          }
+        },
+        "alpha_syst20": {
+          "dict": {
+            "origName": "alpha_syst20"
+          }
+        },
+        "alpha_syst21": {
+          "dict": {
+            "origName": "alpha_syst21"
+          }
+        },
+        "alpha_syst22": {
+          "dict": {
+            "origName": "alpha_syst22"
+          }
+        },
+        "alpha_syst23": {
+          "dict": {
+            "origName": "alpha_syst23"
+          }
+        },
+        "alpha_syst24": {
+          "dict": {
+            "origName": "alpha_syst24"
+          }
+        },
+        "alpha_syst25": {
+          "dict": {
+            "origName": "alpha_syst25"
+          }
+        },
+        "alpha_syst26": {
+          "dict": {
+            "origName": "alpha_syst26"
+          }
+        },
+        "alpha_syst27": {
+          "dict": {
+            "origName": "alpha_syst27"
+          }
+        },
+        "alpha_syst28": {
+          "dict": {
+            "origName": "alpha_syst28"
+          }
+        },
+        "alpha_syst29": {
+          "dict": {
+            "origName": "alpha_syst29"
+          }
+        },
+        "alpha_syst3": {
+          "dict": {
+            "origName": "alpha_syst3"
+          }
+        },
+        "alpha_syst30": {
+          "dict": {
+            "origName": "alpha_syst30"
+          }
+        },
+        "alpha_syst31": {
+          "dict": {
+            "origName": "alpha_syst31"
+          }
+        },
+        "alpha_syst32": {
+          "dict": {
+            "origName": "alpha_syst32"
+          }
+        },
+        "alpha_syst33": {
+          "dict": {
+            "origName": "alpha_syst33"
+          }
+        },
+        "alpha_syst34": {
+          "dict": {
+            "origName": "alpha_syst34"
+          }
+        },
+        "alpha_syst35": {
+          "dict": {
+            "origName": "alpha_syst35"
+          }
+        },
+        "alpha_syst36": {
+          "dict": {
+            "origName": "alpha_syst36"
+          }
+        },
+        "alpha_syst37": {
+          "dict": {
+            "origName": "alpha_syst37"
+          }
+        },
+        "alpha_syst38": {
+          "dict": {
+            "origName": "alpha_syst38"
+          }
+        },
+        "alpha_syst39": {
+          "dict": {
+            "origName": "alpha_syst39"
+          }
+        },
+        "alpha_syst4": {
+          "dict": {
+            "origName": "alpha_syst4"
+          }
+        },
+        "alpha_syst40": {
+          "dict": {
+            "origName": "alpha_syst40"
+          }
+        },
+        "alpha_syst41": {
+          "dict": {
+            "origName": "alpha_syst41"
+          }
+        },
+        "alpha_syst42": {
+          "dict": {
+            "origName": "alpha_syst42"
+          }
+        },
+        "alpha_syst43": {
+          "dict": {
+            "origName": "alpha_syst43"
+          }
+        },
+        "alpha_syst44": {
+          "dict": {
+            "origName": "alpha_syst44"
+          }
+        },
+        "alpha_syst45": {
+          "dict": {
+            "origName": "alpha_syst45"
+          }
+        },
+        "alpha_syst46": {
+          "dict": {
+            "origName": "alpha_syst46"
+          }
+        },
+        "alpha_syst47": {
+          "dict": {
+            "origName": "alpha_syst47"
+          }
+        },
+        "alpha_syst48": {
+          "dict": {
+            "origName": "alpha_syst48"
+          }
+        },
+        "alpha_syst49": {
+          "dict": {
+            "origName": "alpha_syst49"
+          }
+        },
+        "alpha_syst5": {
+          "dict": {
+            "origName": "alpha_syst5"
+          }
+        },
+        "alpha_syst6": {
+          "dict": {
+            "origName": "alpha_syst6"
+          }
+        },
+        "alpha_syst7": {
+          "dict": {
+            "origName": "alpha_syst7"
+          }
+        },
+        "alpha_syst8": {
+          "dict": {
+            "origName": "alpha_syst8"
+          }
+        },
+        "alpha_syst9": {
+          "dict": {
+            "origName": "alpha_syst9"
+          }
+        },
+        "mean_ch0": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "mean_ch1": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "mean_ch2": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_sigma": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst0": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst1": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst10": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst11": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst12": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst13": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst14": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst15": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst16": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst17": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst18": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst19": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst2": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst20": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst21": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst22": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst23": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst24": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst25": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst26": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst27": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst28": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst29": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst3": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst30": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst31": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst32": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst33": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst34": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst35": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst36": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst37": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst38": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst39": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst4": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst40": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst41": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst42": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst43": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst44": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst45": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst46": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst47": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst48": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst49": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst5": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst6": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst7": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst8": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nom_alpha_syst9": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nsig_ch0": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nsig_ch1": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "nsig_ch2": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "sigma_constr": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "sigma_constr_syst": {
+          "tags": [
+            "Constant"
+          ]
+        },
+        "sigma_nom_ch0": {
+          "dict": {
+            "origName": "sigma_nom_ch0"
+          },
+          "tags": [
+            "Constant"
+          ]
+        },
+        "sigma_nom_ch1": {
+          "dict": {
+            "origName": "sigma_nom_ch1"
+          },
+          "tags": [
+            "Constant"
+          ]
+        },
+        "sigma_nom_ch2": {
+          "dict": {
+            "origName": "sigma_nom_ch2"
+          },
+          "tags": [
+            "Constant"
+          ]
+        }
+      },
+      "combined_datasets": {
+        "combData": {
+          "index_cat": "index",
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "labels": [
+            "ch0",
+            "ch1",
+            "ch2"
+          ]
+        }
+      },
+      "combined_distributions": {
+        "sim_pdf": {
+          "distributions": [
+            "model_ch0",
+            "model_ch1",
+            "model_ch2"
+          ],
+          "index_cat": "index",
+          "indices": [
+            0,
+            1,
+            2
+          ],
+          "labels": [
+            "ch0",
+            "ch1",
+            "ch2"
+          ]
+        }
+      }
+    }
+  },
+  "parameter_points": [
+    {
+      "name": "default_values",
+      "parameters": [
+        {
+          "name": "nom_alpha_sigma",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_sigma",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "sigma_constr",
+          "value": 1.0
+        },
+        {
+          "name": "nom_alpha_syst0",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst0",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "sigma_constr_syst",
+          "value": 1.0
+        },
+        {
+          "name": "nom_alpha_syst1",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst1",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst10",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst10",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst11",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst11",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst12",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst12",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst13",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst13",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst14",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst14",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst15",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst15",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst16",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst16",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst17",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst17",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst18",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst18",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst19",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst19",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst2",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst2",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst20",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst20",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst21",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst21",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst22",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst22",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst23",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst23",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst24",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst24",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst25",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst25",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst26",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst26",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst27",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst27",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst28",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst28",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst29",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst29",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst3",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst3",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst30",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst30",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst31",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst31",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst32",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst32",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst33",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst33",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst34",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst34",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst35",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst35",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst36",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst36",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst37",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst37",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst38",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst38",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst39",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst39",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst4",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst4",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst40",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst40",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst41",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst41",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst42",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst42",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst43",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst43",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst44",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst44",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst45",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst45",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst46",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst46",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst47",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst47",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst48",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst48",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst49",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst49",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst5",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst5",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst6",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst6",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst7",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst7",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst8",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst8",
+          "value": 0.0
+        },
+        {
+          "name": "nom_alpha_syst9",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst9",
+          "value": 0.0
+        },
+        {
+          "name": "tau_ch0",
+          "value": 0.3
+        },
+        {
+          "name": "nbkg_ch0",
+          "value": 23.0
+        },
+        {
+          "name": "mu_sig",
+          "value": 1.0
+        },
+        {
+          "const": true,
+          "name": "nsig_ch0",
+          "value": 7.0
+        },
+        {
+          "const": true,
+          "name": "mean_ch0",
+          "value": 15.0
+        },
+        {
+          "const": true,
+          "name": "sigma_nom_ch0",
+          "value": 1.0
+        },
+        {
+          "name": "tau_ch1",
+          "value": 0.25
+        },
+        {
+          "name": "nbkg_ch1",
+          "value": 23.0
+        },
+        {
+          "const": true,
+          "name": "nsig_ch1",
+          "value": 7.0
+        },
+        {
+          "const": true,
+          "name": "mean_ch1",
+          "value": 15.0
+        },
+        {
+          "const": true,
+          "name": "sigma_nom_ch1",
+          "value": 0.9
+        },
+        {
+          "name": "tau_ch2",
+          "value": 0.35
+        },
+        {
+          "name": "nbkg_ch2",
+          "value": 23.0
+        },
+        {
+          "const": true,
+          "name": "nsig_ch2",
+          "value": 7.0
+        },
+        {
+          "const": true,
+          "name": "mean_ch2",
+          "value": 15.0
+        },
+        {
+          "const": true,
+          "name": "sigma_nom_ch2",
+          "value": 1.1
+        }
+      ]
+    },
+    {
+      "name": "nominal",
+      "parameters": [
+        {
+          "name": "alpha_sigma",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst0",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst1",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst10",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst11",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst12",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst13",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst14",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst15",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst16",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst17",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst18",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst19",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst2",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst20",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst21",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst22",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst23",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst24",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst25",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst26",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst27",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst28",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst29",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst3",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst30",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst31",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst32",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst33",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst34",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst35",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst36",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst37",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst38",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst39",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst4",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst40",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst41",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst42",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst43",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst44",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst45",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst46",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst47",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst48",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst49",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst5",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst6",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst7",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst8",
+          "value": 0.0
+        },
+        {
+          "name": "alpha_syst9",
+          "value": 0.0
+        },
+        {
+          "name": "mu_sig",
+          "value": 1.0
+        },
+        {
+          "name": "nbkg_ch0",
+          "value": 23.0
+        },
+        {
+          "name": "nbkg_ch1",
+          "value": 23.0
+        },
+        {
+          "name": "nbkg_ch2",
+          "value": 23.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_sigma",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst0",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst1",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst10",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst11",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst12",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst13",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst14",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst15",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst16",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst17",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst18",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst19",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst2",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst20",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst21",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst22",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst23",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst24",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst25",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst26",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst27",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst28",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst29",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst3",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst30",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst31",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst32",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst33",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst34",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst35",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst36",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst37",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst38",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst39",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst4",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst40",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst41",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst42",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst43",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst44",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst45",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst46",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst47",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst48",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst49",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst5",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst6",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst7",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst8",
+          "value": 0.0
+        },
+        {
+          "const": true,
+          "name": "nom_alpha_syst9",
+          "value": 0.0
+        },
+        {
+          "name": "tau_ch0",
+          "value": 0.3
+        },
+        {
+          "name": "tau_ch1",
+          "value": 0.25
+        },
+        {
+          "name": "tau_ch2",
+          "value": 0.35
+        }
+      ]
+    }
+  ]
+}

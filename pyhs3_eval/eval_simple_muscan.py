@@ -557,6 +557,7 @@ def run_scan(
         "max_abs_resid": max_abs_resid,
         "qf_nlls": qf_nlls,
         "pyhs3_nlls": pyhs3_nlls,
+        "offset (N*ln(C))": offset,
     }
 
 
@@ -684,6 +685,7 @@ def main() -> None:
     if args.output_nll_json:
         with open(args.output_nll_json, "w") as f:
             json.dump(results, f, default=str, indent=2)
+            print(f"NLL output saved to {args.output_nll_json}")
      
     if args.plot_nll is not None:
         from plot_muscan_nll import plot_nll_curves  # noqa: PLC0415

@@ -101,7 +101,7 @@ def yields(ws, ch: str) -> tuple[float, float]:
     """Return (expected signal, expected background) yields for a channel
     from the current parameter values."""
     nsig = ws.function(f"nsig_tot_{ch}")
-    nbkg = ws.var(f"nbkg_{ch}")
+    nbkg = ws.function(f"nbkg_tot_{ch}") or ws.var(f"nbkg_{ch}")
     return (nsig.getVal() if nsig else float("nan"), nbkg.getVal() if nbkg else float("nan"))
 
 

@@ -89,7 +89,7 @@ beyond that a deterministic per-index formula) with observable `x` in [10, 20].
 | POI | `mu_sig` — signal strength, floated in [−5, 10] |
 | Unconstrained NPs | `tau_ch*` (bkg shape; held constant with `--fix-bkg-shape`), `nbkg_ch*` (bkg yield) |
 | Width NP | Shared signal-width nuisance — `alpha_sigma` (additive, ±10%/σ) or `gamma_sigma` (multiplicative), depending on the constraint form |
-| Yield-syst NPs | Optional (`--num-systs M`): shared Gaussian-constrained NPs `alpha_syst<j>` scaling every channel's signal yield via per-channel response factors `resp_syst<j>_<ch>` (3–7% per σ) |
+| Systematic NP groups | Optional, mixable: shared Gaussian-constrained NPs on the signal yield (`--num-sig-yield-systs` / `--num-systs`), signal width (`--num-sig-width-systs`), bkg normalization (`--num-bkg-norm-systs`), and bkg shape (`--num-bkg-shape-systs`), each entering per channel through a `FlexibleInterpVar` response `resp_<kind>_<ch>` (asymmetric 3–7% per σ, interpolation code `--interp-code`) |
 
 ### Signal-width nuisance parameter (`--constraint`)
 
@@ -101,18 +101,34 @@ beyond that a deterministic per-index formula) with observable `x` in [10, 20].
 
 `--no-np` drops the width NP entirely and fixes the signal width at nominal.
 
-### Yield systematics (`--num-systs M`)
+### Systematic NP groups
 
-`--num-systs M` adds `M` shared nuisance parameters `alpha_syst<j>` (j = 0…M−1),
-each unit-Gaussian constrained (`constr_alpha_syst<j>`, global observable
-`nom_alpha_syst<j>`) and entering every channel's signal yield as
-`nsig_tot_<ch> = mu_sig * nsig_<ch> * Π_j (1 + δ(j,ch) * alpha_syst<j>)` with
-`δ` varying between 3% and 7% by systematic and channel (so no systematic is
-degenerate with `mu_sig`). This approximates the many correlated constrained
-systematics of real workspaces for pyhs3 performance studies. It is independent
-of the width-NP flags (`--no-np`, `--constraint`), and the toy datasets are
-identical to the systs-less workspace for a given seed since all alphas sit at 0
-during generation.
+Four mixable flags each add `M` shared unit-Gaussian-constrained nuisance
+parameters of a given type (all default 0):
+
+| Flag | NPs | Target (per channel) |
+|------|-----|----------------------|
+| `--num-sig-yield-systs M` (alias `--num-systs`) | `alpha_syst<j>` | signal yield, via `nsig_tot_<ch>` |
+| `--num-sig-width-systs M` | `alpha_sig_width_syst<j>` | signal width, `sigma_<ch> = sigma_base_<ch> * resp_sig_width_<ch>` |
+| `--num-bkg-norm-systs M` | `alpha_bkg_norm_syst<j>` | bkg yield, `nbkg_tot_<ch> = nbkg_<ch> * resp_bkg_norm_<ch>` |
+| `--num-bkg-shape-systs M` | `alpha_bkg_shape_syst<j>` | bkg slope, `tau_eff_<ch> = tau_<ch> * resp_bkg_shape_<ch>` |
+
+Each NP is constrained by `constr_<np-name>` with global observable
+`nom_<np-name>`. A group's NPs enter a channel through a single multiplicative
+`RooStats::HistFactory::FlexibleInterpVar` response `resp_<kind>_<ch>`
+(nominal 1) holding per-NP asymmetric up/down variations: `δ_up` runs 3–7% by
+systematic and channel (so no systematic is degenerate with `mu_sig`) and
+`δ_down = δ_up × [0.8–1.2]`, both from a deterministic seed-independent
+formula. `--interp-code K` selects the HistFactory interpolation code applied
+to every response (0 = piecewise linear, 1 = piecewise exponential,
+2/3 = quadratic interp with linear/exp extrapolation, 4 = polynomial interp +
+exponential extrapolation — the HistFactory and script default). This
+approximates the many correlated constrained systematics of real workspaces for
+pyhs3 performance studies. The groups are independent of the width-NP flags
+(`--no-np`, `--constraint`), leave the free baselines `nbkg_<ch>`/`tau_<ch>`
+unconstrained, and the toy datasets are identical to the systs-less workspace
+for a given seed since all alphas sit at 0 during generation (where every
+interp code evaluates to the nominal).
 
 The constraint PDF is supplied to quickFit via `--externalConstraint` (not
 wrapped in a `RooProdPdf`, which breaks extended-likelihood evaluation for
@@ -128,8 +144,9 @@ silently break detection elsewhere:
   `x`, category `index`, POI `mu_sig`.
 - Per-channel objects `tau_<ch>`, `bkg_<ch>`, `sig_<ch>`, `nbkg_<ch>`,
   `model_<ch>`.
-- Yield systematics (`--num-systs`): `alpha_syst<j>`, `constr_alpha_syst<j>`,
-  `nom_alpha_syst<j>`, `resp_syst<j>_<ch>`.
+- Systematic NP groups: `alpha_syst<j>` (sig-yield, legacy names) and
+  `alpha_{sig_width,bkg_norm,bkg_shape}_syst<j>`, with `constr_<np-name>`,
+  `nom_<np-name>`, and per-channel responses `resp_<kind>_<ch>`.
 - Constraint PDFs are named `constr_*`; the fit/scan scripts pass all of them via
   `--externalConstraint`, and `export_hs3.py` detects them structurally.
 
@@ -140,10 +157,12 @@ each `make_workspace.py` option is spelled out in a fixed order, so comparing tw
 names shows exactly which aspects differ:
 
 ```
-<N>ch_bkg{RooExp|GenExp|GenPoly}_sig{Gauss|Generic|DSCB}_shape{Float|Fixed}_np{On|Off}_constr{Gauss|Poisson|None}_yield<F>x[_systs<M>]
+<N>ch_bkg{RooExp|GenExp|GenPoly}_sig{Gauss|Generic|DSCB}_shape{Float|Fixed}_np{On|Off}_constr{Gauss|Poisson|None}_yield<F>x[_systs<M>][_wsysts<M>][_bnsysts<M>][_bssysts<M>][_interp<K>]
 ```
 
-(the `_systs<M>` suffix appears only when `--num-systs` is nonzero.)
+(the `_systs<M>`/`_wsysts<M>`/`_bnsysts<M>`/`_bssysts<M>` suffixes appear only
+when the corresponding count is nonzero, and `_interp<K>` only when
+`--interp-code` differs from 4 and at least one group is present.)
 
 For example `3ch_bkgRooExp_sigGauss_shapeFloat_npOn_constrGauss_yield1x` is the
 base variant. `pyhs3_eval/` and `workspace_comparison.sh` parse this stem.
@@ -170,7 +189,10 @@ python3 make_workspace.py --constraint poisson            # Poisson-constrained 
 python3 make_workspace.py --constraint none               # free width NP, no constraint
 python3 make_workspace.py --fix-bkg-shape                 # hold tau_ch constant
 python3 make_workspace.py --num-channels 100              # any number of channels
-python3 make_workspace.py --num-systs 20                  # 20 shared constrained yield NPs
+python3 make_workspace.py --num-systs 20                  # 20 shared constrained sig-yield NPs
+python3 make_workspace.py --num-bkg-norm-systs 5 \
+                          --num-bkg-shape-systs 5         # constrained bkg norm + shape NPs
+python3 make_workspace.py --num-systs 10 --interp-code 0  # piecewise-linear responses
 python3 make_workspace.py --yield-sf 10                   # scale all yields ×10
 python3 make_workspace.py --seed 123 --output my_ws.root
 ```
@@ -185,7 +207,11 @@ python3 make_workspace.py --seed 123 --output my_ws.root
 | `--fix-bkg-shape` | Hold `tau_ch` constant so the bkg shape is frozen during the scan |
 | `--constraint {gauss,poisson,none}` | Constraint form for the width NP (default `gauss`) |
 | `--num-channels N` | Number of channels (default 3, no upper limit; first 30 from the hardcoded table, beyond that a deterministic formula) |
-| `--num-systs M` | Add `M` shared Gaussian-constrained yield-systematic NPs (default 0) |
+| `--num-sig-yield-systs M` / `--num-systs M` | Add `M` shared Gaussian-constrained signal-yield systematic NPs (default 0) |
+| `--num-sig-width-systs M` | Add `M` shared signal-width systematic NPs (default 0) |
+| `--num-bkg-norm-systs M` | Add `M` shared background-normalization systematic NPs (default 0) |
+| `--num-bkg-shape-systs M` | Add `M` shared background-shape systematic NPs (default 0) |
+| `--interp-code K` | HistFactory interpolation code for all systematic responses, 0–4 (default 4) |
 | `--yield-sf F` | Scale all signal and background yields by `F` (default 1.0) |
 | `--seed N` | Random seed for toy generation (default 42) |
 | `--output NAME.root` | Output file (default: auto-derived from options) |

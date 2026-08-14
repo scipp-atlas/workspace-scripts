@@ -47,10 +47,15 @@ ok()   { printf '\033[1;32m  ✓ %s\033[0m\n' "$*"; }
 #   np<State>        width nuisance parameter          (On | Off; --no-np)
 #   constr<Type>     constraint form                   (Gauss | Poisson | None; --constraint)
 #   yield<SF>x       yield scale factor                (--yield-sf, default 1)
-#   systs<M>         yield-systematic NPs, only if M>0 (--num-systs, default 0)
+#   systs<M>         sig-yield systematic NPs, if M>0  (--num-sig-yield-systs / --num-systs)
+#   wsysts<M>        sig-width systematic NPs, if M>0  (--num-sig-width-systs)
+#   bnsysts<M>       bkg-norm systematic NPs, if M>0   (--num-bkg-norm-systs)
+#   bssysts<M>       bkg-shape systematic NPs, if M>0  (--num-bkg-shape-systs)
+#   interp<K>        interpolation code, if K!=4 and any systs (--interp-code)
 canonical_stem() {
     local channels=3 bkg_pdf="RooExp" bkg_form="exp" sig_pdf="Gauss" sig_form="gauss"
     local bkg_shape="Float" np="On" constr="gauss" yield_sf="1" systs=0
+    local wsysts=0 bnsysts=0 bssysts=0 interp=4
 
     set -- $1
     while [[ $# -gt 0 ]]; do
@@ -64,7 +69,15 @@ canonical_stem() {
             --constraint)    constr="${2:?$1 requires a value (check VARIANTS quoting)}";    shift 2 ;;
             --yield-sf)      yield_sf="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
             --num-channels)  channels="${2:?$1 requires a value (check VARIANTS quoting)}";  shift 2 ;;
-            --num-systs)     systs="${2:?$1 requires a value (check VARIANTS quoting)}";     shift 2 ;;
+            --num-sig-yield-systs|--num-systs)
+                             systs="${2:?$1 requires a value (check VARIANTS quoting)}";     shift 2 ;;
+            --num-sig-width-systs)
+                             wsysts="${2:?$1 requires a value (check VARIANTS quoting)}";    shift 2 ;;
+            --num-bkg-norm-systs)
+                             bnsysts="${2:?$1 requires a value (check VARIANTS quoting)}";   shift 2 ;;
+            --num-bkg-shape-systs)
+                             bssysts="${2:?$1 requires a value (check VARIANTS quoting)}";   shift 2 ;;
+            --interp-code)   interp="${2:?$1 requires a value (check VARIANTS quoting)}";    shift 2 ;;
             *)               shift ;;
         esac
     done
@@ -98,6 +111,18 @@ canonical_stem() {
         "$constr_label" "${yield_sf/./p}")
     if [[ $systs != 0 ]]; then
         stem+="_systs${systs}"
+    fi
+    if [[ $wsysts != 0 ]]; then
+        stem+="_wsysts${wsysts}"
+    fi
+    if [[ $bnsysts != 0 ]]; then
+        stem+="_bnsysts${bnsysts}"
+    fi
+    if [[ $bssysts != 0 ]]; then
+        stem+="_bssysts${bssysts}"
+    fi
+    if [[ $interp != 4 && ( $systs != 0 || $wsysts != 0 || $bnsysts != 0 || $bssysts != 0 ) ]]; then
+        stem+="_interp${interp}"
     fi
     printf '%s' "$stem"
 }
@@ -140,6 +165,14 @@ VARIANTS=(
     "--num-systs 5"
     "--num-systs 20"
     "--num-systs 50"
+
+    # per-type systematic NP groups and interpolation codes:
+    "--num-sig-width-systs 5"
+    "--num-bkg-norm-systs 5"
+    "--num-bkg-shape-systs 5"
+    "--num-systs 5 --num-sig-width-systs 3 --num-bkg-norm-systs 3 --num-bkg-shape-systs 3"
+    "--num-systs 20 --interp-code 0"
+    "--num-channels 10 --num-systs 10 --num-bkg-norm-systs 10"
 
     # size products approximating real (bbyy-like) workspaces:
     "--num-channels 10 --num-systs 20"

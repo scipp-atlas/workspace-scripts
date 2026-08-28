@@ -71,13 +71,34 @@ def fix_exponential_functions(doc: dict) -> dict:
         return doc
 
     # Only act on inversions that are referenced as 'c' in an exponential_dist.
-    # Replace those c references with the underlying variable name.
+    # Replace those c references with the underlying variable name. The negated
+    # name may itself be a function rather than a variable (with bkg-shape
+    # systs the slope is tau_eff_<ch> = tau_<ch> * resp_bkg_shape_<ch>); then
+    # the sign flip must land on the single variable factor of that product —
+    # flipping nothing would silently leave c negative (a rising exponential).
+    funcs_by_name = {f["name"]: f for f in doc.get("functions", [])}
+    param_names = {
+        p["name"] for pp in doc.get("parameter_points", []) for p in pp.get("parameters", [])
+    }
     affected_vars: set[str] = set()
     for dist in doc.get("distributions", []):
         if dist.get("type") == "exponential_dist" and dist.get("c") in inversions:
             orig = inversions[dist["c"]]
+            target = orig
+            if orig not in param_names:
+                fn = funcs_by_name.get(orig)
+                var_factors = (
+                    [f for f in fn.get("factors", []) if f in param_names]
+                    if fn is not None and fn.get("type") == "product"
+                    else []
+                )
+                if len(var_factors) != 1:
+                    # Can't identify a unique variable to flip; keep ROOT's
+                    # inversion intermediate for this distribution.
+                    continue
+                target = var_factors[0]
             dist["c"] = orig
-            affected_vars.add(orig)
+            affected_vars.add(target)
 
     if not affected_vars:
         return doc

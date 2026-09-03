@@ -19,18 +19,27 @@ Systematic uncertainty (with --np, the default):
                  sigma_ch = sigma_nom_ch * (1 + SIGMA_DELTA * alpha_sigma)
                  Shared across all channels (correlated).
 
-Yield systematics (--num-systs M, default 0):
-  alpha_syst<j> (j = 0..M-1): shared unit-Gaussian-constrained NPs, each scaling
-  every channel's signal yield through a per-channel response factor
-  resp_syst<j>_<ch> = 1 + delta(j, ch) * alpha_syst<j>, delta in 3-7%.
-  Constraints are named constr_alpha_syst<j> (auto-detected downstream).
-  Independent of the width NP flags; alphas sit at 0 during toy generation, so
-  datasets are identical to the systs-less workspace for a given seed.
+Systematic NP groups (all default 0, freely mixable):
+  --num-sig-yield-systs M (alias --num-systs): alpha_syst<j> scaling nsig_tot_<ch>
+  --num-sig-width-systs M : alpha_sig_width_syst<j> scaling sigma_<ch>
+  --num-bkg-norm-systs  M : alpha_bkg_norm_syst<j> scaling the bkg yield
+  --num-bkg-shape-systs M : alpha_bkg_shape_syst<j> scaling the bkg slope tau
+  Each group's NPs are shared unit-Gaussian-constrained (constraints named
+  constr_<np-name>, auto-detected downstream) and enter each channel through a
+  single multiplicative RooStats::HistFactory::FlexibleInterpVar response
+  resp_<kind>_<ch> (nominal 1, asymmetric per-syst/per-channel up/down
+  variations of 3-7% from _syst_deltas, HistFactory interpolation code from
+  --interp-code, default 4). Alphas sit at 0 during toy generation and every
+  interp code evaluates to 1 there, so datasets are identical to the
+  systs-less workspace for a given seed.
+  Note: the pre-FlexibleInterpVar model multiplied independent per-syst
+  factors (1 + delta_j*alpha_j); a group response with code 0 combines
+  additively (1 + sum_j delta_j*alpha_j), differing at O(delta^2).
 
 POI  : mu_sig       (signal strength, floated in fit)
 NPs  : tau_ch{0,1,2}, nbkg_ch{0,1,2}  (unconstrained)
        alpha_sigma                     (Gaussian constrained, --np only)
-       alpha_syst{0..M-1}              (Gaussian constrained, --num-systs M)
+       alpha_*syst{0..M-1}             (Gaussian constrained, per-group flags)
 Fixed: mean_ch*, sigma_nom_ch*, nsig_ch*
 
 Expected yield per channel at mu_sig=1: ~30 events (7 signal + 23 background)
@@ -119,14 +128,29 @@ def get_channels(n: int) -> dict:
 # Relative uncertainty on signal width applied by alpha_sigma (±1σ → ±10%)
 SIGMA_DELTA = 0.10
 
-# Base relative yield effect of the shared systematics (--num-systs)
+# Base relative effect of the shared systematic groups
 SYST_DELTA_BASE = 0.03
 
+# Systematic group kinds; the index offsets the delta pattern so no two groups
+# apply identical variations to a channel.
+KIND_IDX = {"sig_yield": 0, "sig_width": 1, "bkg_norm": 2, "bkg_shape": 3}
 
-def _syst_delta(j: int, i: int) -> float:
-    """Relative yield effect of alpha_syst<j> on channel i: 3-7%, varying with
-    both indices so no syst is degenerate with mu_sig."""
-    return SYST_DELTA_BASE + 0.01 * ((j + 2 * i) % 5)
+
+def _syst_np_stem(kind: str) -> str:
+    """NP name stem for a group: alpha_syst for sig_yield (legacy contract,
+    --num-systs alias), alpha_<kind>_syst otherwise."""
+    return "alpha_syst" if kind == "sig_yield" else f"alpha_{kind}_syst"
+
+
+def _syst_deltas(kind_idx: int, j: int, i: int) -> tuple[float, float]:
+    """(delta_down, delta_up) for syst j of a group on channel i, deterministic
+    and seed-independent. delta_up is 3-7%, varying with both indices so no
+    syst is degenerate with mu_sig (identical to the historical symmetric
+    formula for kind_idx=0); delta_down = delta_up times an asymmetry factor
+    in 0.8-1.2 with a different stride so it stays non-degenerate."""
+    d_up = SYST_DELTA_BASE + 0.01 * ((j + 2 * i + kind_idx) % 5)
+    d_dn = d_up * (0.8 + 0.1 * ((j + 3 * i + kind_idx) % 5))
+    return d_dn, d_up
 
 POLY_SLOPE_INIT = -0.02
 POLY_SLOPE_LO = -0.049
@@ -140,11 +164,14 @@ DSCB_ALPHA_R = 2.0
 DSCB_N_R = 3.0
 
 
-def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
+def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, shape_resp=None, keep):
     """Return (shape_var, bkg_pdf).
 
     shape_var is named tau_<ch> for all forms so downstream scripts
-    (muscan/export/snapshot) find it unchanged.
+    (muscan/export/snapshot) find it unchanged. With shape_resp (the bkg-shape
+    FlexibleInterpVar response), the pdf slope becomes
+    tau_eff_<ch> = tau_<ch> * resp_bkg_shape_<ch>; tau_<ch> itself stays the
+    floating (or --fix-bkg-shape fixed) baseline parameter.
     """
     if generic_bkg and bkg_form == "poly":
         init, lo, hi = POLY_SLOPE_INIT, POLY_SLOPE_LO, POLY_SLOPE_HI
@@ -155,13 +182,20 @@ def build_background(ch, cfg, x, *, generic_bkg, bkg_form, fix_shape, keep):
     if fix_shape:
         tau.setConstant(True)
 
+    slope = tau
+    if shape_resp is not None:
+        slope = ROOT.RooProduct(
+            f"tau_eff_{ch}", f"effective bkg shape ({ch})", ROOT.RooArgList(tau, shape_resp)
+        )
+        keep[f"tau_eff_{ch}"] = slope
+
     if generic_bkg:
         expr = "1.0 + @1*@0" if bkg_form == "poly" else "exp(@1*@0)"
         bkg = ROOT.RooGenericPdf(
-            f"bkg_{ch}", f"background pdf ({ch})", expr, ROOT.RooArgList(x, tau)
+            f"bkg_{ch}", f"background pdf ({ch})", expr, ROOT.RooArgList(x, slope)
         )
     else:
-        bkg = ROOT.RooExponential(f"bkg_{ch}", f"background pdf ({ch})", x, tau)
+        bkg = ROOT.RooExponential(f"bkg_{ch}", f"background pdf ({ch})", x, slope)
 
     keep[f"tau_{ch}"] = tau
     keep[f"bkg_{ch}"] = bkg
@@ -251,30 +285,66 @@ def build_width_np(constraint, keep):
     return {"np": alpha, "constr": None, "global_ob": None, "kind": "add"}
 
 
-def build_syst_nps(num_systs, keep):
-    """Build the shared yield-systematic NPs (--num-systs), unit-Gaussian constrained.
+def build_syst_group(kind, count, keep):
+    """Build one group of shared systematic NPs, unit-Gaussian constrained.
 
-    Returns a list of dicts {"np", "constr", "global_ob"}, one per systematic.
-    Constraints are named constr_alpha_syst<j> so muscan.py / run_simple_fit.sh
-    auto-detect them; they are imported standalone (never in a RooProdPdf with
-    the RooSimultaneous — ROOT 6.30+ contract).
+    kind is a key of KIND_IDX; NPs are named per _syst_np_stem (alpha_syst<j>
+    for sig_yield — the legacy --num-systs contract — alpha_<kind>_syst<j>
+    otherwise). Returns a list of dicts {"np", "constr", "global_ob"}, one per
+    systematic. Constraints keep the constr_ prefix so muscan.py /
+    run_simple_fit.sh auto-detect them; they are imported standalone (never in
+    a RooProdPdf with the RooSimultaneous — ROOT 6.30+ contract). The Gaussian
+    arg order (glob, alpha, width) makes the global observable the constraint's
+    x, which export_hs3.py's structural detection requires. All groups share
+    the const unit width sigma_constr_syst.
     """
     infos = []
-    if num_systs <= 0:
+    if count <= 0:
         return infos
-    unit = ROOT.RooRealVar("sigma_constr_syst", "syst constraint width", 1.0)
-    unit.setConstant(True)
-    keep["sigma_constr_syst"] = unit
-    for j in range(num_systs):
-        alpha = ROOT.RooRealVar(f"alpha_syst{j}", f"yield syst NP {j}", 0.0, -5.0, 5.0)
-        glob = ROOT.RooRealVar(f"nom_alpha_syst{j}", f"global obs: yield syst {j}", 0.0)
+    unit = keep.get("sigma_constr_syst")
+    if unit is None:
+        unit = ROOT.RooRealVar("sigma_constr_syst", "syst constraint width", 1.0)
+        unit.setConstant(True)
+        keep["sigma_constr_syst"] = unit
+    stem = _syst_np_stem(kind)
+    label = kind.replace("_", " ")
+    for j in range(count):
+        alpha = ROOT.RooRealVar(f"{stem}{j}", f"{label} syst NP {j}", 0.0, -5.0, 5.0)
+        glob = ROOT.RooRealVar(f"nom_{stem}{j}", f"global obs: {label} syst {j}", 0.0)
         glob.setConstant(True)
         constr = ROOT.RooGaussian(
-            f"constr_alpha_syst{j}", f"Gaussian constraint on alpha_syst{j}", glob, alpha, unit
+            f"constr_{stem}{j}", f"Gaussian constraint on {stem}{j}", glob, alpha, unit
         )
         keep.update({alpha.GetName(): alpha, glob.GetName(): glob, constr.GetName(): constr})
         infos.append({"np": alpha, "constr": constr, "global_ob": glob})
     return infos
+
+
+def build_group_response(kind, ch, ch_idx, infos, interp_code, keep):
+    """Build the per-channel response factor for one systematic group.
+
+    A single RooStats::HistFactory::FlexibleInterpVar resp_<kind>_<ch> holds
+    every NP of the group: nominal 1.0, per-NP low/high = 1 -/+ the asymmetric
+    deltas from _syst_deltas, with interp_code applied to all NPs. It is folded
+    multiplicatively into the target quantity by the caller. Returns None when
+    the group is empty.
+    """
+    if not infos:
+        return None
+    nps = ROOT.RooArgList()
+    low = ROOT.std.vector("double")()
+    high = ROOT.std.vector("double")()
+    for j, sinfo in enumerate(infos):
+        d_dn, d_up = _syst_deltas(KIND_IDX[kind], j, ch_idx)
+        nps.add(sinfo["np"])
+        low.push_back(1.0 - d_dn)
+        high.push_back(1.0 + d_up)
+    resp = ROOT.RooStats.HistFactory.FlexibleInterpVar(
+        f"resp_{kind}_{ch}", f"{kind.replace('_', ' ')} response ({ch})", nps, 1.0, low, high
+    )
+    resp.setAllInterpCodes(interp_code)
+    keep[f"resp_{kind}_{ch}"] = resp
+    return resp
 
 
 def build_workspace(
@@ -288,7 +358,11 @@ def build_workspace(
     constraint: str = "gauss",
     yield_sf: float = 1.0,
     num_channels: int = 3,
-    num_systs: int = 0,
+    num_sig_yield_systs: int = 0,
+    num_sig_width_systs: int = 0,
+    num_bkg_norm_systs: int = 0,
+    num_bkg_shape_systs: int = 0,
+    interp_code: int = 4,
 ) -> ROOT.RooWorkspace:
     """Build the workspace."""
     ROOT.gRandom.SetSeed(seed)
@@ -306,7 +380,16 @@ def build_workspace(
 
     _keep = {}
     np_info = build_width_np(constraint, _keep) if with_np else None
-    syst_infos = build_syst_nps(num_systs, _keep)
+    syst_groups = {
+        kind: build_syst_group(kind, count, _keep)
+        for kind, count in (
+            ("sig_yield", num_sig_yield_systs),
+            ("sig_width", num_sig_width_systs),
+            ("bkg_norm", num_bkg_norm_systs),
+            ("bkg_shape", num_bkg_shape_systs),
+        )
+    }
+    all_syst_infos = [info for infos in syst_groups.values() for info in infos]
 
     # ── Signal-width systematic (only when with_np=True) ────────────────────
     # Convention follows HS3: constraint PDF is Gaussian(x=nom, mean=alpha, sigma).
@@ -321,9 +404,24 @@ def build_workspace(
     np_vars: list[ROOT.RooRealVar] = []
 
     for ch, cfg in channels.items():
+        ch_idx = int(ch[2:])
+
+        # Per-group FlexibleInterpVar response factors (None for empty groups)
+        resp = {
+            kind: build_group_response(kind, ch, ch_idx, infos, interp_code, _keep)
+            for kind, infos in syst_groups.items()
+        }
+
         # Background: exp(tau*x)
         tau, bkg = build_background(
-            ch, cfg, x, generic_bkg=generic_bkg, bkg_form=bkg_form, fix_shape=fix_shape, keep=_keep
+            ch,
+            cfg,
+            x,
+            generic_bkg=generic_bkg,
+            bkg_form=bkg_form,
+            fix_shape=fix_shape,
+            shape_resp=resp["bkg_shape"],
+            keep=_keep,
         )
 
         # Signal: Gaussian with fixed mean
@@ -332,23 +430,35 @@ def build_workspace(
         mean.setConstant(True)
         sigma_nom.setConstant(True)
 
-        # Effective width: depends on the NP form
+        # Effective width: depends on the NP form; when sig-width systs are on,
+        # the width-NP node becomes sigma_base_<ch> and sigma_<ch> is its
+        # product with the group response
+        width_resp = resp["sig_width"]
+        base_name = f"sigma_base_{ch}" if width_resp is not None else f"sigma_{ch}"
         if with_np and np_info["kind"] == "add":
-            # sigma_ch = sigma_nom_ch * (1 + SIGMA_DELTA * alpha_sigma)
-            sigma = ROOT.RooFormulaVar(
-                f"sigma_{ch}",
+            # sigma_nom_ch * (1 + SIGMA_DELTA * alpha_sigma)
+            sigma_base = ROOT.RooFormulaVar(
+                base_name,
                 f"signal sigma ({ch})",
                 f"@0 * (1.0 + {SIGMA_DELTA} * @1)",
                 ROOT.RooArgList(sigma_nom, np_info["np"]),
             )
-            _keep[f"sigma_{ch}"] = sigma
+            _keep[base_name] = sigma_base
         elif with_np and np_info["kind"] == "mul":
+            sigma_base = ROOT.RooProduct(
+                base_name, f"signal sigma ({ch})", ROOT.RooArgList(sigma_nom, np_info["np"])
+            )
+            _keep[base_name] = sigma_base
+        else:
+            sigma_base = sigma_nom  # fixed at nominal width
+
+        if width_resp is not None:
             sigma = ROOT.RooProduct(
-                f"sigma_{ch}", f"signal sigma ({ch})", ROOT.RooArgList(sigma_nom, np_info["np"])
+                f"sigma_{ch}", f"signal sigma ({ch})", ROOT.RooArgList(sigma_base, width_resp)
             )
             _keep[f"sigma_{ch}"] = sigma
         else:
-            sigma = sigma_nom  # fixed at nominal width
+            sigma = sigma_base
 
         sig = build_signal(
             ch, x, mean, sigma, generic_sig=generic_sig, sig_form=sig_form, keep=_keep
@@ -360,31 +470,33 @@ def build_workspace(
         )
         nsig_nom.setConstant(True)
 
-        # Scaled signal yield: mu_sig * nsig_nom * (per-syst response factors)
+        # Scaled signal yield: mu_sig * nsig_nom * (sig-yield group response)
         factors = ROOT.RooArgList(mu_sig, nsig_nom)
-        for j, sinfo in enumerate(syst_infos):
-            delta = _syst_delta(j, int(ch[2:]))
-            resp = ROOT.RooFormulaVar(
-                f"resp_syst{j}_{ch}",
-                f"syst {j} response ({ch})",
-                f"1.0 + {delta} * @0",
-                ROOT.RooArgList(sinfo["np"]),
-            )
-            _keep[f"resp_syst{j}_{ch}"] = resp
-            factors.add(resp)
+        if resp["sig_yield"] is not None:
+            factors.add(resp["sig_yield"])
         nsig_tot = ROOT.RooProduct(f"nsig_tot_{ch}", f"scaled signal yield ({ch})", factors)
 
-        # Floating background yield
+        # Floating background yield; the bkg-norm group response scales it
+        # without constraining the free nbkg_<ch> baseline
         nbkg = ROOT.RooRealVar(
             f"nbkg_{ch}", f"background yield ({ch})", cfg["nbkg"] * yield_sf, 0.0, 500.0 * yield_sf
         )
+        if resp["bkg_norm"] is not None:
+            nbkg_coef = ROOT.RooProduct(
+                f"nbkg_tot_{ch}",
+                f"scaled background yield ({ch})",
+                ROOT.RooArgList(nbkg, resp["bkg_norm"]),
+            )
+            _keep[f"nbkg_tot_{ch}"] = nbkg_coef
+        else:
+            nbkg_coef = nbkg
 
         # Extended sum PDF
         model = ROOT.RooAddPdf(
             f"model_{ch}",
             f"full model ({ch})",
             ROOT.RooArgList(sig, bkg),
-            ROOT.RooArgList(nsig_tot, nbkg),
+            ROOT.RooArgList(nsig_tot, nbkg_coef),
         )
 
         channel_pdfs[ch] = model
@@ -444,7 +556,7 @@ def build_workspace(
     wsImport(sim_pdf, ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
     if with_np and np_info["constr"] is not None:
         wsImport(np_info["constr"], ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
-    for sinfo in syst_infos:
+    for sinfo in all_syst_infos:
         wsImport(sinfo["constr"], ROOT.RooFit.RecycleConflictNodes(), ROOT.RooFit.Silence())
     wsImport(combined_data, ROOT.RooFit.Silence())
 
@@ -461,13 +573,13 @@ def build_workspace(
             np_argset.add(ws_var)
     if with_np:
         np_argset.add(ws.var(np_info["np"].GetName()))
-    for sinfo in syst_infos:
+    for sinfo in all_syst_infos:
         np_argset.add(ws.var(sinfo["np"].GetName()))
     mc.SetNuisanceParameters(np_argset)
     glob_argset = ROOT.RooArgSet()
     if with_np and np_info["global_ob"] is not None:
         glob_argset.add(ws.var(np_info["global_ob"].GetName()))
-    for sinfo in syst_infos:
+    for sinfo in all_syst_infos:
         glob_argset.add(ws.var(sinfo["global_ob"].GetName()))
     if glob_argset.getSize() > 0:
         mc.SetGlobalObservables(glob_argset)
@@ -481,7 +593,7 @@ def build_workspace(
         snap_vars.add(ws.var(np_info["np"].GetName()))
         if np_info["global_ob"] is not None:
             snap_vars.add(ws.var(np_info["global_ob"].GetName()))
-    for sinfo in syst_infos:
+    for sinfo in all_syst_infos:
         snap_vars.add(ws.var(sinfo["np"].GetName()))
         snap_vars.add(ws.var(sinfo["global_ob"].GetName()))
     for ch in channels:
@@ -507,7 +619,11 @@ def _output_stem(
     constraint: str,
     yield_sf: float = 1.0,
     num_channels: int = 3,
-    num_systs: int = 0,
+    num_sig_yield_systs: int = 0,
+    num_sig_width_systs: int = 0,
+    num_bkg_norm_systs: int = 0,
+    num_bkg_shape_systs: int = 0,
+    interp_code: int = 4,
 ) -> str:
     """Derive a default workspace file stem from the build options.
 
@@ -537,8 +653,17 @@ def _output_stem(
         stem += "_nonp"
     if yield_sf != 1.0:
         stem += f"_yield{yield_sf:g}x".replace(".", "p")
-    if num_systs:
-        stem += f"_systs{num_systs}"
+    if num_sig_yield_systs:
+        stem += f"_systs{num_sig_yield_systs}"
+    if num_sig_width_systs:
+        stem += f"_wsysts{num_sig_width_systs}"
+    if num_bkg_norm_systs:
+        stem += f"_bnsysts{num_bkg_norm_systs}"
+    if num_bkg_shape_systs:
+        stem += f"_bssysts{num_bkg_shape_systs}"
+    any_systs = num_sig_yield_systs or num_sig_width_systs or num_bkg_norm_systs or num_bkg_shape_systs
+    if interp_code != 4 and any_systs:
+        stem += f"_interp{interp_code}"
     return stem
 
 
@@ -604,11 +729,51 @@ def main() -> None:
         "use the hardcoded CHANNELS table, beyond that a deterministic formula)",
     )
     parser.add_argument(
+        "--num-sig-yield-systs",
         "--num-systs",
+        dest="num_sig_yield_systs",
         type=int,
         default=0,
-        help="add M shared Gaussian-constrained yield-systematic NPs (alpha_syst<j>), "
-        "each scaling every channel's signal yield by a per-channel response factor",
+        metavar="M",
+        help="add M shared Gaussian-constrained signal-yield systematic NPs "
+        "(alpha_syst<j>) entering each channel via the FlexibleInterpVar response "
+        "resp_sig_yield_<ch> (--num-systs is a backward-compatible alias)",
+    )
+    parser.add_argument(
+        "--num-sig-width-systs",
+        type=int,
+        default=0,
+        metavar="M",
+        help="add M shared signal-width systematic NPs (alpha_sig_width_syst<j>) "
+        "scaling sigma_<ch> via resp_sig_width_<ch>",
+    )
+    parser.add_argument(
+        "--num-bkg-norm-systs",
+        type=int,
+        default=0,
+        metavar="M",
+        help="add M shared background-normalization systematic NPs "
+        "(alpha_bkg_norm_syst<j>) scaling the bkg yield via resp_bkg_norm_<ch> "
+        "(nbkg_<ch> itself stays free)",
+    )
+    parser.add_argument(
+        "--num-bkg-shape-systs",
+        type=int,
+        default=0,
+        metavar="M",
+        help="add M shared background-shape systematic NPs "
+        "(alpha_bkg_shape_syst<j>) scaling the slope tau_<ch> via resp_bkg_shape_<ch>",
+    )
+    parser.add_argument(
+        "--interp-code",
+        type=int,
+        default=4,
+        choices=range(0, 5),
+        metavar="K",
+        help="HistFactory interpolation code for all systematic responses: "
+        "0=piecewise linear, 1=piecewise exponential, 2=quadratic interp/linear "
+        "extrap, 3=quadratic interp/exp extrap, 4=polynomial interp/exp extrap "
+        "(HistFactory default; default here too)",
     )
     args = parser.parse_args()
 
@@ -630,7 +795,11 @@ def main() -> None:
                 constraint=args.constraint,
                 yield_sf=args.yield_sf,
                 num_channels=args.num_channels,
-                num_systs=args.num_systs,
+                num_sig_yield_systs=args.num_sig_yield_systs,
+                num_sig_width_systs=args.num_sig_width_systs,
+                num_bkg_norm_systs=args.num_bkg_norm_systs,
+                num_bkg_shape_systs=args.num_bkg_shape_systs,
+                interp_code=args.interp_code,
             )
             + ".root"
         )
@@ -660,7 +829,11 @@ def main() -> None:
         constraint=args.constraint,
         yield_sf=args.yield_sf,
         num_channels=args.num_channels,
-        num_systs=args.num_systs,
+        num_sig_yield_systs=args.num_sig_yield_systs,
+        num_sig_width_systs=args.num_sig_width_systs,
+        num_bkg_norm_systs=args.num_bkg_norm_systs,
+        num_bkg_shape_systs=args.num_bkg_shape_systs,
+        interp_code=args.interp_code,
     )
 
     ws.Print("v")
@@ -674,7 +847,14 @@ def main() -> None:
         constr_names.append(
             "constr_gamma_sigma" if args.constraint == "poisson" else "constr_alpha_sigma"
         )
-    constr_names += [f"constr_alpha_syst{j}" for j in range(args.num_systs)]
+    for kind, count in (
+        ("sig_yield", args.num_sig_yield_systs),
+        ("sig_width", args.num_sig_width_systs),
+        ("bkg_norm", args.num_bkg_norm_systs),
+        ("bkg_shape", args.num_bkg_shape_systs),
+    ):
+        stem = _syst_np_stem(kind)
+        constr_names += [f"constr_{stem}{j}" for j in range(count)]
     if constr_names:
         print(
             f"           -p mu_sig=1_-5_10 --minos 1 --externalConstraint {','.join(constr_names)} \\"

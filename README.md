@@ -103,6 +103,8 @@ beyond that a deterministic per-index formula) with observable `x` in [10, 20].
 
 ### Systematic NP groups
 
+### Note this feature has not been extensively tested and there may be flaws in implementation
+
 Four mixable flags each add `M` shared unit-Gaussian-constrained nuisance
 parameters of a given type (all default 0):
 
